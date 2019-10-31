@@ -1,0 +1,10 @@
+VALID_EMAIL = 'kgoautomation@gmail.com'
+VALID_EMAIL_PASSWORD = 'LivePlanet16!'
+ACCOUNT_PASSWORD_DEFAULT = 'tester123'
+ACCOUNT_PASSWORD_01 = 'tester1234'
+NON_EXISTANT_EMAIL = 'not_a_real_email@fake.ru'
+INVALID_PASSWORD = 'not_a_real_password'
+SUPPORT_EMAIL = 'support@videocoin.network'
+PASSWORD_RECOVERY_SUBJECT = 'Password Recovery'
+# TODO: Crappy regex pls fix.
+PASSWORD_RECOVERY_REGEX = r'<a href=\"(.*)\" s.*>Reset Password</a>'

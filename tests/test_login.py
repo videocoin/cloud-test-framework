@@ -2,14 +2,13 @@ import requests
 
 from consts import endpoints
 from consts import expected_results
+from consts import input_values
 
-non_existant_email = 'not_a_real_email@fake.ru'
-invalid_password = 'not_a_real_password'
 
 def test_sign_in_with_non_existant_email_gives_error():
     body = {
-        'email': non_existant_email,
-        'password': invalid_password
+        'email': input_values.NON_EXISTANT_EMAIL,
+        'password': input_values.INVALID_PASSWORD
     }
 
     response = requests.post(endpoints.BASE_URL + endpoints.AUTH, json=body)
