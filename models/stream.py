@@ -1,5 +1,6 @@
 import requests
 from consts import endpoints
+
 class Stream:
     def __init__(self, token, id):
         self.token = token
