@@ -23,16 +23,22 @@ class StreamManager:
         # TODO: This always returns the same ID for all stream objects created
         # return [Stream(self.token, stream['id']) for stream in items]
 
-    def create_stream(self, name='', profile_name='720p'):
-        if name == '':
+    def create_stream(self, name=None, profile_name=None, profile_id=None):
+        """
+        profile_name is only a convenience argument
+        profile_id takes precedence over profile_name
+        """
+        if name == None:
             name = datetime.now().strftime("%m-%d-%Y@%H:%M:%S %p")
 
-        profile_id = ''
-        for profile in self._get_profile_ids():
-            if profile['name'] == profile_name:
-                profile_id = profile['id']
-        if not profile_id:
-            raise ValueError('Profile name does not exist')
+        if profile_id == None:
+            if profile_name == None:
+                profile_name = '720p'
+            for profile in self._get_profile_ids():
+                if profile['name'] == profile_name:
+                    profile_id = profile['id']
+            if not profile_id:
+                raise ValueError('Profile name does not exist')
 
         body = {
             'name': name,
