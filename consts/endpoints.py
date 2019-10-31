@@ -1,0 +1,5 @@
+BASE_URL = 'https://studio.snb.videocoin.network'
+AUTH = '/api/v1/auth'
+STREAM = '/api/v1/streams'
+USER = '/api/v1/user'
+PROFILE = '/api/v1/profiles'
