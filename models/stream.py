@@ -24,7 +24,7 @@ class Stream:
     def _get_headers(self):
         return {'Authorization': 'Bearer ' + self.token}
 
-    def _get_json(self):
+    def json(self):
         response = requests.get(endpoints.BASE_URL + endpoints.STREAM +
             '/' + self.id, headers=self.headers)
         response.raise_for_status()
@@ -33,50 +33,50 @@ class Stream:
 
     @property
     def name(self):
-        return self._get_json()['name']
+        return self.json()['name']
 
     @property
     def input_url(self):
-        return self._get_json()['input_url']
+        return self.json()['input_url']
 
     @property
     def output_url(self):
-        return self._get_json()['output_url']
+        return self.json()['output_url']
 
     @property
     def stream_contract_id(self):
-        return self._get_json()['stream_contract_id']
+        return self.json()['stream_contract_id']
 
     @property
     def stream_contract_address(self):
-        return self._get_json()['stream_contract_address']
+        return self.json()['stream_contract_address']
 
     @property
     def status(self):
-        return self._get_json()['status']
+        return self.json()['status']
 
     @property
     def input_status(self):
-        return self._get_json()['input_status']
+        return self.json()['input_status']
 
     @property
     def created_at(self):
         # TODO: Do I wanna wrap this in a datetime instance?
-        return self._get_json()['created_at']
+        return self.json()['created_at']
     
     @property
     def updated_at(self):
-        return self._get_json()['updated_at']
+        return self.json()['updated_at']
 
     @property
     def ready_at(self):
-        return self._get_json()['ready_at']
+        return self.json()['ready_at']
 
     @property
     def completed_at(self):
-        return self._get_json()['completed_at']
+        return self.json()['completed_at']
 
     @property
     def rtmp_url(self):
-        return self._get_json()['rtmp_url']
+        return self.json()['rtmp_url']
  

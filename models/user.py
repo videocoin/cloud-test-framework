@@ -13,8 +13,7 @@ class User:
     def __init__(self, token):
         self.token = token
         self.headers = self._get_headers()
-        self.json = self._get_json()
-        self.id = self._get_json()['id']
+        self.id = self.json()['id']
 
     def get_streams(self):
         response = requests.get(endpoints.BASE_URL + endpoints.STREAM,
@@ -38,12 +37,16 @@ class User:
         if name == None:
             name = datetime.now().strftime("%m-%d-%Y@%H:%M:%S %p")
 
+        output_profiles = self._get_output_profiles()
         if profile_id == None:
             if profile_name == None:
-                profile_name = '720p'
-            for profile in self._get_profile_ids():
-                if profile['name'] == profile_name:
-                    profile_id = profile['id']
+                # If profile_id nor profile_name is specified, assume
+                # user will take any profile (the first)
+                profile_id = output_profiles[0]['id']
+            else:
+                for profile in output_profiles:
+                    if profile['name'] == profile_name:
+                        profile_id = profile['id']
             if not profile_id:
                 raise ValueError('Profile name does not exist')
 
@@ -62,18 +65,19 @@ class User:
     # 1) An authenticated request
     # 2) Needs its response verified (make sure it doesn't have 404, 500, etc.)
     # Can I create some kind of decorator for these kinds of methods?
-    def _get_json(self):
+    # Maybe all 'test_objects' (like User and Stream) should implement a json()...
+    def json(self):
         response = requests.get(endpoints.BASE_URL + endpoints.USER,
             headers=self.headers)
         response.raise_for_status()
-        # TODO: Check that the response is good
+
         return response.json()
 
     def _get_headers(self):
         return {'Authorization': 'Bearer ' + self.token}
 
-    def _get_profile_ids(self):
+    def _get_output_profiles(self):
         response = requests.get(endpoints.BASE_URL + endpoints.PROFILE)
         response.raise_for_status()
-        # TODO: Make sure response is good
+
         return response.json()['items']
