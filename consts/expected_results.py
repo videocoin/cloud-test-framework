@@ -55,8 +55,7 @@ NEW_STREAM_INFORMATION = {
   'input_status': 'INPUT_STATUS_NONE',
   'created_at': '2019-10-31T23:49:05Z',
   'updated_at': '2019-10-31T23:49:05Z',
-  # TODO: Figure me out pls.
-  # 'ready_at': None,
-  # 'completed_at': None,
+  'ready_at': None,
+  'completed_at': None,
   'rtmp_url': 'rtmp://rtmp.studio.snb.videocoin.network:1935/live/93f9512c-e524-4027-45a3-7e96c62ac0ff'
 }

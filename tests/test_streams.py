@@ -29,7 +29,11 @@ def test_creating_valid_stream_has_correct_information(user):
         new_stream = user.create_stream()
         tested_keys = expected_results.NEW_STREAM_INFORMATION.keys()
         for key in tested_keys:
-            assert new_stream.json()[key] is not None
+            # These keys are expected to be None (or null)
+            if key in ['ready_at', 'completed_at']:
+                assert new_stream.json()[key] is None
+            else: 
+                assert new_stream.json()[key] is not None
     finally:
         new_stream.delete()
         all_streams = user.get_streams()
