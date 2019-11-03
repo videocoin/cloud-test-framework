@@ -30,7 +30,7 @@ def test_sign_in_with_non_existant_email_returns_error():
 
 def test_sign_in_with_incorrect_password_returns_error():
     with pytest.raises(requests.HTTPError) as e:
-        _auth(input_values.VALID_EMAIL, input_values.INVALID_PASSWORD)
+        _auth(input_values.ACCOUNT_EMAIL_DEFAULT, input_values.INVALID_PASSWORD)
 
     assert e.value.response.status_code == 401
     assert e.value.response.json() == expected_results.SIGN_IN_WITH_INCORRECT_PASSWORD_ERROR

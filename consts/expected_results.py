@@ -30,6 +30,24 @@ PASSWORD_RECOVERY_WITH_INVALID_EMAIL_ERROR = {
         'email': 'Enter a valid email address'
     }
 }
+SIGN_UP_WITH_EXISTING_EMAIL_ERROR = {
+    'message': 'invalid argument',
+    'fields': {
+        'email': 'Email is already registered'
+    }
+}
+SIGN_UP_WITH_SHORT_NAME_ERROR = {
+    'message': 'invalid argument',
+    'fields': {
+        'name': 'Name must be at least 2 characters in length'
+    }
+}
+SIGN_UP_WITH_INVALID_PASSWORD = {
+    'message': 'invalid argument',
+    'fields': {
+        'password': 'Password must be more than 8 characters and contain both numbers and letters'
+    }
+}
 # TODO: Don't compare the commented out valeus for now, since they're constantly changing
 # Need to find a way to not compare these values, but make sure they're in the right format
 TEST_USER_INFORMATION = {

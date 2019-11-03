@@ -8,7 +8,7 @@ from consts import input_values
 from utils import utils
 
 def test_password_recovery_with_registered_email():
-    email = input_values.VALID_EMAIL
+    email = input_values.ACCOUNT_EMAIL_DEFAULT
     old_password = input_values.ACCOUNT_PASSWORD_DEFAULT
     new_password = input_values.ACCOUNT_PASSWORD_01
 
@@ -19,6 +19,10 @@ def test_password_recovery_with_registered_email():
     sleep(5)
 
     # Get token from recently sent email and change password    
+    # TODO: This was failing with a 500 server error because the email was
+    # never sending and a wrong, invalid token was being used. It'd be nice
+    # if I could get an easy reason to find out what's wrong instead of needing
+    # to figure out why I'm getting a 500 error (my tests or an actual problem?)
     token = _get_password_reset_token(email)
     _change_password_with_token(token, new_password)
 

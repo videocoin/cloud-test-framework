@@ -41,7 +41,7 @@ def get_items_from_email(test_email, subject, body_regex, test_email_password = 
 
     if test_email_password == None:
         # TODO: Should support different emails without needing to provide test_email_password
-        test_email_password = input_values.VALID_EMAIL_PASSWORD
+        test_email_password = input_values.EMAIL_PASSWORD
 
     pop_conn = poplib.POP3_SSL(pop_server)
     pop_conn.user(test_email)
