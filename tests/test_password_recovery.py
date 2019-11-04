@@ -1,7 +1,9 @@
 from time import sleep
-import re
 import requests
+import urllib.parse
 import pytest
+import logging
+logger = logging.getLogger(__name__)
 
 from consts import endpoints
 from consts import expected_results
@@ -73,9 +75,18 @@ def _get_password_reset_token(email, email_password):
         input_values.PASSWORD_RECOVERY_SUBJECT,
         input_values.PASSWORD_RECOVERY_REGEX)
     redirect_url = requests.get(first_url).url
-    result = re.search(r'token=(.*)', redirect_url).group(1)
+    # redirect_url stores the token in its query param as a URL
+    # encoded string. Have to escape the URL encoding before using
+    # token in the body of the request
+    # token = urllib.parse.unquote(re.search(r'token=(.*)', redirect_url).group(1))
+    query_str = getattr(urllib.parse.urlparse(redirect_url), 'query')
+    token = urllib.parse.parse_qsl(query_str)[0][1]
 
-    return result
+    logger.debug('first_url: %s', first_url)
+    logger.debug('redirect_url: %s', redirect_url)
+    logger.debug('token: %s', token)
+
+    return token
 
 def _change_password_with_token(token, new_password):
     body = {

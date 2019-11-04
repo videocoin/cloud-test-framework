@@ -1,13 +1,13 @@
 import requests
 import pytest
-# import pdb
-# from time import sleep
+import logging
 
 from consts import expected_results
 
 def test_creating_valid_stream_appears_in_streams_list(user):
     try:
         new_stream = user.create_stream()
+        logging.debug('New stream created: %s', new_stream.id)
         all_streams = user.get_streams()
         found_stream = [stream for stream in all_streams 
             if stream.id == new_stream.id]

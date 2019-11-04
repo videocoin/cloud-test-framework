@@ -13,7 +13,7 @@ INVALID_PASSWORD = 'not_a_real_password'
 SUPPORT_EMAIL = 'support@videocoin.network'
 PASSWORD_RECOVERY_SUBJECT = 'Password Recovery'
 # TODO: Crappy regex pls fix.
-PASSWORD_RECOVERY_REGEX = r'<a href="(.*)" s.*>Reset Password</a>'
+PASSWORD_RECOVERY_REGEX = r'"(https://.*sendgrid.net.*)" t'
 VID_TRANSFER_AMOUNT_REGEX = r'(\d+\.\d+) VID'
 DEPOSIT_ADDRESS_REGEX = r'(0x[A-Za-z0-9]{40})'
 SIX_DIGIT_CODE_REGEX = r'Copy the 6 digit code below [\S\s]* ([0-9]{6})'
