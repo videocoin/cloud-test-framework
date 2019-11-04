@@ -1,4 +1,5 @@
 from time import sleep
+import re
 import requests
 import pytest
 
@@ -9,6 +10,7 @@ from utils import utils
 
 def test_password_recovery_with_registered_email():
     email = input_values.ACCOUNT_EMAIL_DEFAULT
+    email_password = input_values.EMAIL_PASSWORD
     old_password = input_values.ACCOUNT_PASSWORD_DEFAULT
     new_password = input_values.ACCOUNT_PASSWORD_01
 
@@ -23,7 +25,7 @@ def test_password_recovery_with_registered_email():
     # never sending and a wrong, invalid token was being used. It'd be nice
     # if I could get an easy reason to find out what's wrong instead of needing
     # to figure out why I'm getting a 500 error (my tests or an actual problem?)
-    token = _get_password_reset_token(email)
+    token = _get_password_reset_token(email, email_password)
     _change_password_with_token(token, new_password)
 
     # Check that the new password works
@@ -32,7 +34,7 @@ def test_password_recovery_with_registered_email():
     # Change password back to old password for future tests
     _start_password_recovery(email)
     sleep(5)
-    token = _get_password_reset_token(email)
+    token = _get_password_reset_token(email, email_password)
     _change_password_with_token(token, old_password)
 
     # Check that changing back to old password works
@@ -65,10 +67,15 @@ def _start_password_recovery(email):
         json=body)
     response.raise_for_status()
 
-def _get_password_reset_token(email):
-    return utils.get_items_from_email(
-        email, input_values.PASSWORD_RECOVERY_SUBJECT,
+def _get_password_reset_token(email, email_password):
+    first_url = utils.get_items_from_email(
+        email, email_password,
+        input_values.PASSWORD_RECOVERY_SUBJECT,
         input_values.PASSWORD_RECOVERY_REGEX)
+    redirect_url = requests.get(first_url).url
+    result = re.search(r'token=(.*)', redirect_url).group(1)
+
+    return result
 
 def _change_password_with_token(token, new_password):
     body = {

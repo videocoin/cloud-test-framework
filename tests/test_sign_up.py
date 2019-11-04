@@ -27,7 +27,6 @@ def test_signing_up_with_short_name_returns_error():
     assert e.value.response.status_code == 400
     assert e.value.response.json() == expected_results.SIGN_UP_WITH_SHORT_NAME_ERROR
 
-
 @pytest.mark.parametrize('password', [
     input_values.ACCOUNT_PASSWORD_NO_LETTERS,
     input_values.ACCOUNT_PASSWORD_NO_NUMBERS,

@@ -61,6 +61,18 @@ class User:
         # TODO: Make sure response is good
         return Stream(self.token, response.json()['id'])
 
+    def start_withdrawl(self, amount, address):
+        body = {
+            'amount': amount,
+            'address': address
+        }
+
+        res = requests.post(endpoints.BASE_URL + endpoints.WITHDRAW,
+            headers=self.headers, json=body)
+        res.raise_for_status()
+
+        return res.json()
+
     # This kind of method is reoccuring. It does:
     # 1) An authenticated request
     # 2) Needs its response verified (make sure it doesn't have 404, 500, etc.)
