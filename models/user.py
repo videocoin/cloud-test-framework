@@ -40,12 +40,12 @@ class User:
         profile_name is only a convenience argument
         profile_id takes precedence over profile_name
         """
-        if name == None:
+        if name is None:
             name = datetime.now().strftime("%m-%d-%Y@%H:%M:%S %p")
 
         output_profiles = self._get_output_profiles()
-        if profile_id == None:
-            if profile_name == None:
+        if profile_id is None:
+            if profile_name is None:
                 # If profile_id nor profile_name is specified, assume
                 # user will take any profile (the first)
                 profile_id = output_profiles[0]['id']

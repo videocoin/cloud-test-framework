@@ -30,11 +30,11 @@ class StreamManager:
         profile_name is only a convenience argument
         profile_id takes precedence over profile_name
         """
-        if name == None:
+        if name is None:
             name = datetime.now().strftime("%m-%d-%Y@%H:%M:%S %p")
 
-        if profile_id == None:
-            if profile_name == None:
+        if profile_id is None:
+            if profile_name is None:
                 profile_name = '720p'
             for profile in self._get_profile_ids():
                 if profile['name'] == profile_name:

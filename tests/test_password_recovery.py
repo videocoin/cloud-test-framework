@@ -4,12 +4,12 @@ import urllib.parse
 import pytest
 import logging
 
-logger = logging.getLogger(__name__)
-
 from consts import endpoints
 from consts import expected_results
 from consts import input_values
 from utils import utils
+
+logger = logging.getLogger(__name__)
 
 
 def test_password_recovery_with_registered_email():

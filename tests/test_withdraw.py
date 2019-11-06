@@ -92,19 +92,20 @@ def test_entering_incorrect_confirmation_code_returns_error(user):
 # This should return an error, currently gives a valid transfer_id
 @pytest.mark.skip
 def test_starting_withdraw_with_invalid_address_format_returns_error(user):
-    try:
-        DEPOSIT_ADDRESS_INVALID = 'aasdfff0x03948593jcns456fsc52j358dsjsf4499'
-        utils.send_vid_to_account(user.wallet_address, 20)
-        withdraw_id = user.start_withdraw(DEPOSIT_ADDRESS_INVALID, 20)
-    finally:
-        # should be able to throw the rest of the VID away, to clean the account
-        pass
-
+    # try:
+    #     DEPOSIT_ADDRESS_INVALID = 'aasdfff0x03948593jcns456fsc52j358dsjsf4499'
+    #     utils.send_vid_to_account(user.wallet_address, 20)
+    #     # withdraw_id = user.start_withdraw(DEPOSIT_ADDRESS_INVALID, 20)
+    # finally:
+    #     # should be able to throw the rest of the VID away, to clean the account
+    #     pass
+    pass
 
 # This should return an error, currently gives a valid transfer_id
 @pytest.mark.skip
 def test_starting_withdraw_with_unavailable_amount_of_vid(user):
-    withdraw_id = user.start_withdraw(input_values.DEPOSIT_ADDRESS_METAMASK, 9999)
+    # withdraw_id = user.start_withdraw(input_values.DEPOSIT_ADDRESS_METAMASK, 9999)
+    pass
 
 
 def _get_withdraw_start_email_information(email, email_password):

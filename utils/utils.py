@@ -19,8 +19,8 @@ def get_raw_request(method, url, body={}):
         At this point it is completely built and ready
         to be fired; it is "prepared".
 
-        However pay attention at the formatting used in 
-        this function because it is programmed to be pretty 
+        However pay attention at the formatting used in
+        this function because it is programmed to be pretty
         printed and may differ from the actual request.
         """
         print(
