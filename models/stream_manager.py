@@ -4,14 +4,16 @@ from datetime import datetime
 from models.stream import Stream
 from consts import endpoints
 
+
 class StreamManager:
     def __init__(self, token):
         self.token = token
         self.headers = self._get_headers()
 
-    def get_streams(self):  
-        response = requests.get(endpoints.BASE_URL + endpoints.STREAM,
-            headers=self.headers)
+    def get_streams(self):
+        response = requests.get(
+            endpoints.BASE_URL + endpoints.STREAM, headers=self.headers
+        )
         response.raise_for_status()
         # TODO: Make sure response is good
         items = response.json()['items']
@@ -40,26 +42,25 @@ class StreamManager:
             if not profile_id:
                 raise ValueError('Profile name does not exist')
 
-        body = {
-            'name': name,
-            'profile_id': profile_id
-        }
+        body = {'name': name, 'profile_id': profile_id}
 
-        response = requests.post(endpoints.BASE_URL + endpoints.STREAM,
-            headers=self.headers, json=body)
+        response = requests.post(
+            endpoints.BASE_URL + endpoints.STREAM, headers=self.headers, json=body
+        )
         response.raise_for_status()
         # TODO: Make sure response is good
         return Stream(self.token, response.json()['id'])
 
     def get_user(self):
-        response = requests.get(endpoints.BASE_URL + endpoints.USER,
-            headers=self.headers).json()
+        response = requests.get(
+            endpoints.BASE_URL + endpoints.USER, headers=self.headers
+        ).json()
         response.raise_for_status()
         # TODO: Make sure response is good
         return response.json()
 
     def _get_profile_ids(self):
-        response = requests.get(endpoints.BASE_URL + endpoints.PROFILE)        
+        response = requests.get(endpoints.BASE_URL + endpoints.PROFILE)
         response.raise_for_status()
         # TODO: Make sure response is good
         return response.json()['items']

@@ -7,6 +7,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def get_raw_request(method, url, body={}):
     req = requests.Request(method, url, data=body)
     prepared = req.prepare()
@@ -22,14 +23,17 @@ def get_raw_request(method, url, body={}):
         this function because it is programmed to be pretty 
         printed and may differ from the actual request.
         """
-        print('{}\n{}\r\n{}\r\n\r\n{}'.format(
-            '-----------START-----------',
-            req.method + ' ' + req.url,
-            '\r\n'.join('{}: {}'.format(k, v) for k, v in req.headers.items()),
-            req.body,
-        ))
+        print(
+            '{}\n{}\r\n{}\r\n\r\n{}'.format(
+                '-----------START-----------',
+                req.method + ' ' + req.url,
+                '\r\n'.join('{}: {}'.format(k, v) for k, v in req.headers.items()),
+                req.body,
+            )
+        )
 
     pretty_print_POST(prepared)
+
 
 def get_items_from_email(test_email, test_email_password, support_subject, *body_regex):
     """
@@ -45,7 +49,7 @@ def get_items_from_email(test_email, test_email_password, support_subject, *body
     pop_conn.pass_(test_email_password)
 
     support_email = 'support@videocoin.network'
-    
+
     # List of email is given in chronological ascending order
     email_count = len(pop_conn.list()[1])
     if email_count > 0:
@@ -57,7 +61,9 @@ def get_items_from_email(test_email, test_email_password, support_subject, *body
         parsed_email = email.message_from_bytes(raw_email)
         email_from = parsed_email['From']
         parsed_email_from = re.match(r'^.* <(.+)>$', email_from).group(1)
-        logger.debug('Parsed email "From" line on email #%d: %s', email_count, parsed_email_from)
+        logger.debug(
+            'Parsed email "From" line on email #%d: %s', email_count, parsed_email_from
+        )
         subject = parsed_email['Subject']
         logger.debug('Email subject line on email #%d: %s', email_count, subject)
 
@@ -91,22 +97,26 @@ def get_items_from_email(test_email, test_email_password, support_subject, *body
         pop_conn.quit()
         return result if len(regex_result) == 1 else regex_result
 
+
 def send_vid_to_account(address, amount):
     if type(amount) == float:
         amount = int(amount)
-        logger.warning('Cannot send float VID amount to address. '
-            'Converting float value to integer')
+        logger.warning(
+            'Cannot send float VID amount to address. '
+            'Converting float value to integer'
+        )
 
-    body = {
-        'account': address,
-        'amount': amount
-    }
+    body = {'account': address, 'amount': amount}
 
-    res = requests.post('http://faucet.dev.videocoin.network', json=body,
-        auth=('admin', 'VideoCoinS3cr3t'))
+    res = requests.post(
+        'http://faucet.dev.videocoin.network',
+        json=body,
+        auth=('admin', 'VideoCoinS3cr3t'),
+    )
     res.raise_for_status()
 
     # return res.json()
+
 
 if __name__ == '__main__':
     send_vid_to_account('0x003d07A64C2FeFc8C1654EF742F9AF4088354090', 20)

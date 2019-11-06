@@ -1,22 +1,25 @@
 import requests
 from consts import endpoints
 
+
 class Stream:
     def __init__(self, token, id):
         self.token = token
-        self.headers = self._get_headers()        
+        self.headers = self._get_headers()
         self.id = id
 
     def start(self):
-        response = requests.post(endpoints.BASE_URL + endpoints.STREAM
-            + '/' + self.id, headers=self.headers) 
+        response = requests.post(
+            endpoints.BASE_URL + endpoints.STREAM + '/' + self.id, headers=self.headers
+        )
         response.raise_for_status()
         # TODO: Make sure response was good here
         return response.json()
 
     def delete(self):
-        response = requests.delete(endpoints.BASE_URL + endpoints.STREAM
-            + '/' + self.id, headers=self.headers)
+        response = requests.delete(
+            endpoints.BASE_URL + endpoints.STREAM + '/' + self.id, headers=self.headers
+        )
         response.raise_for_status()
         # TODO: Make sure the response was good here
         return True
@@ -25,8 +28,9 @@ class Stream:
         return {'Authorization': 'Bearer ' + self.token}
 
     def json(self):
-        response = requests.get(endpoints.BASE_URL + endpoints.STREAM +
-            '/' + self.id, headers=self.headers)
+        response = requests.get(
+            endpoints.BASE_URL + endpoints.STREAM + '/' + self.id, headers=self.headers
+        )
         response.raise_for_status()
         # TODO: Make sure response was good here
         return response.json()
@@ -63,7 +67,7 @@ class Stream:
     def created_at(self):
         # TODO: Do I wanna wrap this in a datetime instance?
         return self.json()['created_at']
-    
+
     @property
     def updated_at(self):
         return self.json()['updated_at']
@@ -79,4 +83,3 @@ class Stream:
     @property
     def rtmp_url(self):
         return self.json()['rtmp_url']
- 

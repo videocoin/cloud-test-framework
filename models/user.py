@@ -13,6 +13,7 @@ from consts import endpoints
 
 logger = logging.getLogger(__name__)
 
+
 class User:
     def __init__(self, token):
         self.token = token
@@ -20,8 +21,9 @@ class User:
         self.id = self.json()['id']
 
     def get_streams(self):
-        response = requests.get(endpoints.BASE_URL + endpoints.STREAM,
-            headers=self.headers)
+        response = requests.get(
+            endpoints.BASE_URL + endpoints.STREAM, headers=self.headers
+        )
         response.raise_for_status()
         # TODO: Make sure response is good
         items = response.json()['items']
@@ -54,37 +56,32 @@ class User:
             if not profile_id:
                 raise ValueError('Profile name does not exist')
 
-        body = {
-            'name': name,
-            'profile_id': profile_id
-        }
+        body = {'name': name, 'profile_id': profile_id}
 
-        response = requests.post(endpoints.BASE_URL + endpoints.STREAM,
-            headers=self.headers, json=body)
+        response = requests.post(
+            endpoints.BASE_URL + endpoints.STREAM, headers=self.headers, json=body
+        )
         response.raise_for_status()
         # TODO: Make sure response is good
         return Stream(self.token, response.json()['id'])
 
     def start_withdraw(self, address, amount):
-        body = {
-            'address': address,  
-            'amount': amount
-        }
+        body = {'address': address, 'amount': amount}
         logger.debug('address: %s', address)
         logger.debug('amount: %d', amount)
 
-        res = requests.post(endpoints.BASE_URL + endpoints.START_WITHDRAW,
-            headers=self.headers, json=body)
+        res = requests.post(
+            endpoints.BASE_URL + endpoints.START_WITHDRAW,
+            headers=self.headers,
+            json=body,
+        )
         res.raise_for_status()
 
         return res.json()['transfer_id']
 
     def confirm_withdraw(self, transfer_id, pin):
         url = endpoints.BASE_URL + endpoints.CONFIRM_WITHDRAW
-        body = {
-            'transfer_id': transfer_id,
-            'pin': pin
-        }
+        body = {'transfer_id': transfer_id, 'pin': pin}
         logger.debug('transfer_id: %s', transfer_id)
         logger.debug('pin: %s', pin)
 
@@ -100,8 +97,9 @@ class User:
     # Can I create some kind of decorator for these kinds of methods?
     # Maybe all 'test_objects' (like User and Stream) should implement a json()...
     def json(self):
-        response = requests.get(endpoints.BASE_URL + endpoints.USER,
-            headers=self.headers)
+        response = requests.get(
+            endpoints.BASE_URL + endpoints.USER, headers=self.headers
+        )
         response.raise_for_status()
 
         return response.json()
