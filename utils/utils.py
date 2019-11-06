@@ -48,7 +48,9 @@ def get_items_from_email(test_email, test_email_password, support_subject, *body
     
     # List of email is given in chronological ascending order
     email_count = len(pop_conn.list()[1])
-    logger.debug('Email count: %d', email_count)
+    if email_count > 0:
+        logger.warning('Email count is not 0. Tests might pick up old emails.')
+        logger.warning('Email count: %d', email_count)
 
     while email_count > 0:
         raw_email = b"\n".join(pop_conn.retr(email_count)[1])
@@ -71,15 +73,40 @@ def get_items_from_email(test_email, test_email_password, support_subject, *body
             # Having trouble with decoding using utf-8, have to use ISO-8859-1
             # https://stackoverflow.com/questions/23772144/python-unicodedecodeerror-utf8-codec-cant-decode-byte-0xc0-in-position-0-i
             email_body_str = email_body_bytes.decode('ISO-8859-1')
-            # logger.debug('Full email body: %s', email_body_str)
+            logger.debug('Full email body: %s', email_body_str)
             break
         email_count -= 1
 
     if email_count == 0:
         raise IndexError('Email cannot be found')
 
-    regex_result = []
-    for regex in body_regex:
-        regex_result.append(re.search(regex, email_body_str).group(1))
-    pop_conn.quit()
-    return regex_result[0] if len(regex_result) == 1 else regex_result
+    try:
+        regex_result = {}
+        for regex in body_regex:
+            result = re.search(regex.pattern, email_body_str).group(1)
+            regex_result[regex.name] = result
+            logger.debug('regex found for pattern %s: %s', regex.name, result)
+    finally:
+        pop_conn.dele(email_count)
+        pop_conn.quit()
+        return result if len(regex_result) == 1 else regex_result
+
+def send_vid_to_account(address, amount):
+    if type(amount) == float:
+        amount = int(amount)
+        logger.warning('Cannot send float VID amount to address. '
+            'Converting float value to integer')
+
+    body = {
+        'account': address,
+        'amount': amount
+    }
+
+    res = requests.post('http://faucet.dev.videocoin.network', json=body,
+        auth=('admin', 'VideoCoinS3cr3t'))
+    res.raise_for_status()
+
+    # return res.json()
+
+if __name__ == '__main__':
+    send_vid_to_account('0x003d07A64C2FeFc8C1654EF742F9AF4088354090', 20)

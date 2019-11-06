@@ -1,4 +1,5 @@
 from datetime import datetime
+import logging
 import requests
 
 from models.stream import Stream
@@ -9,6 +10,9 @@ from consts import endpoints
 # 2) Some headers (that currently only wrap the token in an Authorization header)
 # 3) Has a JSON representation that you get from the API
 # Can I create some kind of super class to wrap these kinds of classes?
+
+logger = logging.getLogger(__name__)
+
 class User:
     def __init__(self, token):
         self.token = token
@@ -61,14 +65,31 @@ class User:
         # TODO: Make sure response is good
         return Stream(self.token, response.json()['id'])
 
-    def start_withdrawl(self, amount, address):
+    def start_withdraw(self, address, amount):
         body = {
-            'amount': amount,
-            'address': address
+            'address': address,  
+            'amount': amount
         }
+        logger.debug('address: %s', address)
+        logger.debug('amount: %d', amount)
 
-        res = requests.post(endpoints.BASE_URL + endpoints.WITHDRAW,
+        res = requests.post(endpoints.BASE_URL + endpoints.START_WITHDRAW,
             headers=self.headers, json=body)
+        res.raise_for_status()
+
+        return res.json()['transfer_id']
+
+    def confirm_withdraw(self, transfer_id, pin):
+        url = endpoints.BASE_URL + endpoints.CONFIRM_WITHDRAW
+        body = {
+            'transfer_id': transfer_id,
+            'pin': pin
+        }
+        logger.debug('transfer_id: %s', transfer_id)
+        logger.debug('pin: %s', pin)
+
+        res = requests.post(url, headers=self.headers, json=body)
+        logger.debug('response from {}: {}'.format(url, res.json()))
         res.raise_for_status()
 
         return res.json()
@@ -84,6 +105,34 @@ class User:
         response.raise_for_status()
 
         return response.json()
+
+    @property
+    def email(self):
+        return self.json()['email']
+
+    @property
+    def name(self):
+        return self.json()['name']
+
+    @property
+    def is_active(self):
+        return self.json()['is_active']
+
+    @property
+    def wallet_id(self):
+        return self.json()['account']['id']
+
+    @property
+    def wallet_address(self):
+        return self.json()['account']['address']
+
+    @property
+    def wallet_balance(self):
+        return self.json()['account']['balance']
+
+    @property
+    def wallet_update_at(self):
+        return self.json()['account']['update_at']
 
     def _get_headers(self):
         return {'Authorization': 'Bearer ' + self.token}

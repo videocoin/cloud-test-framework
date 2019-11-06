@@ -48,6 +48,10 @@ SIGN_UP_WITH_INVALID_PASSWORD = {
         'password': 'Password must be more than 8 characters and contain both numbers and letters'
     }
 }
+INCORRECT_CONFIRMATION_CODE_ERROR = {
+    'message': 'Bad request',
+    'fields': None
+}
 # TODO: Don't compare the commented out valeus for now, since they're constantly changing
 # Need to find a way to not compare these values, but make sure they're in the right format
 TEST_USER_INFORMATION = {

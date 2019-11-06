@@ -20,7 +20,7 @@ def test_password_recovery_with_registered_email():
     _start_password_recovery(email)
 
     # Wait for server to send email
-    sleep(5)
+    sleep(3)
 
     # Get token from recently sent email and change password    
     # TODO: This was failing with a 500 server error because the email was
