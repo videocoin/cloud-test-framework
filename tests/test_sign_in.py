@@ -35,8 +35,10 @@ def test_sign_in_with_valid_credentials_have_correct_user_information(user):
 
 
 def test_sign_in_with_non_existant_email_returns_error():
+    email = 'really_fake_email@fake.ru'
+    password = 'not_a_valid_password'
     with pytest.raises(requests.HTTPError) as e:
-        _auth(input_values.NONEXISTANT_EMAIL, input_values.INVALID_PASSWORD)
+        _auth(email, password)
 
     assert e.value.response.status_code == 401
     assert (
@@ -46,8 +48,10 @@ def test_sign_in_with_non_existant_email_returns_error():
 
 
 def test_sign_in_with_incorrect_password_returns_error():
+    email = input_values.ACCOUNT_EMAIL_DEFAULT
+    password = 'not_a_valid_password'
     with pytest.raises(requests.HTTPError) as e:
-        _auth(input_values.ACCOUNT_EMAIL_DEFAULT, input_values.INVALID_PASSWORD)
+        _auth(email, password)
 
     assert e.value.response.status_code == 401
     assert (

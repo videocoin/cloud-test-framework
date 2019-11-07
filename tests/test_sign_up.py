@@ -21,7 +21,7 @@ def test_signing_up_with_an_existing_email_returns_error():
 def test_signing_up_with_short_name_returns_error():
     email = input_values.ACCOUNT_EMAIL_DEFAULT
     password = input_values.ACCOUNT_PASSWORD_DEFAULT
-    name = input_values.ACCOUNT_NAME_SHORT
+    name = 'K'
 
     with pytest.raises(requests.HTTPError) as e:
         _sign_up(email, password, name)
@@ -30,14 +30,7 @@ def test_signing_up_with_short_name_returns_error():
     assert e.value.response.json() == expected_results.SIGN_UP_WITH_SHORT_NAME_ERROR
 
 
-@pytest.mark.parametrize(
-    'password',
-    [
-        input_values.ACCOUNT_PASSWORD_NO_LETTERS,
-        input_values.ACCOUNT_PASSWORD_NO_NUMBERS,
-        input_values.ACCOUNT_PASSWORD_TOO_SHORT,
-    ],
-)
+@pytest.mark.parametrize('password', ['1234567890', 'no_number_password', '2short'])
 def test_signing_up_with_invalid_password_returns_error(password):
     email = input_values.ACCOUNT_EMAIL_DEFAULT
     password = password

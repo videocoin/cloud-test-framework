@@ -4,6 +4,8 @@ import logging
 
 from consts import expected_results
 
+logger = logging.getLogger(__name__)
+
 
 def test_creating_valid_stream_appears_in_streams_list(user):
     try:

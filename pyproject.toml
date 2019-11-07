@@ -1,6 +1,5 @@
 [tool.black]
 skip-string-normalization = true
-diff = true
 include = '\.pyi?$'
 exclude = '''
 /(

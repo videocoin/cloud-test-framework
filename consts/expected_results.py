@@ -14,14 +14,6 @@ CREATE_STREAM_WITH_EMPTY_PROFILE_ID_ERROR = {
     'message': 'invalid argument',
     'fields': {'profile_id': 'ProfileId is a required field'},
 }
-PASSWORD_RECOVERY_WITH_NON_EXISTENT_EMAIL_ERROR = {
-    'message': 'invalid argument',
-    'fields': {'email': 'Enter a valid email address'},
-}
-PASSWORD_RECOVERY_WITH_INVALID_EMAIL_ERROR = {
-    'message': 'invalid argument',
-    'fields': {'email': 'Enter a valid email address'},
-}
 SIGN_UP_WITH_EXISTING_EMAIL_ERROR = {
     'message': 'invalid argument',
     'fields': {'email': 'Email is already registered'},

@@ -5,8 +5,8 @@ import pytest
 import logging
 
 from consts import endpoints
-from consts import expected_results
 from consts import input_values
+from consts import email_body_regex
 from utils import utils
 
 logger = logging.getLogger(__name__)
@@ -45,33 +45,25 @@ def test_password_recovery_with_registered_email():
     _auth(email, old_password)
 
 
-@pytest.mark.xfail(
-    reason="""
-    I'm pretty sure this should return something with a more descriptive message
-    Check expected_results.py to see what the current message is
-    """
+@pytest.mark.parametrize(
+    'invalid_email',
+    [
+        'not_a_registered_email@fake.ru',
+        'no_domain_email',
+        'invalid#symbol#in#email.gmail.com',
+        'consecutive__symbol__email@gmail.com',
+        'short_domain_tld@gmail.c',
+        'invalid_symbol_in_domain@gmail#com',
+        'consecutive_symbol_in_domain@gmail..com',
+    ],
 )
-def test_password_recovery_with_nonexistent_email_returns_error():
-    email = input_values.NONEXISTANT_EMAIL
+def test_password_recovery_with_invalid_email_returns_error(invalid_email):
     with pytest.raises(requests.HTTPError) as e:
-        _start_password_recovery(email)
-    assert (
-        e.value.response.json()
-        == expected_results.PASSWORD_RECOVERY_WITH_NONEXISTENT_EMAIL_ERROR
-    )
-    assert e.value.response.status_code == 400
-
-
-# TODO: I should probably be parametrizing this test with the one above
-# and all other invalid email tests
-def test_password_recovery_with_invalid_email_returns_error():
-    email = input_values.INVALID_EMAIL_NO_AT_SIGN
-    with pytest.raises(requests.HTTPError) as e:
-        _start_password_recovery(email)
-    assert (
-        e.value.response.json()
-        == expected_results.PASSWORD_RECOVERY_WITH_INVALID_EMAIL_ERROR
-    )
+        _start_password_recovery(invalid_email)
+    assert e.value.response.json() == {
+        'message': 'invalid argument',
+        'fields': {'email': 'Enter a valid email address'},
+    }
     assert e.value.response.status_code == 400
 
 
@@ -82,12 +74,9 @@ def _start_password_recovery(email):
 
 
 def _get_password_reset_token(email, email_password):
-    first_url = utils.get_items_from_email(
-        email,
-        email_password,
-        input_values.PASSWORD_RECOVERY_SUBJECT,
-        input_values.PASSWORD_RECOVERY_REGEX,
-    )
+    subject = 'Password Recovery'
+    token_regex = email_body_regex.PASSWORD_RECOVERY_REGEX
+    first_url = utils.get_items_from_email(email, email_password, subject, token_regex)
     redirect_url = requests.get(first_url).url
     # redirect_url stores the token in its query param as a URL
     # encoded string. Have to escape the URL encoding before using
