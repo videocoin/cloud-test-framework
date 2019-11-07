@@ -5,18 +5,17 @@ import pytest
 import logging
 
 from consts import endpoints
-from consts import input_values
 from consts import email_body_regex
 from utils import utils
 
 logger = logging.getLogger(__name__)
 
 
-def test_password_recovery_with_registered_email():
-    email = input_values.ACCOUNT_EMAIL_DEFAULT
-    email_password = input_values.EMAIL_PASSWORD
-    old_password = input_values.ACCOUNT_PASSWORD_DEFAULT
-    new_password = input_values.ACCOUNT_PASSWORD_01
+def test_password_recovery_with_registered_email(user):
+    email = user.email
+    email_password = user.email_password
+    old_password = user.password
+    new_password = 'brand_n3w_test_p4ssword'
 
     # Send email to start password recovery
     _start_password_recovery(email)

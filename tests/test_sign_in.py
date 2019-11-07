@@ -3,7 +3,6 @@ import requests
 
 from consts import endpoints
 from consts import expected_results
-from consts import input_values
 
 
 def test_sign_in_with_valid_credentials_have_correct_user_information(user):
@@ -47,8 +46,8 @@ def test_sign_in_with_non_existant_email_returns_error():
     )
 
 
-def test_sign_in_with_incorrect_password_returns_error():
-    email = input_values.ACCOUNT_EMAIL_DEFAULT
+def test_sign_in_with_incorrect_password_returns_error(user):
+    email = user.email
     password = 'not_a_valid_password'
     with pytest.raises(requests.HTTPError) as e:
         _auth(email, password)

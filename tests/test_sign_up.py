@@ -3,13 +3,12 @@ import requests
 
 from consts import endpoints
 from consts import expected_results
-from consts import input_values
 
 
-def test_signing_up_with_an_existing_email_returns_error():
-    email = input_values.ACCOUNT_EMAIL_DEFAULT
-    password = input_values.ACCOUNT_PASSWORD_DEFAULT
-    name = input_values.ACCOUNT_NAME_DEFAULT
+def test_signing_up_with_an_existing_email_returns_error(user):
+    email = user.email
+    password = user.password
+    name = 'Automation Account'
 
     with pytest.raises(requests.HTTPError) as e:
         _sign_up(email, password, name)
@@ -18,9 +17,9 @@ def test_signing_up_with_an_existing_email_returns_error():
     assert e.value.response.json() == expected_results.SIGN_UP_WITH_EXISTING_EMAIL_ERROR
 
 
-def test_signing_up_with_short_name_returns_error():
-    email = input_values.ACCOUNT_EMAIL_DEFAULT
-    password = input_values.ACCOUNT_PASSWORD_DEFAULT
+def test_signing_up_with_short_name_returns_error(user):
+    email = user.email
+    password = user.password
     name = 'K'
 
     with pytest.raises(requests.HTTPError) as e:
@@ -31,10 +30,10 @@ def test_signing_up_with_short_name_returns_error():
 
 
 @pytest.mark.parametrize('password', ['1234567890', 'no_number_password', '2short'])
-def test_signing_up_with_invalid_password_returns_error(password):
-    email = input_values.ACCOUNT_EMAIL_DEFAULT
+def test_signing_up_with_invalid_password_returns_error(user, password):
+    email = user.email
     password = password
-    name = input_values.ACCOUNT_NAME_DEFAULT
+    name = 'Automation Account'
 
     with pytest.raises(requests.HTTPError) as e:
         _sign_up(email, password, name)

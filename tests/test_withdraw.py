@@ -13,8 +13,8 @@ logger = logging.getLogger(__name__)
 
 def test_start_withdraw_with_valid_address_and_amount_is_correct(user):
     deposit_address = input_values.DEPOSIT_ADDRESS_METAMASK
-    email = input_values.ACCOUNT_EMAIL_DEFAULT
-    email_password = input_values.EMAIL_PASSWORD
+    email = user.email
+    email_password = user.email_password
 
     utils.send_vid_to_account(user.wallet_address, 20)
     user.start_withdraw(deposit_address, 20)
@@ -70,8 +70,8 @@ def test_invalid_confirmation_code_returns_error(user, invalid_code, expected_er
 def test_correct_confirmation_code_sends_success_email(user):
     deposit_address = input_values.DEPOSIT_ADDRESS_METAMASK
     vid_to_withdraw = 20.0
-    email = input_values.ACCOUNT_EMAIL_DEFAULT
-    email_password = input_values.EMAIL_PASSWORD
+    email = user.email
+    email_password = user.email_password
 
     utils.send_vid_to_account(user.wallet_address, vid_to_withdraw)
     transfer_id = user.start_withdraw(deposit_address, vid_to_withdraw)
@@ -108,8 +108,8 @@ def test_correct_confirmation_code_sends_success_email(user):
 
 
 def test_entering_incorrect_confirmation_code_returns_error(user):
-    email = input_values.ACCOUNT_EMAIL_DEFAULT
-    email_password = input_values.EMAIL_PASSWORD
+    email = user.email
+    email_password = user.email_password
     deposit_address = input_values.DEPOSIT_ADDRESS_METAMASK
 
     utils.send_vid_to_account(user.wallet_address, 20)
