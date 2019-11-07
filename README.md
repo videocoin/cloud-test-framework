@@ -28,7 +28,6 @@ pre-commit hooks use `black` and `flake8`. Read more about them here:
 Black: https://github.com/psf/black
 
 - This project conciously ignores Black's preference to double-quote usage (see more in the `pyproject.toml` configuration file for Black)
-- Black is enabled in a report-only mode specified by `diff = true` in its configuration file. If you want Black to automatically format for you, remove the line in `pyproject.toml` (please leave it enabled before checking in)
 
 flake8: https://github.com/PyCQA/flake8
 
