@@ -15,9 +15,14 @@ logger = logging.getLogger(__name__)
 
 
 class User:
-    def __init__(self, token):
-        self.token = token
+    def __init__(self, email, password, email_password, name="Automation Account"):
+        # Set token and headers first because all get methods for properties
+        # of this class rely getting information from server
+        self.token = self._get_token(email, password)
         self.headers = self._get_headers()
+
+        self.password = password
+        self.email_password = email_password
         self.id = self.json()['id']
 
     def get_streams(self):
@@ -140,3 +145,11 @@ class User:
         response.raise_for_status()
 
         return response.json()['items']
+
+    def _get_token(self, email, password):
+        body = {'email': email, 'password': password}
+
+        response = requests.post(endpoints.BASE_URL + endpoints.AUTH, json=body)
+        response.raise_for_status()
+
+        return response.json()['token']

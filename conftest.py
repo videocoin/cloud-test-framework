@@ -1,24 +1,25 @@
 import pytest
-import requests
 
+from consts import input_values
 from models.user import User
-from consts import endpoints
 
 
 def pytest_addoption(parser):
-    parser.addoption('--email', action='store', default='kgoautomation@gmail.com')
-    parser.addoption('--password', action='store', default='tester123')
+    parser.addoption(
+        '--email', action='store', default=input_values.ACCOUNT_EMAIL_DEFAULT
+    )
+    parser.addoption(
+        '--email_password', action='store', default=input_values.EMAIL_PASSWORD
+    )
+    parser.addoption(
+        '--password', action='store', default=input_values.ACCOUNT_PASSWORD_DEFAULT
+    )
 
 
 @pytest.fixture
 def user(request):
     email = request.config.getoption('--email')
     password = request.config.getoption('--password')
+    email_password = request.config.getoption('--email_password')
 
-    body = {'email': email, 'password': password}
-
-    response = requests.post(endpoints.BASE_URL + endpoints.AUTH, json=body)
-    # TODO: Make sure response is good
-    token = response.json()['token']
-
-    return User(token)
+    return User(email, password, email_password)
