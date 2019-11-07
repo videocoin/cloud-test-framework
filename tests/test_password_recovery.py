@@ -50,9 +50,6 @@ def test_password_recovery_with_registered_email():
     [
         'not_a_registered_email@fake.ru',
         'no_domain_email',
-        'invalid#symbol#in#email.gmail.com',
-        'consecutive__symbol__email@gmail.com',
-        'short_domain_tld@gmail.c',
         'invalid_symbol_in_domain@gmail#com',
         'consecutive_symbol_in_domain@gmail..com',
     ],

@@ -27,7 +27,47 @@ def test_start_withdraw_with_valid_address_and_amount_is_correct(user):
     assert len(withdraw_info[email_body_regex.CONFIRMATION_CODE_REGEX.name]) == 6
 
 
-def test_entering_correct_confirmation_code_sends_success_email(user):
+@pytest.mark.parametrize(
+    'invalid_code, expected_error',
+    [
+        (
+            '',
+            {
+                'message': 'invalid argument',
+                'fields': {'pin': 'Pin is a required field'},
+            },
+        ),
+        ('asdf56', {'message': 'Bad request', 'fields': None}),
+        (
+            '123',
+            {
+                "message": "invalid argument",
+                "fields": {"pin": "Pin must be 6 characters in length"},
+            },
+        ),
+        (
+            '123456789',
+            {
+                "message": "invalid argument",
+                "fields": {"pin": "Pin must be 6 characters in length"},
+            },
+        ),
+    ],
+)
+def test_invalid_confirmation_code_returns_error(user, invalid_code, expected_error):
+    deposit_address = input_values.DEPOSIT_ADDRESS_METAMASK
+    vid_to_withdraw = 20.0
+
+    utils.send_vid_to_account(user.wallet_address, vid_to_withdraw)
+    transfer_id = user.start_withdraw(deposit_address, vid_to_withdraw)
+    with pytest.raises(requests.HTTPError) as e:
+        user.confirm_withdraw(transfer_id, invalid_code)
+
+    assert e.value.response.status_code == 400
+    assert e.value.response.json() == expected_error
+
+
+def test_correct_confirmation_code_sends_success_email(user):
     deposit_address = input_values.DEPOSIT_ADDRESS_METAMASK
     vid_to_withdraw = 20.0
     email = input_values.ACCOUNT_EMAIL_DEFAULT
@@ -85,6 +125,7 @@ def test_entering_incorrect_confirmation_code_returns_error(user):
         # No way this'll happen lol
         logger.warning('Holy shit it happened')
         incorrect_confirmation_code == _create_random_confirmation_code()
+
     logger.debug('transfer_id: %s', transfer_id)
     logger.debug('real_confirmation_code: %s', real_confirmation_code)
     logger.debug('incorrect_confirmation_code: %s', incorrect_confirmation_code)
