@@ -10,6 +10,8 @@ from utils.rtmp_runner import RTMPRunner
 logger = logging.getLogger(__name__)
 
 
+@pytest.mark.smoke
+@pytest.mark.functional
 def test_creating_valid_stream_appears_in_streams_list(user):
     try:
         new_stream = user.create_stream()
@@ -29,6 +31,8 @@ def test_creating_valid_stream_appears_in_streams_list(user):
         assert len(other_found_stream) == 0
 
 
+@pytest.mark.smoke
+@pytest.mark.functional
 # TODO: Need to change test to verify the format of these values, not just
 # check that they're not None
 def test_creating_valid_stream_has_correct_information(user):
@@ -50,6 +54,8 @@ def test_creating_valid_stream_has_correct_information(user):
         assert len(other_found_stream) == 0
 
 
+@pytest.mark.smoke
+@pytest.mark.functional
 def test_creating_stream_and_send_data_to_rtmp_url(user):
     try:
         new_stream = user.create_stream()
@@ -68,8 +74,9 @@ def test_creating_stream_and_send_data_to_rtmp_url(user):
         new_stream.delete()
 
 
+@pytest.mark.performance
 def test_time_it_takes_for_stream_prepared(user):
-    NUM_OF_TESTS = 3
+    NUM_OF_TESTS = 5
     EXPECTED_TIME = 8
 
     results = []
@@ -83,7 +90,8 @@ def test_time_it_takes_for_stream_prepared(user):
             results.append(duration)
         finally:
             new_stream.stop()
-            _wait_for_stream_status(new_stream, 'STREAM_STATUS_CANCELLED')
+            # TODO: Should this be CANCELLED or COMPLETED?
+            _wait_for_stream_status(new_stream, 'STREAM_STATUS_COMPLETED')
             new_stream.delete()
 
     average = sum(results) / len(results)
@@ -95,8 +103,9 @@ def test_time_it_takes_for_stream_prepared(user):
     assert average < EXPECTED_TIME
 
 
+@pytest.mark.performance
 def test_time_it_takes_for_stream_output_ready(user):
-    NUM_OF_TESTS = 3
+    NUM_OF_TESTS = 5
     EXPECTED_TIME = 35
 
     results = []
@@ -126,6 +135,41 @@ def test_time_it_takes_for_stream_output_ready(user):
     assert average < EXPECTED_TIME
 
 
+# TODO: Something's not right about this test...
+# Is the transition to STREAM_STATUS_COMPLETED really instant?
+@pytest.mark.performance
+def test_time_it_takes_for_stream_complete(user):
+    NUM_OF_TESTS = 5
+    EXPECTED_TIME = 5
+
+    results = []
+    for i in range(NUM_OF_TESTS):
+        try:
+            new_stream = user.create_stream()
+            new_stream.start()
+            _wait_for_stream_status(new_stream, 'STREAM_STATUS_PREPARED')
+            rtmp_job = RTMPRunner('http://127.0.0.1:8000', new_stream.rtmp_url)
+            rtmp_job.start()
+            _wait_for_stream_status(new_stream, 'STREAM_STATUS_READY')
+            new_stream.stop()
+            duration = _wait_for_stream_status(
+                new_stream, 'STREAM_STATUS_COMPLETED', timeout=EXPECTED_TIME
+            )
+            results.append(duration)
+        finally:
+            rtmp_job.stop()
+            new_stream.delete()
+
+    average = sum(results) / len(results)
+    logger.info(
+        'Average time to get stream complete over {} tests: {}'.format(
+            NUM_OF_TESTS, average
+        )
+    )
+    assert average < EXPECTED_TIME
+
+
+@pytest.mark.functional
 def test_creating_stream_with_empty_name_returns_error(user):
     with pytest.raises(requests.HTTPError) as e:
         user.create_stream(name='')
@@ -135,6 +179,7 @@ def test_creating_stream_with_empty_name_returns_error(user):
     )
 
 
+@pytest.mark.functional
 def test_creating_stream_with_empty_profile_id_returns_error(user):
     with pytest.raises(requests.HTTPError) as e:
         user.create_stream(profile_id='')
@@ -145,6 +190,7 @@ def test_creating_stream_with_empty_profile_id_returns_error(user):
     )
 
 
+@pytest.mark.functional
 @pytest.mark.skip(reason="What's the expected behavior of an invalid profile_id?")
 def test_creating_stream_with_invalid_profile_id(user):
     with pytest.raises(requests.HTTPError) as e:

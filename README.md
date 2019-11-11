@@ -6,7 +6,7 @@ The videocoin-api-test-framework exercises the various endpoints (used internall
 ### Python
 python3.7 is currently being used for the development of this test framework
 
-### Live Planet backend cluster
+### VideoCoin backend cluster
 All tests use the sandbox (snb) environment of the Live Planet cloud. The domain for these endpoints are hosted on https://studio.snb.videocoin.network. Please verify any accounts being used for these tests are created on the staging environment
 
 ### Default email / VideoCoin account
@@ -37,3 +37,18 @@ flake8: https://github.com/PyCQA/flake8
 
 ### Run all tests
 Run all tests with `pytest` from the root directory of this project
+
+Usage:
+
+`pytest`
+
+### Run tests by category
+Run tests based on custom pytest markers that categorize the tests by type. Available markers:
+
+- `smoke`: Runs minimal smoke tests to check health of cloud. Runs should be kept under 30 minutes
+- `functional`: More thorough test of all features in cloud. Include positive and negative tests
+- `performance`: Longer, metric based tests that take more time because of test repetition. Tests create metrics to compare to KPI baseline
+
+Usage:
+
+`pytest -m smoke`

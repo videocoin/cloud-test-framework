@@ -11,6 +11,8 @@ from utils import utils
 logger = logging.getLogger(__name__)
 
 
+@pytest.mark.smoke
+@pytest.mark.functional
 def test_start_withdraw_with_valid_address_and_amount_is_correct(user):
     deposit_address = input_values.DEPOSIT_ADDRESS_METAMASK
     email = user.email
@@ -27,6 +29,7 @@ def test_start_withdraw_with_valid_address_and_amount_is_correct(user):
     assert len(withdraw_info[email_body_regex.CONFIRMATION_CODE_REGEX.name]) == 6
 
 
+@pytest.mark.functional
 @pytest.mark.parametrize(
     'invalid_code, expected_error',
     [
@@ -73,6 +76,8 @@ def test_invalid_confirmation_code_returns_error(user, invalid_code, expected_er
     assert e.value.response.json() == expected_error
 
 
+@pytest.mark.smoke
+@pytest.mark.functional
 def test_correct_confirmation_code_sends_success_email(user):
     deposit_address = input_values.DEPOSIT_ADDRESS_METAMASK
     vid_to_withdraw = 20.0
@@ -113,6 +118,7 @@ def test_correct_confirmation_code_sends_success_email(user):
     assert email_info[email_body_regex.ETHERSCAN_REGEX.name]
 
 
+@pytest.mark.functional
 def test_entering_incorrect_confirmation_code_returns_error(user):
     email = user.email
     email_password = user.email_password
@@ -150,6 +156,7 @@ def test_entering_incorrect_confirmation_code_returns_error(user):
 
 # This should return an error, currently gives a valid transfer_id
 @pytest.mark.skip
+@pytest.mark.functional
 def test_starting_withdraw_with_invalid_address_format_returns_error(user):
     # try:
     #     DEPOSIT_ADDRESS_INVALID = 'aasdfff0x03948593jcns456fsc52j358dsjsf4499'
@@ -163,6 +170,7 @@ def test_starting_withdraw_with_invalid_address_format_returns_error(user):
 
 # This should return an error, currently gives a valid transfer_id
 @pytest.mark.skip
+@pytest.mark.functional
 def test_starting_withdraw_with_unavailable_amount_of_vid(user):
     # withdraw_id = user.start_withdraw(input_values.DEPOSIT_ADDRESS_METAMASK, 9999)
     pass

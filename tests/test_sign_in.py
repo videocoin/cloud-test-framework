@@ -5,6 +5,8 @@ from consts import endpoints
 from consts import expected_results
 
 
+@pytest.mark.smoke
+@pytest.mark.functional
 def test_sign_in_with_valid_credentials_have_correct_user_information(user):
     # TODO: I wanna do something fancy, but the JSON isn't flat. Maybe I should
     # flatten it before comparing?
@@ -33,6 +35,7 @@ def test_sign_in_with_valid_credentials_have_correct_user_information(user):
     )
 
 
+@pytest.mark.functional
 def test_sign_in_with_non_existant_email_returns_error():
     email = 'really_fake_email@fake.ru'
     password = 'not_a_valid_password'
@@ -46,6 +49,7 @@ def test_sign_in_with_non_existant_email_returns_error():
     )
 
 
+@pytest.mark.functional
 def test_sign_in_with_incorrect_password_returns_error(user):
     email = user.email
     password = 'not_a_valid_password'

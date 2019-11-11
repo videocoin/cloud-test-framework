@@ -11,6 +11,8 @@ from utils import utils
 logger = logging.getLogger(__name__)
 
 
+@pytest.mark.smoke
+@pytest.mark.functional
 def test_password_recovery_with_registered_email(user):
     email = user.email
     email_password = user.email_password
@@ -21,7 +23,7 @@ def test_password_recovery_with_registered_email(user):
     _start_password_recovery(email)
 
     # Wait for server to send email
-    sleep(3)
+    sleep(5)
 
     # Get token from recently sent email and change password
     # TODO: This was failing with a 500 server error because the email was
@@ -44,9 +46,11 @@ def test_password_recovery_with_registered_email(user):
     _auth(email, old_password)
 
 
+@pytest.mark.functional
 @pytest.mark.parametrize(
     'invalid_email',
     [
+        '',
         'not_a_registered_email@fake.ru',
         'no_domain_email',
         'invalid_symbol_in_domain@gmail#com',
