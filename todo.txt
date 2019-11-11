@@ -10,7 +10,7 @@ Kenneth's TODOs
         TODO: Use web3 to connect to rinkeby network
         TODO: Hook tests up to TestRail
         TODO: More withdraw and streams tests
-        TODO: Withdraw takes a STRING WEI amount now when creating starting new withdraw
+        -TODO: Withdraw takes a STRING WEI amount now when creating starting new withdraw-
         TODO: Long duration stream tests
         TODO: Varying test content tests
         TODO: Ask for and implement auto-generated / auto-deleted users

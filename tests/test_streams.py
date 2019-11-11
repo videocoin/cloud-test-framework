@@ -3,6 +3,7 @@ from datetime import datetime
 import requests
 import pytest
 import logging
+import m3u8
 
 from consts import expected_results
 from utils.rtmp_runner import RTMPRunner
@@ -47,11 +48,6 @@ def test_creating_valid_stream_has_correct_information(user):
                 assert new_stream.json()[key] is not None
     finally:
         new_stream.delete()
-        all_streams = user.get_streams()
-        other_found_stream = [
-            stream for stream in all_streams if stream.id == new_stream.id
-        ]
-        assert len(other_found_stream) == 0
 
 
 @pytest.mark.smoke
@@ -65,6 +61,7 @@ def test_creating_stream_and_send_data_to_rtmp_url(user):
         rtmp_job = RTMPRunner('http://127.0.0.1:8000', new_stream.rtmp_url)
         rtmp_job.start()
         _wait_for_stream_status(new_stream, 'STREAM_STATUS_READY')
+        # m3u8.load('https://streams-snb.videocoin.network/' + new_stream.id + '/index.m3u8')
         # Let 'er run
         sleep(60)
     finally:

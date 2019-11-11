@@ -30,9 +30,11 @@ identify==1.4.7
 idna==2.8
 importlib-metadata==0.23
 ipfshttpclient==0.4.12
+iso8601==0.1.12
 jmespath==0.9.4
 jsonschema==3.1.1
 lru-dict==1.1.6
+m3u8==0.5.1
 mccabe==0.6.1
 more-itertools==7.2.0
 multiaddr==0.0.8
@@ -55,6 +57,7 @@ pykwalify==1.7.0
 pyparsing==2.4.2
 pyrsistent==0.15.5
 pytest==4.5.0
+pytest-repeat==0.8.0
 python-box==3.4.5
 python-dateutil==2.8.0
 PyYAML==5.1.2

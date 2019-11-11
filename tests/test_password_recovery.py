@@ -14,35 +14,41 @@ logger = logging.getLogger(__name__)
 @pytest.mark.smoke
 @pytest.mark.functional
 def test_password_recovery_with_registered_email(user):
+    """
+    Summary:
+    Initiating and completing the password recovery process of a registered email
+    should change the account's password and the user should be able to authenticate
+    with the new password.
+
+    Steps:
+    0. Initate password recovery process with a registered email address
+    0. Wait for user's email to receive password recovery email
+    0. Open the latest Password Recovery email and retrieve the password reset token
+    0. Use the password reset token with a new password to change the account password
+    0. Verify the new password works to log in
+    0. Repeat above steps with the old account password to restore account to correct state
+    0. Verify the old password works to log in
+
+    Expected results:
+    0. User receives Password Recovery email
+    0. User is able to use token to create new password
+    0. User is able to log in using new password
+    0. User's password is reset to old password before test
+    """
     email = user.email
     email_password = user.email_password
     old_password = user.password
     new_password = 'brand_n3w_test_p4ssword'
 
-    # Send email to start password recovery
     _start_password_recovery(email)
-
-    # Wait for server to send email
     sleep(5)
-
-    # Get token from recently sent email and change password
-    # TODO: This was failing with a 500 server error because the email was
-    # never sending and a wrong, invalid token was being used. It'd be nice
-    # if I could get an easy reason to find out what's wrong instead of needing
-    # to figure out why I'm getting a 500 error (my tests or an actual problem?)
     token = _get_password_reset_token(email, email_password)
     _change_password_with_token(token, new_password)
-
-    # Check that the new password works
     _auth(email, new_password)
-
-    # Change password back to old password for future tests
     _start_password_recovery(email)
     sleep(5)
     token = _get_password_reset_token(email, email_password)
     _change_password_with_token(token, old_password)
-
-    # Check that changing back to old password works
     _auth(email, old_password)
 
 
@@ -58,6 +64,18 @@ def test_password_recovery_with_registered_email(user):
     ],
 )
 def test_password_recovery_with_invalid_email_returns_error(invalid_email):
+    """
+    Summary:
+    Starting password recovery process with email that has a variety of errors should
+    return an error and should not continue the process.
+
+    Steps:
+    0. Initiate process with a variety of invalid emails
+    0. Observe response from server
+
+    Expected results:
+    0. Server should return with correct error and error object
+    """
     with pytest.raises(requests.HTTPError) as e:
         _start_password_recovery(invalid_email)
     assert e.value.response.json() == {
