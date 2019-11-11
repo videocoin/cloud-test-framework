@@ -1,6 +1,7 @@
 from datetime import datetime
 import logging
 import requests
+from web3.auto import w3
 
 from models.stream import Stream
 from consts import endpoints
@@ -71,9 +72,11 @@ class User:
         return Stream(self.token, response.json()['id'])
 
     def start_withdraw(self, address, amount):
-        body = {'address': address, 'amount': amount}
-        logger.debug('address: %s', address)
-        logger.debug('amount: %d', amount)
+        logger.debug('amount in VID: {}'.format(amount))
+        amount = w3.toWei(amount, 'ether')
+        body = {'address': address, 'amount': str(amount)}
+        logger.debug('address: {}'.format(address))
+        logger.debug('amount in wei: {}'.format(amount))
 
         res = requests.post(
             endpoints.BASE_URL + endpoints.START_WITHDRAW,

@@ -57,9 +57,15 @@ def test_start_withdraw_with_valid_address_and_amount_is_correct(user):
 def test_invalid_confirmation_code_returns_error(user, invalid_code, expected_error):
     deposit_address = input_values.DEPOSIT_ADDRESS_METAMASK
     vid_to_withdraw = 20.0
+    email = user.email
+    email_password = user.email_password
 
     utils.send_vid_to_account(user.wallet_address, vid_to_withdraw)
     transfer_id = user.start_withdraw(deposit_address, vid_to_withdraw)
+    # Used to delete the sent emails, but no information is needed
+    # TODO: Replace with waiting until the newly sent (unread) email is found in inbox
+    sleep(5)
+    _ = _get_withdraw_confirmation_email_information(email, email_password)
     with pytest.raises(requests.HTTPError) as e:
         user.confirm_withdraw(transfer_id, invalid_code)
 
@@ -135,6 +141,11 @@ def test_entering_incorrect_confirmation_code_returns_error(user):
 
     assert e.value.response.status_code == 400
     assert e.value.response.json() == {'message': 'Bad request', 'fields': None}
+
+
+# def test_many_withdraws_at_once(users):
+#     for user in users:
+#         print(user.email)
 
 
 # This should return an error, currently gives a valid transfer_id

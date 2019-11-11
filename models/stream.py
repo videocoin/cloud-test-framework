@@ -10,10 +10,20 @@ class Stream:
 
     def start(self):
         response = requests.post(
-            endpoints.BASE_URL + endpoints.STREAM + '/' + self.id, headers=self.headers
+            endpoints.BASE_URL + endpoints.STREAM + '/' + self.id + '/run',
+            headers=self.headers,
         )
         response.raise_for_status()
-        # TODO: Make sure response was good here
+
+        return response.json()
+
+    def stop(self):
+        response = requests.post(
+            endpoints.BASE_URL + endpoints.STREAM + '/' + self.id + '/stop',
+            headers=self.headers,
+        )
+        response.raise_for_status()
+
         return response.json()
 
     def delete(self):
@@ -21,7 +31,7 @@ class Stream:
             endpoints.BASE_URL + endpoints.STREAM + '/' + self.id, headers=self.headers
         )
         response.raise_for_status()
-        # TODO: Make sure the response was good here
+
         return True
 
     def _get_headers(self):

@@ -1,8 +1,11 @@
+from time import sleep
+from datetime import datetime
 import requests
 import pytest
 import logging
 
 from consts import expected_results
+from utils.rtmp_runner import RTMPRunner
 
 logger = logging.getLogger(__name__)
 
@@ -47,6 +50,82 @@ def test_creating_valid_stream_has_correct_information(user):
         assert len(other_found_stream) == 0
 
 
+def test_creating_stream_and_send_data_to_rtmp_url(user):
+    try:
+        new_stream = user.create_stream()
+        new_stream.start()
+
+        _wait_for_stream_status(new_stream, 'STREAM_STATUS_PREPARED')
+        rtmp_job = RTMPRunner('http://127.0.0.1:8000', new_stream.rtmp_url)
+        rtmp_job.start()
+        _wait_for_stream_status(new_stream, 'STREAM_STATUS_READY')
+        # Let 'er run
+        sleep(60)
+    finally:
+        new_stream.stop()
+        _wait_for_stream_status(new_stream, 'STREAM_STATUS_COMPLETED')
+        rtmp_job.stop()
+        new_stream.delete()
+
+
+def test_time_it_takes_for_stream_prepared(user):
+    NUM_OF_TESTS = 3
+    EXPECTED_TIME = 8
+
+    results = []
+    for i in range(NUM_OF_TESTS):
+        try:
+            new_stream = user.create_stream()
+            new_stream.start()
+            duration = _wait_for_stream_status(
+                new_stream, 'STREAM_STATUS_PREPARED', timeout=EXPECTED_TIME
+            )
+            results.append(duration)
+        finally:
+            new_stream.stop()
+            _wait_for_stream_status(new_stream, 'STREAM_STATUS_CANCELLED')
+            new_stream.delete()
+
+    average = sum(results) / len(results)
+    logger.info(
+        'Average time to get stream prepared over {} tests: {}'.format(
+            NUM_OF_TESTS, average
+        )
+    )
+    assert average < EXPECTED_TIME
+
+
+def test_time_it_takes_for_stream_output_ready(user):
+    NUM_OF_TESTS = 3
+    EXPECTED_TIME = 35
+
+    results = []
+    for i in range(NUM_OF_TESTS):
+        try:
+            new_stream = user.create_stream()
+            new_stream.start()
+            _wait_for_stream_status(new_stream, 'STREAM_STATUS_PREPARED')
+            rtmp_job = RTMPRunner('http://127.0.0.1:8000', new_stream.rtmp_url)
+            rtmp_job.start()
+            duration = _wait_for_stream_status(
+                new_stream, 'STREAM_STATUS_READY', timeout=EXPECTED_TIME
+            )
+            results.append(duration)
+        finally:
+            new_stream.stop()
+            _wait_for_stream_status(new_stream, 'STREAM_STATUS_COMPLETED')
+            rtmp_job.stop()
+            new_stream.delete()
+
+    average = sum(results) / len(results)
+    logger.info(
+        'Average time to get stream output ready over {} tests: {}'.format(
+            NUM_OF_TESTS, average
+        )
+    )
+    assert average < EXPECTED_TIME
+
+
 def test_creating_stream_with_empty_name_returns_error(user):
     with pytest.raises(requests.HTTPError) as e:
         user.create_stream(name='')
@@ -71,3 +150,23 @@ def test_creating_stream_with_invalid_profile_id(user):
     with pytest.raises(requests.HTTPError) as e:
         user.create_stream(profile_id='abcd-1234')
     print(e)
+
+
+def _wait_for_stream_status(stream, status, timeout=60):
+    start = datetime.now()
+    while stream.status != status and _time_from_start(start) < timeout:
+        sleep(1)
+    if _time_from_start(start) > timeout:
+        raise RuntimeError(
+            'Stream {} took too long to transition to {}.'
+            'Time allowed: {}. Status during failure: {}'.format(
+                stream.id, status, timeout, stream.status
+            )
+        )
+
+    return _time_from_start(start)
+
+
+def _time_from_start(start):
+    now = datetime.now()
+    return (now - start).seconds
