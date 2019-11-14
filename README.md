@@ -64,4 +64,4 @@ Reporting to TestRail has a large number of advantages (stores test results, gra
 
 Usage:
 
-`pytest --testrail_report`
+`pytest --testrail_report=True`
