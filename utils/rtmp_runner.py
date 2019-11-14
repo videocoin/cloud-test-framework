@@ -11,7 +11,7 @@ class RTMPRunner:
 
     def start(self, destination):
         body = {'destination': destination}
-        res = requests.post(self.url + '/rtmpjobs/', json=body)
+        res = requests.post(self.url + '/rtmpjobs', json=body)
         try:
             res.raise_for_status()
         except requests.HTTPError as e:
@@ -26,7 +26,7 @@ class RTMPRunner:
         return self.id
 
     def stop(self):
-        res = requests.delete(self.url + '/rtmpjobs/' + str(self.id) + '/')
+        res = requests.delete(self.url + '/rtmpjobs/' + str(self.id))
         try:
             res.raise_for_status()
         except requests.HTTPError as e:
