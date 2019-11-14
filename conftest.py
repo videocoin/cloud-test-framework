@@ -24,6 +24,7 @@ def pytest_addoption(parser):
     )
     parser.addoption('--num_of_test_users', action='store', default=3)
     parser.addoption('--rtmp_runner', action='store', default='127.0.0.1:8000')
+    parser.addoption('--testrail_report', action='store', default=False)
 
 
 @pytest.fixture
@@ -52,12 +53,6 @@ def users(request):
     return list_of_users
 
 
-def pytest_collection_modifyitems(session, config, items):
-    # Do syncing here
-    # testrail_client.add_local_tests_to_testrail(items)
-    pass
-
-
 def pytest_sessionstart(session):
     # TODO: Test run creation should ideally go here
     pass
@@ -69,26 +64,33 @@ def pytest_sessionfinish(session):
 
 
 def pytest_collection_finish(session):
-    # use_test_rail = config.getoption(consts.CLI_OPTION_USE_TESTRAIL)
-    # if not use_test_rail:
-    #     return
+    use_testrail = session.config.getoption('--testrail_report')
+    if not use_testrail:
+        return
+
     testrail_email = 'kenneth@liveplanet.net'
     testrail_key = os.getenv('TESTRAIL_KEY')
     if testrail_email is None:
         raise Exception("specify testrail email")
     if testrail_key is None:
         raise Exception("specify testrail key")
-
     testrail_client = TestRailClient(testrail_email, testrail_key)
+
+    # Sync tests before doing anything
+    # BUG: I have an input() call in here. Tests will fail if I try to run this
+    # without -s argument in pytest invocation (don't capture stdout)
+    testrail_client.add_local_tests_to_testrail(session.items)
+
     # Get all test cases in TestRail testsuite
     current_existing_testcases = testrail_client.get_all_test_cases(
         project_id=12, test_suite_id=473
     )
 
     # Create a new empty run, add the test cases to it later
-    run_name = 'VideoCoin cloud testing: ' + datetime.now().strftime(
-        '%m-%d-%Y@%H:%M:%S %p'
-    )
+    # run_name = 'VideoCoin cloud testing: ' + datetime.now().strftime(
+    #     '%m-%d-%Y@%H:%M:%S %p'
+    # )
+    run_name = 'fake test run'
     new_run = testrail_client.add_run(12, 473, run_name)
     new_run_id = new_run['id']
 
@@ -115,18 +117,23 @@ def pytest_collection_finish(session):
                 local_testcase.user_properties.append(('testrail_run_id', new_run_id))
                 testcase_found = True
         if not testcase_found:
+            # TODO: Just skip the tests that aren't in TestRail. If there are no more
+            # tests to be ran (because none of the tests are in TestRail), _then_ close
+            # the test run
             testrail_client.close_test_run(new_run_id)
             raise Exception(
-                '"{}" cannot be found. Are you sure local testcases are synced'
+                '"{}" cannot be found. Are you sure local testcases are synced '
                 'with TestRail testcases?'.format(local_testcase_name)
             )
 
     testrail_client.add_tests_to_run(new_run_id, tests_to_run)
-    # _create_testrail_test_run
-    # _add_tests_to_test_run
 
 
 def pytest_runtest_makereport(item, call):
+    use_testrail = item.session.config.getoption('--testrail_report')
+    if not use_testrail:
+        return
+
     testrail_email = 'kenneth@liveplanet.net'
     testrail_key = os.getenv('TESTRAIL_KEY')
     if testrail_email is None:

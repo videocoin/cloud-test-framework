@@ -82,6 +82,116 @@ class TestRailClient:
         }
         return self.client.send_post('add_case/' + str(section_id), request_fields)
 
+    def add_local_tests_to_testrail(self, local_testcases):
+        TESTRAIL_PROJECT_ID = 12
+        TESTRAIL_TEST_SUITE = 473
+        TESTRAIL_SECTION = 3427
+
+        current_existing_testcases = self.get_all_test_cases(
+            project_id=TESTRAIL_PROJECT_ID, test_suite_id=TESTRAIL_TEST_SUITE
+        )
+
+        # We want to programatically add new tests as we write them. Test rail API has
+        # a rate limit (180 Requests per minute at the time of writing). If possible,
+        # we want to minimize the amount of calls. Let's check what test case are maintained
+        # on test rail and add new ones that may be written in this framework
+        name_regex = re.compile(r'Name:\n([\s\S]*)Description:')
+        param_name = re.compile(r'\[(.*)\]')
+        description_regex = re.compile(r'Description:\n([\s\S]*)Steps:')
+        steps_regex = re.compile(r'Steps:\n([\s\S]*)Expected results:')
+        expected_results_regex = re.compile(r'Expected results:\n([\s\S]*)')
+        # add_new_test_cases
+        # edit_test_case
+        # delete_unused_test_cases (this should be its own util method, should not be run
+        # on every test run)
+        skip_tests = []
+        add_tests = []
+        for local_testcase in local_testcases:
+            need_to_add_local_test = True
+            test_docstring = local_testcase._obj.__doc__
+
+            if test_docstring:
+                local_test_name = re.search(name_regex, test_docstring).group(1).strip()
+                if local_testcase.originalname:
+                    # If a test has an original name, it is a parametrized test and the
+                    # parametrized argument should be appended to the name
+                    local_test_name = re.search(name_regex, test_docstring).group(
+                        1
+                    ).strip() + ' [{}]'.format(
+                        re.search(param_name, local_testcase.name).group(1)
+                    )
+
+                # A test case needs to be added if there is no test case in the TestRail
+                # test repository that shares the same name
+                for cloud_testcase in current_existing_testcases:
+                    cloud_test_display_name = cloud_testcase['title']
+
+                    # It already exists on testrail so break out and check the next
+                    # local test cases
+                    if cloud_test_display_name == local_test_name:
+                        need_to_add_local_test = False
+                        skip_tests.append(local_test_name)
+                        break
+
+                if need_to_add_local_test:
+                    if test_docstring:
+                        # TODO: This formatting isn't gonna handle things that aren't in simple
+                        # paragraph or simple list form...
+                        #
+                        # As of right now, description MUST be in a simple paragraph form
+                        # Steps and expected results MUST be in numbered list form
+                        reformat_paragraph = lambda txt: ' '.join(txt.split())
+                        reformat_list = (
+                            lambda txt: txt.replace('\n', ' ')
+                            .replace('\t', '')
+                            .replace('0.', '\n0.')
+                        )
+                        unformatted_description = (
+                            re.search(description_regex, test_docstring)
+                            .group(1)
+                            .strip()
+                        )
+                        unformatted_steps = (
+                            re.search(steps_regex, test_docstring).group(1).strip()
+                        )
+                        unformatted_expected_results = (
+                            re.search(expected_results_regex, test_docstring)
+                            .group(1)
+                            .strip()
+                        )
+                        description = reformat_paragraph(unformatted_description)
+                        steps = reformat_list(unformatted_steps)
+                        expected_results = reformat_list(unformatted_expected_results)
+                        add_tests.append(
+                            (
+                                local_test_name,
+                                TESTRAIL_SECTION,
+                                description,
+                                steps,
+                                expected_results,
+                            )
+                        )
+
+        if not len(add_tests):
+            print('All tests up to date')
+        else:
+            print('The following tests are already registered in TestRail: ')
+            for test in skip_tests:
+                print(test)
+            print()
+
+            print('The following tests need to be added into TestRail: ')
+            for test in add_tests:
+                print('- ' + test[0])
+
+            confirm = input('Are you sure you want to add these tests to TestRail? ')
+            if confirm.lower() == 'y':
+                for test in add_tests:
+                    self.add_test_case(*test)
+                return True
+            else:
+                return False
+
 
 #
 # TestRail API binding for Python 3.x (API v2, available since
@@ -169,102 +279,3 @@ class APIClient:
 
 class APIError(Exception):
     pass
-
-
-def add_local_tests_to_testrail(self, local_testcases):
-    TESTRAIL_PROJECT_ID = 12
-    TESTRAIL_TEST_SUITE = 473
-    TESTRAIL_SECTION = 3427
-
-    current_existing_testcases = self.get_all_test_cases(
-        project_id=TESTRAIL_PROJECT_ID, test_suite_id=TESTRAIL_TEST_SUITE
-    )
-
-    # We want to programatically add new tests as we write them. Test rail API has
-    # a rate limit (180 Requests per minute at the time of writing). If possible,
-    # we want to minimize the amount of calls. Let's check what test case are maintained
-    # on test rail and add new ones that may be written in this framework
-    name_regex = re.compile(r'Name:\n([\s\S]*)Description:')
-    param_name = re.compile(r'\[(.*)\]')
-    description_regex = re.compile(r'Description:\n([\s\S]*)Steps:')
-    steps_regex = re.compile(r'Steps:\n([\s\S]*)Expected results:')
-    expected_results_regex = re.compile(r'Expected results:\n([\s\S]*)')
-    # add_new_test_cases
-    # edit_test_case
-    # delete_unused_test_cases (this should be its own util method, should not be run
-    # on every test run)
-    for local_testcase in local_testcases:
-        need_to_add_local_test = True
-        test_docstring = local_testcase._obj.__doc__
-
-        if test_docstring:
-            local_test_display_name = (
-                re.search(name_regex, test_docstring).group(1).strip()
-            )
-            local_test_automated_test_name = local_testcase.name
-            if local_testcase.originalname:
-                # If a test has an original name, it is a parametrized test and the
-                # parametrized argument should be appended to the name
-                local_test_display_name = re.search(name_regex, test_docstring).group(
-                    1
-                ).strip() + ' [{}]'.format(
-                    re.search(param_name, local_testcase.name).group(1)
-                )
-                local_test_automated_test_name = local_testcase.originalname
-
-            # A test case needs to be added if there is no test case in the TestRail
-            # test repository that shares the same:
-            # 1) Display name (title) as the local test case AND
-            # 2) automated_test_name (custom TestRail field) as the local test case
-            # If a test case shares one of the two criteria, then the test case should
-            # be edited instead (see: edit_testrail_with_local_tests())
-            for cloud_testcase in current_existing_testcases:
-                cloud_test_display_name = cloud_testcase['title']
-                cloud_test_automated_test_name = cloud_testcase[
-                    'custom_automated_test_name'
-                ]
-
-                # It already exists on testrail so break out and check the next
-                # local test cases
-                if (
-                    cloud_test_display_name == local_test_display_name
-                    and cloud_test_automated_test_name == local_test_automated_test_name
-                ):
-                    need_to_add_local_test = False
-                    break
-
-            if need_to_add_local_test:
-                if test_docstring:
-                    # TODO: This formatting isn't gonna handle things that aren't in simple
-                    # paragraph or simple list form...
-                    #
-                    # As of right now, description MUST be in a simple paragraph form
-                    # Steps and expected results MUST be in numbered list form
-                    reformat_paragraph = lambda txt: ' '.join(txt.split())
-                    reformat_list = (
-                        lambda txt: txt.replace('\n', ' ')
-                        .replace('\t', '')
-                        .replace('0.', '\n0.')
-                    )
-                    unformatted_description = (
-                        re.search(description_regex, test_docstring).group(1).strip()
-                    )
-                    unformatted_steps = (
-                        re.search(steps_regex, test_docstring).group(1).strip()
-                    )
-                    unformatted_expected_results = (
-                        re.search(expected_results_regex, test_docstring)
-                        .group(1)
-                        .strip()
-                    )
-                    description = reformat_paragraph(unformatted_description)
-                    steps = reformat_list(unformatted_steps)
-                    expected_results = reformat_list(unformatted_expected_results)
-
-                    self.add_test_case(
-                        local_test_display_name,
-                        TESTRAIL_SECTION,
-                        description,
-                        steps,
-                        expected_results,
-                    )
