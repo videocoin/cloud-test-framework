@@ -1,8 +1,11 @@
 import re
+import logging
 import urllib.request
 import urllib.error
 import json
 import base64
+
+logger = logging.getLogger(__name__)
 
 
 class TestRailClient:
@@ -184,13 +187,22 @@ class TestRailClient:
             for test in add_tests:
                 print('- ' + test[0])
 
-            confirm = input('Are you sure you want to add these tests to TestRail? ')
-            if confirm.lower() == 'y':
-                for test in add_tests:
-                    self.add_test_case(*test)
-                return True
-            else:
-                return False
+            try:
+                confirm = input(
+                    'Are you sure you want to add these tests to TestRail? '
+                )
+                if confirm.lower() == 'y':
+                    for test in add_tests:
+                        self.add_test_case(*test)
+                    return True
+                else:
+                    return False
+            except OSError as e:
+                logger.error(
+                    'PyTest option -s has to be passed in with --testrail_report'
+                    'Enable -s and try again. Aborting tests and test sync'
+                )
+                raise e
 
 
 #
