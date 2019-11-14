@@ -14,5 +14,5 @@ Kenneth's TODOs
         TODO: Long duration stream tests
         TODO: Varying test content tests
         TODO: Ask for and implement auto-generated / auto-deleted users
-        TODO: Edit README to reflect testrail_report and rtmp_runner usage
+        -TODO: Edit README to reflect testrail_report and rtmp_runner usage-
         TODO: Make request for ability to delete user (only on snb, for testing sign up)
