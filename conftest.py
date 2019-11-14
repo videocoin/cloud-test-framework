@@ -23,7 +23,7 @@ def pytest_addoption(parser):
         '--password', action='store', default=input_values.ACCOUNT_PASSWORD_DEFAULT
     )
     parser.addoption('--num_of_test_users', action='store', default=3)
-    parser.addoption('--rtmp_runner', action='store', default='127.0.0.1:8000')
+    parser.addoption('--rtmp_runner', action='store', default='http://127.0.0.1:8000')
     parser.addoption('--testrail_report', action='store', default=False)
 
 

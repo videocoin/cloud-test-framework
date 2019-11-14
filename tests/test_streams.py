@@ -11,6 +11,12 @@ from utils.rtmp_runner import RTMPRunner
 logger = logging.getLogger(__name__)
 
 
+@pytest.fixture
+def rtmp_runner(request):
+    addr = request.config.getoption('--rtmp_runner')
+    return RTMPRunner(addr)
+
+
 @pytest.mark.smoke
 @pytest.mark.functional
 def test_creating_valid_stream_appears_in_streams_list(user):
@@ -52,14 +58,13 @@ def test_creating_valid_stream_has_correct_information(user):
 
 @pytest.mark.smoke
 @pytest.mark.functional
-def test_creating_stream_and_send_data_to_rtmp_url(user):
+def test_creating_stream_and_send_data_to_rtmp_url(user, rtmp_runner):
     try:
         new_stream = user.create_stream()
         new_stream.start()
 
         _wait_for_stream_status(new_stream, 'STREAM_STATUS_PREPARED')
-        rtmp_job = RTMPRunner('http://127.0.0.1:8000', new_stream.rtmp_url)
-        rtmp_job.start()
+        rtmp_runner.start(new_stream.rtmp_url)
         _wait_for_stream_status(new_stream, 'STREAM_STATUS_READY')
         # m3u8.load('https://streams-snb.videocoin.network/' + new_stream.id + '/index.m3u8')
         # Let 'er run
@@ -67,7 +72,7 @@ def test_creating_stream_and_send_data_to_rtmp_url(user):
     finally:
         new_stream.stop()
         _wait_for_stream_status(new_stream, 'STREAM_STATUS_COMPLETED')
-        rtmp_job.stop()
+        rtmp_runner.stop()
         new_stream.delete()
 
 
@@ -101,7 +106,7 @@ def test_time_it_takes_for_stream_prepared(user):
 
 
 @pytest.mark.performance
-def test_time_it_takes_for_stream_output_ready(user):
+def test_time_it_takes_for_stream_output_ready(user, rtmp_runner):
     NUM_OF_TESTS = 5
     EXPECTED_TIME = 35
 
@@ -111,8 +116,7 @@ def test_time_it_takes_for_stream_output_ready(user):
             new_stream = user.create_stream()
             new_stream.start()
             _wait_for_stream_status(new_stream, 'STREAM_STATUS_PREPARED')
-            rtmp_job = RTMPRunner('http://127.0.0.1:8000', new_stream.rtmp_url)
-            rtmp_job.start()
+            rtmp_runner.start(new_stream.rtmp_url)
             duration = _wait_for_stream_status(
                 new_stream, 'STREAM_STATUS_READY', timeout=EXPECTED_TIME
             )
@@ -120,7 +124,7 @@ def test_time_it_takes_for_stream_output_ready(user):
         finally:
             new_stream.stop()
             _wait_for_stream_status(new_stream, 'STREAM_STATUS_COMPLETED')
-            rtmp_job.stop()
+            rtmp_runner.stop()
             new_stream.delete()
 
     average = sum(results) / len(results)
@@ -135,7 +139,7 @@ def test_time_it_takes_for_stream_output_ready(user):
 # TODO: Something's not right about this test...
 # Is the transition to STREAM_STATUS_COMPLETED really instant?
 @pytest.mark.performance
-def test_time_it_takes_for_stream_complete(user):
+def test_time_it_takes_for_stream_complete(user, rtmp_runner):
     NUM_OF_TESTS = 5
     EXPECTED_TIME = 5
 
@@ -145,8 +149,7 @@ def test_time_it_takes_for_stream_complete(user):
             new_stream = user.create_stream()
             new_stream.start()
             _wait_for_stream_status(new_stream, 'STREAM_STATUS_PREPARED')
-            rtmp_job = RTMPRunner('http://127.0.0.1:8000', new_stream.rtmp_url)
-            rtmp_job.start()
+            rtmp_runner.start(rtmp_runner)
             _wait_for_stream_status(new_stream, 'STREAM_STATUS_READY')
             new_stream.stop()
             duration = _wait_for_stream_status(
@@ -154,7 +157,7 @@ def test_time_it_takes_for_stream_complete(user):
             )
             results.append(duration)
         finally:
-            rtmp_job.stop()
+            rtmp_runner.stop()
             new_stream.delete()
 
     average = sum(results) / len(results)
@@ -198,6 +201,11 @@ def test_creating_stream_with_invalid_profile_id(user):
 def _wait_for_stream_status(stream, status, timeout=60):
     start = datetime.now()
     while stream.status != status and _time_from_start(start) < timeout:
+        logger.debug(
+            'Time: {} | Current status: {} | Waiting for status: {}'.format(
+                _time_from_start(start), stream.status, status
+            )
+        )
         sleep(1)
     if _time_from_start(start) > timeout:
         raise RuntimeError(

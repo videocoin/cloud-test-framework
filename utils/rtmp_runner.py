@@ -1,16 +1,25 @@
 import requests
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class RTMPRunner:
-    def __init__(self, url, destination):
+    def __init__(self, url):
         self.url = url
         self.state = 'NEW'
-        self.destination = destination
 
-    def start(self):
-        body = {'destination': self.destination}
+    def start(self, destination):
+        body = {'destination': destination}
         res = requests.post(self.url + '/rtmpjobs/', json=body)
-        res.raise_for_status()
+        try:
+            res.raise_for_status()
+        except requests.HTTPError as e:
+            logger.error(
+                'Cannot send request to RTMP Runner server. Are you sure '
+                'you have the right address / that the server is running?'
+            )
+            raise e
         self.state = 'RUNNING'
 
         self.id = res.json()['id']
@@ -18,5 +27,12 @@ class RTMPRunner:
 
     def stop(self):
         res = requests.delete(self.url + '/rtmpjobs/' + str(self.id) + '/')
-        res.raise_for_status()
+        try:
+            res.raise_for_status()
+        except requests.HTTPError as e:
+            logger.error(
+                'Cannot send request to RTMP Runner server. Are you sure '
+                'you have the right address / that the server is running?'
+            )
+            raise e
         self.state = 'COMPLETE'
