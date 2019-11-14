@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 
 class RTMPRunner:
     def __init__(self, url):
-        self.url = url
+        self.url = 'http://' + url
         self.state = 'NEW'
 
     def start(self, destination):

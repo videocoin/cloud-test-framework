@@ -7,10 +7,12 @@ Kenneth's TODOs
         -TOOD: Mark tests properly (smoke, functional, performance, etc.)-
         TODO: m3u8 parser and other HLS verification stuff
         -TODO: Do conversion from wei to VID for tests using web3-
-        TODO: Use web3 to connect to rinkeby network
-        TODO: Hook tests up to TestRail
+        -TODO: Use web3 to connect to rinkeby network-
+        -TODO: Hook tests up to TestRail-
         TODO: More withdraw and streams tests
         -TODO: Withdraw takes a STRING WEI amount now when creating starting new withdraw-
         TODO: Long duration stream tests
         TODO: Varying test content tests
         TODO: Ask for and implement auto-generated / auto-deleted users
+        TODO: Edit README to reflect testrail_report and rtmp_runner usage
+        TODO: Make request for ability to delete user (only on snb, for testing sign up)
