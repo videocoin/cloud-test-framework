@@ -76,16 +76,6 @@ def pytest_collection_finish(session):
         raise Exception("specify testrail key")
     testrail_client = TestRailClient(testrail_email, testrail_key)
 
-    # Sync tests before doing anything
-    # BUG: I have an input() call in here. Tests will fail if I try to run this
-    # without -s argument in pytest invocation (don't capture stdout)
-    testrail_client.add_local_tests_to_testrail(session.items)
-
-    # Get all test cases in TestRail testsuite
-    current_existing_testcases = testrail_client.get_all_test_cases(
-        project_id=12, test_suite_id=473
-    )
-
     # Create a new empty run, add the test cases to it later
     # run_name = 'VideoCoin cloud testing: ' + datetime.now().strftime(
     #     '%m-%d-%Y@%H:%M:%S %p'
@@ -93,6 +83,22 @@ def pytest_collection_finish(session):
     run_name = 'fake test run'
     new_run = testrail_client.add_run(12, 473, run_name)
     new_run_id = new_run['id']
+
+    # Sync tests before doing anything
+    # BUG: I have an input() call in here. Tests will fail if I try to run this
+    # without -s argument in pytest invocation (don't capture stdout)
+    is_synced = testrail_client.add_local_tests_to_testrail(session.items)
+    if not is_synced:
+        raise pytest.UsageError(
+            'Not all collected tests are synced with TestRail. '
+            'To run tests, sync tests with TestRail or exclude --testrail_report'
+            'flag. Aborting.'
+        )
+
+    # Get all test cases in TestRail testsuite
+    current_existing_testcases = testrail_client.get_all_test_cases(
+        project_id=12, test_suite_id=473
+    )
 
     # Get all the display names of the test cases to run and attach TestRail test IDs
     # to the items to be ran

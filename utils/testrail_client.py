@@ -47,6 +47,9 @@ class TestRailClient:
             'add_result_for_case/{}/{}'.format(run_id, case_id), data
         )
 
+    def delete_run(self, run_id):
+        return self.client.send_post('delete_run/{}'.format(run_id))
+
     def add_run(
         self,
         project_id,
@@ -177,6 +180,7 @@ class TestRailClient:
 
         if not len(add_tests):
             print('All tests up to date')
+            return True
         else:
             print('The following tests are already registered in TestRail: ')
             for test in skip_tests:
