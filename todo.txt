@@ -16,3 +16,5 @@ Kenneth's TODOs
         TODO: Ask for and implement auto-generated / auto-deleted users
         -TODO: Edit README to reflect testrail_report and rtmp_runner usage-
         TODO: Make request for ability to delete user (only on snb, for testing sign up)
+        TODO: Allow for editing of tests in TestRail from .py test files
+        TODO: Allow for deletion of unused tests??
