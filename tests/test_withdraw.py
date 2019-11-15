@@ -13,7 +13,24 @@ logger = logging.getLogger(__name__)
 
 @pytest.mark.smoke
 @pytest.mark.functional
-def test_start_withdraw_with_valid_address_and_amount_is_correct(user):
+def test_starting_withdraw_with_valid_address_and_amount_has_correct_information(user):
+    """
+    Name:
+    Starting withdraw with valid address and amount has correct information
+
+    Description:
+    When the user begins a withdraw process to deposit to a valid address and has a
+    valid withdraw amount, the information in the withdraw confirmation email should
+    be correct and accurately reflect the information that initiated the withdraw.
+
+    Steps:
+    0. Initiate withdraw request from server, noting the address and amount submitted
+    0. Check email for withdraw confirmation email, note the information listed in email
+    0. Compare submitted information to information in confirmation email
+
+    Expected results:
+    0. Information listed in email is accurate compared to information submitted
+    """
     deposit_address = input_values.DEPOSIT_ADDRESS_METAMASK
     email = user.email
     email_password = user.email_password
