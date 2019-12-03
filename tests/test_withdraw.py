@@ -75,6 +75,22 @@ def test_starting_withdraw_with_valid_address_and_amount_has_correct_information
     ],
 )
 def test_invalid_confirmation_code_returns_error(user, invalid_code, expected_error):
+    """
+    Name:
+    Invalid confirmation code format returns error
+
+    Description:
+    When the user attempts to confirm their withdraw with a confirmation code, invalid
+    confirmation code formats should be rejected and provide user with appropriate
+    error message.
+
+    Steps:
+    0. Initiate withdraw request from server
+    0. Attempt to complete withdraw request by submitting invalid format confirmation codes
+
+    Expected results:
+    0. Server returns error describing problem with confirmation code format
+    """
     deposit_address = input_values.DEPOSIT_ADDRESS_METAMASK
     vid_to_withdraw = 20.0
     email = user.email
@@ -96,6 +112,23 @@ def test_invalid_confirmation_code_returns_error(user, invalid_code, expected_er
 @pytest.mark.smoke
 @pytest.mark.functional
 def test_correct_confirmation_code_sends_success_email(user):
+    """
+    Name:
+    Correct confirmation code sends success email
+
+    Description:
+    When the user initiates and correctly completes a withdraw request, the user should
+    be sent an email describing the transaction with accurate information.
+
+    Steps:
+    0. Initiate withdraw request from server
+    0. Complete withdraw request using correct confirmation code
+    0. Check email for withdraw success email, verifying all information in email is correct
+
+    Expected results:
+    0. User's email receives success email from server after completing withdraw
+    0. Information in withdraw success email is correct
+    """
     deposit_address = input_values.DEPOSIT_ADDRESS_METAMASK
     vid_to_withdraw = 20.0
     email = user.email
@@ -137,6 +170,22 @@ def test_correct_confirmation_code_sends_success_email(user):
 
 @pytest.mark.functional
 def test_entering_incorrect_confirmation_code_returns_error(user):
+    """
+    Name:
+    Entering incorrect confirmation code returns error
+
+    Description:
+    When the user initiates a withdraw process, but inputs an incorrect code for
+    confirmation, the user should be returned an error and the withdraw process
+    is not completed
+
+    Steps:
+    0. Initiate withdraw request from server
+    0. Complete withdraw process using a confirmation code different from what was sent
+
+    Expected results:
+    0. Server returns an error describing the problem. The withdraw process is not complete
+    """
     email = user.email
     email_password = user.email_password
     deposit_address = input_values.DEPOSIT_ADDRESS_METAMASK
@@ -171,26 +220,26 @@ def test_entering_incorrect_confirmation_code_returns_error(user):
 #         print(user.email)
 
 
-# This should return an error, currently gives a valid transfer_id
-@pytest.mark.skip
-@pytest.mark.functional
-def test_starting_withdraw_with_invalid_address_format_returns_error(user):
-    # try:
-    #     DEPOSIT_ADDRESS_INVALID = 'aasdfff0x03948593jcns456fsc52j358dsjsf4499'
-    #     utils.send_vid_to_account(user.wallet_address, 20)
-    #     # withdraw_id = user.start_withdraw(DEPOSIT_ADDRESS_INVALID, 20)
-    # finally:
-    #     # should be able to throw the rest of the VID away, to clean the account
-    #     pass
-    pass
+# # This should return an error, currently gives a valid transfer_id
+# @pytest.mark.skip
+# @pytest.mark.functional
+# def test_starting_withdraw_with_invalid_address_format_returns_error(user):
+#     # try:
+#     #     DEPOSIT_ADDRESS_INVALID = 'aasdfff0x03948593jcns456fsc52j358dsjsf4499'
+#     #     utils.send_vid_to_account(user.wallet_address, 20)
+#     #     # withdraw_id = user.start_withdraw(DEPOSIT_ADDRESS_INVALID, 20)
+#     # finally:
+#     #     # should be able to throw the rest of the VID away, to clean the account
+#     #     pass
+#     pass
 
 
-# This should return an error, currently gives a valid transfer_id
-@pytest.mark.skip
-@pytest.mark.functional
-def test_starting_withdraw_with_unavailable_amount_of_vid(user):
-    # withdraw_id = user.start_withdraw(input_values.DEPOSIT_ADDRESS_METAMASK, 9999)
-    pass
+# # This should return an error, currently gives a valid transfer_id
+# @pytest.mark.skip
+# @pytest.mark.functional
+# def test_starting_withdraw_with_unavailable_amount_of_vid(user):
+#     # withdraw_id = user.start_withdraw(input_values.DEPOSIT_ADDRESS_METAMASK, 9999)
+#     pass
 
 
 def _get_withdraw_confirmation_email_information(email, email_password):

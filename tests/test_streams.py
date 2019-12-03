@@ -103,7 +103,7 @@ def test_creating_stream_and_send_data_to_rtmp_url_starts_output_stream(
     When the user creates a stream and begins sending data to its RTMP URL, the stream
     should begin transcoding the data and provide output to its output URL.
 
-    Steps to reproduce:
+    Steps:
     0. Create new stream with valid name and profile and note its RTMP URL
     0. Start preparing the stream and wait for it to be prepared
     0. Begin streaming to the stream's RTMP URL and wait for output stream to be ready
@@ -368,7 +368,7 @@ def _wait_for_stream_status(stream, status, timeout=60):
             )
         )
         sleep(1)
-    if _time_from_start(start) > timeout:
+    if _time_from_start(start) >= timeout:
         raise RuntimeError(
             'Stream {} took too long to transition to {}.'
             'Time allowed: {}. Status during failure: {}'.format(

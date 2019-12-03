@@ -109,9 +109,9 @@ def send_vid_to_account(address, amount):
     body = {'account': address, 'amount': amount}
 
     res = requests.post(
-        'http://faucet.dev.videocoin.network',
+        'http://faucet.dev.kili.videocoin.network',
         json=body,
-        auth=('admin', 'VideoCoinS3cr3t'),
+        auth=('dev1', 'D6msEL93LJT5RaPk'),
     )
     res.raise_for_status()
 

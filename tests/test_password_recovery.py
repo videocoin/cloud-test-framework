@@ -31,7 +31,7 @@ def test_testrail_integration():
     0. This is what the test should do
     0. It should also do this
     """
-    assert 1 == 1
+    assert 1 == 0
 
 
 @pytest.mark.smoke

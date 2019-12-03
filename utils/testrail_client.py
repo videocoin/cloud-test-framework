@@ -152,19 +152,26 @@ class TestRailClient:
                             .replace('\t', '')
                             .replace('0.', '\n0.')
                         )
-                        unformatted_description = (
-                            re.search(description_regex, test_docstring)
-                            .group(1)
-                            .strip()
-                        )
-                        unformatted_steps = (
-                            re.search(steps_regex, test_docstring).group(1).strip()
-                        )
-                        unformatted_expected_results = (
-                            re.search(expected_results_regex, test_docstring)
-                            .group(1)
-                            .strip()
-                        )
+                        try:
+                            unformatted_description = (
+                                re.search(description_regex, test_docstring)
+                                .group(1)
+                                .strip()
+                            )
+                            unformatted_steps = (
+                                re.search(steps_regex, test_docstring).group(1).strip()
+                            )
+                            unformatted_expected_results = (
+                                re.search(expected_results_regex, test_docstring)
+                                .group(1)
+                                .strip()
+                            )
+                        except AttributeError as e:
+                            logger.error(
+                                '{} has incorrect docstring formatting! Fix the '
+                                'docstring and try again.'.format(local_testcase.name)
+                            )
+                            raise e
                         description = reformat_paragraph(unformatted_description)
                         steps = reformat_list(unformatted_steps)
                         expected_results = reformat_list(unformatted_expected_results)
