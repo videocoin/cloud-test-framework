@@ -7,6 +7,7 @@ import m3u8
 
 from consts import expected_results
 from utils.rtmp_runner import RTMPRunner
+from utils.utils import send_vid_to_account
 
 logger = logging.getLogger(__name__)
 
@@ -114,6 +115,7 @@ def test_creating_stream_and_send_data_to_rtmp_url_starts_output_stream(
     0. Stream from output HLS stream can be viewed properly
     """
     try:
+        send_vid_to_account(user.wallet_address, 11)
         new_stream = user.create_stream()
         new_stream.start()
 
@@ -156,6 +158,7 @@ def test_time_it_takes_for_stream_prepared_state_is_less_than_expected_time(user
     results = []
     for i in range(NUM_OF_TESTS):
         try:
+            send_vid_to_account(user.wallet_address, 11)
             new_stream = user.create_stream()
             new_stream.start()
             duration = _wait_for_stream_status(
@@ -207,6 +210,7 @@ def test_time_it_takes_for_stream_to_reach_output_ready_state_is_less_than_expec
     results = []
     for i in range(NUM_OF_TESTS):
         try:
+            send_vid_to_account(user.wallet_address, 11)
             new_stream = user.create_stream()
             new_stream.start()
             _wait_for_stream_status(new_stream, 'STREAM_STATUS_PREPARED')
@@ -264,10 +268,11 @@ def test_time_it_takes_for_stream_to_reach_completed_state_is_less_than_expected
     results = []
     for i in range(NUM_OF_TESTS):
         try:
+            send_vid_to_account(user.wallet_address, 11)
             new_stream = user.create_stream()
             new_stream.start()
             _wait_for_stream_status(new_stream, 'STREAM_STATUS_PREPARED')
-            rtmp_runner.start(rtmp_runner)
+            rtmp_runner.start(new_stream.rtmp_url)
             _wait_for_stream_status(new_stream, 'STREAM_STATUS_READY')
             new_stream.stop()
             duration = _wait_for_stream_status(
