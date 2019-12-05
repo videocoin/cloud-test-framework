@@ -132,6 +132,41 @@ def test_creating_stream_and_send_data_to_rtmp_url_starts_output_stream(
         new_stream.delete()
 
 
+@pytest.mark.functional
+def test_cancelling_stream_after_input_url_ready_cancels_stream(user):
+    try:
+        send_vid_to_account(user.wallet_address, 11)
+        new_stream = user.create_stream()
+        new_stream.start()
+
+        _wait_for_stream_status(new_stream, 'STREAM_STATUS_PREPARED')
+        new_stream.stop()
+        # Make sure it really stopped by waiting a little after invoking cancel
+        sleep(5)
+        _wait_for_stream_status(new_stream, 'STREAM_STATUS_COMPLETED')
+    finally:
+        new_stream.delete()
+        pass
+
+
+@pytest.mark.functional
+def test_cancelling_stream_during_input_processing_cancels_stream(user, rtmp_runner):
+    try:
+        # send_vid_to_account(user.wallet_address, 11)
+        new_stream = user.create_stream()
+        new_stream.start()
+        _wait_for_stream_status(new_stream, 'STREAM_STATUS_PREPARED')
+        rtmp_runner.start(new_stream.rtmp_url)
+        # Let stream run before attemtping to stop
+        sleep(10)
+        new_stream.stop()
+        # Make sure it really stopped by waiting a little after invoking cancel
+        sleep(5)
+        _wait_for_stream_status(new_stream, 'STREAM_STATUS_COMPLETED')
+    finally:
+        new_stream.delete()
+
+
 @pytest.mark.performance
 def test_time_it_takes_for_stream_prepared_state_is_less_than_expected_time(user):
     """
