@@ -130,7 +130,7 @@ def test_correct_confirmation_code_sends_success_email(user):
     0. Information in withdraw success email is correct
     """
     deposit_address = input_values.DEPOSIT_ADDRESS_METAMASK
-    vid_to_withdraw = 20.0
+    vid_to_withdraw = 20
     email = user.email
     email_password = user.email_password
 
@@ -161,7 +161,7 @@ def test_correct_confirmation_code_sends_success_email(user):
                 raise e
 
     assert (
-        float(email_info[email_body_regex.VID_TRANSFER_AMOUNT_REGEX.name])
+        int(email_info[email_body_regex.VID_TRANSFER_AMOUNT_REGEX.name])
         == vid_to_withdraw
     )
     assert email_info[email_body_regex.DEPOSIT_ADDRESS_REGEX.name] == deposit_address
