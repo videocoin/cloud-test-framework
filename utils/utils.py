@@ -5,6 +5,9 @@ import re
 import requests
 import logging
 
+from web3 import Web3, HTTPProvider
+from web3.middleware import geth_poa_middleware
+
 logger = logging.getLogger(__name__)
 
 
@@ -116,6 +119,55 @@ def send_vid_to_account(address, amount):
     res.raise_for_status()
 
     # return res.json()
+
+
+def get_vid_balance_of_erc20(addr, network='rinkeby'):
+    if network == 'rinkeby':
+        network_url = 'https://rinkeby.infura.io'
+        token_addr = '0x0A94F11D89e799A2a6b9EAdC784FfD3897592dD7'
+
+    w3 = Web3(HTTPProvider(network_url))
+    # Still don't really understand this...Read more here:
+    # https://web3py.readthedocs.io/en/latest/middleware.html#geth-style-proof-of-authority
+    w3.middleware_onion.inject(geth_poa_middleware, layer=0)
+    ABI = [
+        {
+            "constant": True,
+            "inputs": [],
+            "name": "name",
+            "outputs": [{"name": "", "type": "string"}],
+            "payable": False,
+            "type": "function",
+        },
+        {
+            "constant": True,
+            "inputs": [],
+            "name": "decimals",
+            "outputs": [{"name": "", "type": "uint8"}],
+            "payable": False,
+            "type": "function",
+        },
+        {
+            "constant": True,
+            "inputs": [{"name": "_owner", "type": "address"}],
+            "name": "balanceOf",
+            "outputs": [{"name": "balance", "type": "uint256"}],
+            "payable": False,
+            "type": "function",
+        },
+        {
+            "constant": True,
+            "inputs": [],
+            "name": "symbol",
+            "outputs": [{"name": "", "type": "string"}],
+            "payable": False,
+            "type": "function",
+        },
+    ]
+    vid_addr = w3.eth.contract(token_addr, abi=ABI)
+    amt = vid_addr.functions.balanceOf(addr).call()
+
+    return amt
 
 
 if __name__ == '__main__':

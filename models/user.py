@@ -134,7 +134,7 @@ class User:
 
     @property
     def wallet_balance(self):
-        return self.json()['account']['balance']
+        return int(self.json()['account']['balance'])
 
     @property
     def wallet_update_at(self):

@@ -3,6 +3,7 @@ import pytest
 import random
 import requests
 from time import sleep
+from web3.auto import w3
 
 from consts import input_values
 from consts import email_body_regex
@@ -160,12 +161,73 @@ def test_correct_confirmation_code_sends_success_email(user):
             else:
                 raise e
 
-    assert (
-        int(email_info[email_body_regex.VID_TRANSFER_AMOUNT_REGEX.name])
-        == vid_to_withdraw
-    )
+    if type(vid_to_withdraw) == int:
+        assert (
+            int(email_info[email_body_regex.VID_TRANSFER_AMOUNT_REGEX.name])
+            == vid_to_withdraw
+        )
+    elif type(vid_to_withdraw) == float:
+        assert (
+            float(email_info[email_body_regex.VID_TRANSFER_AMOUNT_REGEX.name])
+            == vid_to_withdraw
+        )
     assert email_info[email_body_regex.DEPOSIT_ADDRESS_REGEX.name] == deposit_address
     assert email_info[email_body_regex.ETHERSCAN_REGEX.name]
+
+
+def test_correct_vid_amount_is_subtracted_from_user_balance(user):
+    deposit_address = input_values.DEPOSIT_ADDRESS_METAMASK
+    withdraw_amt = 20
+    email = user.email
+    email_password = user.email_password
+    withdraw_amt_wei = w3.toWei(withdraw_amt, 'ether')
+
+    utils.send_vid_to_account(user.wallet_address, withdraw_amt)
+    # Wait for faucet to send VID to account
+    sleep(90)
+    start_balance = user.wallet_balance
+    transfer_id = user.start_withdraw(deposit_address, withdraw_amt)
+    # Wait for confirmation email to be sent
+    sleep(10)
+    withdraw_info = _get_withdraw_confirmation_email_information(email, email_password)
+    confirmation_code = withdraw_info[email_body_regex.CONFIRMATION_CODE_REGEX.name]
+    user.confirm_withdraw(transfer_id, confirmation_code)
+    # Wait for transaction to finish and be reflected in user's balance
+    sleep(90)
+    end_balance = user.wallet_balance
+
+    logger.debug('Start balance: {}'.format(start_balance))
+    logger.debug('End balance: {}'.format(end_balance))
+    logger.debug('Withdraw amount (in wei): {}'.format(withdraw_amt_wei))
+    logger.debug('Gas amount: {}'.format(input_values.GAS_AMOUNT))
+    assert start_balance - end_balance == withdraw_amt_wei + input_values.GAS_AMOUNT
+
+
+def test_correct_vid_amount_is_added_to_erc20_addr(user):
+    deposit_address = input_values.DEPOSIT_ADDRESS_METAMASK
+    withdraw_amt = 20
+    email = user.email
+    email_password = user.email_password
+    withdraw_amt_wei = w3.toWei(withdraw_amt, 'ether')
+
+    start_balance = utils.get_vid_balance_of_erc20(deposit_address)
+    utils.send_vid_to_account(user.wallet_address, withdraw_amt)
+    # Wait for faucet to send VID to account
+    sleep(90)
+    transfer_id = user.start_withdraw(deposit_address, withdraw_amt)
+    # Wait for confirmation email to be sent
+    sleep(10)
+    withdraw_info = _get_withdraw_confirmation_email_information(email, email_password)
+    confirmation_code = withdraw_info[email_body_regex.CONFIRMATION_CODE_REGEX.name]
+    user.confirm_withdraw(transfer_id, confirmation_code)
+    # Wait for transaction to finish and be reflected in user's balance
+    sleep(90)
+    end_balance = utils.get_vid_balance_of_erc20(deposit_address)
+
+    logger.debug('Start balance: {}'.format(start_balance))
+    logger.debug('End balance: {}'.format(end_balance))
+    logger.debug('Withdraw amount (in wei): {}'.format(withdraw_amt_wei))
+    assert end_balance - start_balance == withdraw_amt_wei
 
 
 @pytest.mark.functional
