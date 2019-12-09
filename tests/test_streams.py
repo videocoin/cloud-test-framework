@@ -212,7 +212,7 @@ def test_time_it_takes_for_stream_prepared_state_is_less_than_expected_time(user
             NUM_OF_TESTS, average
         )
     )
-    assert average < EXPECTED_TIME
+    assert average <= EXPECTED_TIME
 
 
 @pytest.mark.performance
@@ -266,7 +266,7 @@ def test_time_it_takes_for_stream_to_reach_output_ready_state_is_less_than_expec
             NUM_OF_TESTS, average
         )
     )
-    assert average < EXPECTED_TIME
+    assert average <= EXPECTED_TIME
 
 
 # TODO: Something's not right about this test...
@@ -324,7 +324,7 @@ def test_time_it_takes_for_stream_to_reach_completed_state_is_less_than_expected
             NUM_OF_TESTS, average
         )
     )
-    assert average < EXPECTED_TIME
+    assert average <= EXPECTED_TIME
 
 
 @pytest.mark.functional
