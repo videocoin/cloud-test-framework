@@ -42,7 +42,7 @@ def test_starting_withdraw_with_valid_address_and_amount_has_correct_information
     sleep(5)
     withdraw_info = _get_withdraw_confirmation_email_information(email, email_password)
 
-    assert withdraw_info[email_body_regex.VID_TRANSFER_AMOUNT_REGEX.name] == '20.000000'
+    assert withdraw_info[email_body_regex.VID_TRANSFER_AMOUNT_REGEX.name] == '20'
     assert withdraw_info[email_body_regex.DEPOSIT_ADDRESS_REGEX.name] == deposit_address
     assert len(withdraw_info[email_body_regex.CONFIRMATION_CODE_REGEX.name]) == 6
 
