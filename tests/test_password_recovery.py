@@ -12,29 +12,6 @@ logger = logging.getLogger(__name__)
 
 
 @pytest.mark.smoke
-def test_testrail_integration():
-    """
-    Name:
-    Test TestRail integration
-
-    Description:
-    See if I can get TestRail integration working. I'm gonna write a longer summary so I
-    can get a multiline string and I'll see how TestRail is gonna format it when I edit
-    the description of an automated test.
-
-    Steps:
-    0. First step
-    0. Second step
-    0. Third step
-
-    Expected results:
-    0. This is what the test should do
-    0. It should also do this
-    """
-    assert 1 == 0
-
-
-@pytest.mark.smoke
 @pytest.mark.functional
 def test_password_recovery_with_registered_email(user):
     """
