@@ -401,16 +401,16 @@ def test_creating_stream_with_invalid_profile_id(user):
 
 def _wait_for_stream_status(stream, status, timeout=60):
     start = datetime.now()
-    while stream.status != status and _time_from_start(start) < timeout:
+    while stream.status != status and _time_from_start(start) <= timeout:
         logger.debug(
             'Time: {} | Current status: {} | Waiting for status: {}'.format(
                 _time_from_start(start), stream.status, status
             )
         )
         sleep(1)
-    if _time_from_start(start) >= timeout:
+    if _time_from_start(start) > timeout:
         raise RuntimeError(
-            'Stream {} took too long to transition to {}.'
+            'Stream {} took too long to transition to {}. '
             'Time allowed: {}. Status during failure: {}'.format(
                 stream.id, status, timeout, stream.status
             )
