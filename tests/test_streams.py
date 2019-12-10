@@ -122,7 +122,7 @@ def test_creating_stream_and_send_data_to_rtmp_url_starts_output_stream(
 
         _wait_for_stream_status(new_stream, 'STREAM_STATUS_PREPARED')
         rtmp_runner.start(new_stream.rtmp_url)
-        _wait_for_stream_status(new_stream, 'STREAM_STATUS_READY')
+        _wait_for_stream_status(new_stream, 'STREAM_STATUS_READY', 120)
         # m3u8.load('https://streams-snb.videocoin.network/' + new_stream.id + '/index.m3u8')
         # Let 'er run
         sleep(60)
@@ -189,7 +189,7 @@ def test_time_it_takes_for_stream_prepared_state_is_less_than_expected_time(user
     0. Time to successfully prepare stream is less than benchmarked time over average of 5 tests
     """
     NUM_OF_TESTS = 5
-    EXPECTED_TIME = 8
+    EXPECTED_TIME = 10
 
     results = []
     for i in range(NUM_OF_TESTS):
@@ -231,7 +231,7 @@ def test_time_it_takes_for_stream_to_reach_output_ready_state_is_less_than_expec
     output to be ready have not regressed
 
     Steps:
-    0. Create new stream with valid name and profil
+    0. Create new stream with valid name and profile
     0. Start preparing the stream
     0. Once stream is prepared, begin sending stream data from encoder and start timing
     0. When output is ready, stop timer
@@ -241,7 +241,7 @@ def test_time_it_takes_for_stream_to_reach_output_ready_state_is_less_than_expec
     0. Time to successfully prepare ouput is less than benchmarked time over average of 5 tests
     """
     NUM_OF_TESTS = 5
-    EXPECTED_TIME = 35
+    EXPECTED_TIME = 120
 
     results = []
     for i in range(NUM_OF_TESTS):
