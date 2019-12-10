@@ -170,6 +170,13 @@ def get_vid_balance_of_erc20(addr, network='rinkeby'):
     return amt
 
 
+def get_base_url(cluster):
+    env = ''
+    if cluster == 'snb':
+        env = '.snb'
+    return 'https://studio{}.videocoin.network'.format(env)
+
+
 if __name__ == '__main__':
     import sys
 

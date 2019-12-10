@@ -1,7 +1,6 @@
 import math
 import os
 import re
-from datetime import datetime
 import logging
 import pytest
 
@@ -22,6 +21,8 @@ def pytest_addoption(parser):
     parser.addoption(
         '--password', action='store', default=input_values.ACCOUNT_PASSWORD_DEFAULT
     )
+    parser.addoption('--token', action='store', default=None)
+    parser.addoption('--cluster', action='store', default='snb')
     parser.addoption('--num_of_test_users', action='store', default=3)
     parser.addoption('--rtmp_runner', action='store', default='192.168.1.159:8000')
     parser.addoption('--testrail_report', action='store', default=False)
@@ -29,11 +30,13 @@ def pytest_addoption(parser):
 
 @pytest.fixture
 def user(request):
+    cluster = request.config.getoption('--cluster')
     email = request.config.getoption('--email')
     password = request.config.getoption('--password')
     email_password = request.config.getoption('--email_password')
+    token = request.config.getoption('--token')
 
-    return User(email, password, email_password)
+    return User(cluster, email, password, email_password, token)
 
 
 @pytest.fixture

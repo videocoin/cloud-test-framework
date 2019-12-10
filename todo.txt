@@ -18,3 +18,5 @@ Kenneth's TODOs
         TODO: Make request for ability to delete user (only on snb, for testing sign up)
         TODO: Allow for editing of tests in TestRail from .py test files
         TODO: Allow for deletion of unused tests??
+        TODO (CRITICAL): Move auth for faucet to environment variable
+        TODO: Add stacktrace and exception info to TestRail result on failure

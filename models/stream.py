@@ -1,16 +1,19 @@
 import requests
 from consts import endpoints
+from utils import utils
 
 
 class Stream:
-    def __init__(self, token, id):
+    def __init__(self, cluster, token, id):
+        self.cluster = cluster
+        self.base_url = utils.get_base_url(self.cluster)
         self.token = token
         self.headers = self._get_headers()
         self.id = id
 
     def start(self):
         response = requests.post(
-            endpoints.BASE_URL + endpoints.STREAM + '/' + self.id + '/run',
+            self.base_url + endpoints.STREAM + '/' + self.id + '/run',
             headers=self.headers,
         )
         response.raise_for_status()
@@ -19,7 +22,7 @@ class Stream:
 
     def stop(self):
         response = requests.post(
-            endpoints.BASE_URL + endpoints.STREAM + '/' + self.id + '/stop',
+            self.base_url + endpoints.STREAM + '/' + self.id + '/stop',
             headers=self.headers,
         )
         response.raise_for_status()
@@ -28,7 +31,7 @@ class Stream:
 
     def delete(self):
         response = requests.delete(
-            endpoints.BASE_URL + endpoints.STREAM + '/' + self.id, headers=self.headers
+            self.base_url + endpoints.STREAM + '/' + self.id, headers=self.headers
         )
         response.raise_for_status()
 
@@ -39,7 +42,7 @@ class Stream:
 
     def json(self):
         response = requests.get(
-            endpoints.BASE_URL + endpoints.STREAM + '/' + self.id, headers=self.headers
+            self.base_url + endpoints.STREAM + '/' + self.id, headers=self.headers
         )
         response.raise_for_status()
         # TODO: Make sure response was good here

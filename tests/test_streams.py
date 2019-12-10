@@ -115,7 +115,8 @@ def test_creating_stream_and_send_data_to_rtmp_url_starts_output_stream(
     0. Stream from output HLS stream can be viewed properly
     """
     try:
-        send_vid_to_account(user.wallet_address, 11)
+        if user.token_type == 'sign_in':
+            send_vid_to_account(user.wallet_address, 11)
         new_stream = user.create_stream()
         new_stream.start()
 

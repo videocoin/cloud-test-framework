@@ -5,6 +5,7 @@ from web3.auto import w3
 
 from models.stream import Stream
 from consts import endpoints
+from utils import utils
 
 # This kind of class is reoccurring. It has:
 # 1) A token
@@ -16,26 +17,29 @@ logger = logging.getLogger(__name__)
 
 
 class User:
-    def __init__(self, email, password, email_password, name="Automation Account"):
+    def __init__(
+        self, cluster, email, password, email_password, token, name="Automation Account"
+    ):
         # Set token and headers first because all get methods for properties
         # of this class rely getting information from server
-        self.token = self._get_token(email, password)
+        self.cluster = cluster
+        self.base_url = utils.get_base_url(self.cluster)
+        self.token_type = 'api_token' if token else 'sign_in'
+        self.token = token if token else self._get_token(email, password)
         self.headers = self._get_headers()
 
         self.password = password
         self.email_password = email_password
-        self.id = self.json()['id']
+        # self.id = self.json()['id']
 
     def get_streams(self):
-        response = requests.get(
-            endpoints.BASE_URL + endpoints.STREAM, headers=self.headers
-        )
+        response = requests.get(self.base_url + endpoints.STREAM, headers=self.headers)
         response.raise_for_status()
         # TODO: Make sure response is good
         items = response.json()['items']
         stream_objs = []
         for item in items:
-            stream_obj = Stream(self.token, item['id'])
+            stream_obj = Stream(self.cluster, self.token, item['id'])
             stream_objs.append(stream_obj)
         return stream_objs
         # TODO: This always returns the same ID for all stream objects created
@@ -65,11 +69,11 @@ class User:
         body = {'name': name, 'profile_id': profile_id}
 
         response = requests.post(
-            endpoints.BASE_URL + endpoints.STREAM, headers=self.headers, json=body
+            self.base_url + endpoints.STREAM, headers=self.headers, json=body
         )
         response.raise_for_status()
         # TODO: Make sure response is good
-        return Stream(self.token, response.json()['id'])
+        return Stream(self.cluster, self.token, response.json()['id'])
 
     def start_withdraw(self, address, amount):
         logger.debug('amount in VID: {}'.format(amount))
@@ -79,16 +83,14 @@ class User:
         logger.debug('amount in wei: {}'.format(amount))
 
         res = requests.post(
-            endpoints.BASE_URL + endpoints.START_WITHDRAW,
-            headers=self.headers,
-            json=body,
+            self.base_url + endpoints.START_WITHDRAW, headers=self.headers, json=body
         )
         res.raise_for_status()
 
         return res.json()['transfer_id']
 
     def confirm_withdraw(self, transfer_id, pin):
-        url = endpoints.BASE_URL + endpoints.CONFIRM_WITHDRAW
+        url = self.base_url + endpoints.CONFIRM_WITHDRAW
         body = {'transfer_id': transfer_id, 'pin': pin}
         logger.debug('transfer_id: %s', transfer_id)
         logger.debug('pin: %s', pin)
@@ -105,9 +107,7 @@ class User:
     # Can I create some kind of decorator for these kinds of methods?
     # Maybe all 'test_objects' (like User and Stream) should implement a json()...
     def json(self):
-        response = requests.get(
-            endpoints.BASE_URL + endpoints.USER, headers=self.headers
-        )
+        response = requests.get(self.base_url + endpoints.USER, headers=self.headers)
         response.raise_for_status()
 
         return response.json()
@@ -144,7 +144,7 @@ class User:
         return {'Authorization': 'Bearer ' + self.token}
 
     def _get_output_profiles(self):
-        response = requests.get(endpoints.BASE_URL + endpoints.PROFILE)
+        response = requests.get(self.base_url + endpoints.PROFILE)
         response.raise_for_status()
 
         return response.json()['items']
@@ -152,7 +152,7 @@ class User:
     def _get_token(self, email, password):
         body = {'email': email, 'password': password}
 
-        response = requests.post(endpoints.BASE_URL + endpoints.AUTH, json=body)
+        response = requests.post(self.base_url + endpoints.AUTH, json=body)
         response.raise_for_status()
 
         return response.json()['token']
