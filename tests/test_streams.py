@@ -123,9 +123,7 @@ def test_creating_stream_and_send_data_to_rtmp_url_starts_output_stream(
         _wait_for_stream_status(new_stream, 'STREAM_STATUS_PREPARED')
         rtmp_runner.start(new_stream.rtmp_url)
         _wait_for_stream_status(new_stream, 'STREAM_STATUS_READY', 120)
-        # m3u8.load('https://streams-snb.videocoin.network/' + new_stream.id + '/index.m3u8')
-        # Let 'er run
-        sleep(60)
+        assert _is_hls_playlist_healthy(new_stream.id, 120)
     finally:
         new_stream.stop()
         _wait_for_stream_status(new_stream, 'STREAM_STATUS_COMPLETED')
@@ -423,3 +421,36 @@ def _wait_for_stream_status(stream, status, timeout=60):
 def _time_from_start(start):
     now = datetime.now()
     return (now - start).seconds
+
+
+def _is_hls_playlist_healthy(stream_id, duration, expected_update_duration=10):
+    start = datetime.now()
+    playlist_url = 'https://streams-snb.videocoin.network/{}/index.m3u8'.format(
+        stream_id
+    )
+    last = ''
+    last_time = None
+
+    while _time_from_start(start) < duration:
+        res = requests.get(playlist_url)
+        if last != res.text:
+            if last_time is not None:
+                try:
+                    last_chunk = res.text.split('\n')[-2]
+                    logger.debug('last chunk: {}'.format(last_chunk))
+                except IndexError:
+                    continue
+                logger.debug('took {} to update'.format(datetime.now() - last_time))
+                if _time_from_start(last_time) > expected_update_duration:
+                    logger.warning(
+                        'Next .ts chunk took too long to update playlist: '
+                        'Expected duration: {} | Actual duration: {}'.format(
+                            expected_update_duration, _time_from_start(last_time)
+                        )
+                    )
+                    return False
+            last = res.text
+            last_time = datetime.now()
+        sleep(0.5)
+
+    return True

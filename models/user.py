@@ -72,7 +72,7 @@ class User:
             self.base_url + endpoints.STREAM, headers=self.headers, json=body
         )
         response.raise_for_status()
-        # TODO: Make sure response is good
+
         return Stream(self.cluster, self.token, response.json()['id'])
 
     def start_withdraw(self, address, amount):
