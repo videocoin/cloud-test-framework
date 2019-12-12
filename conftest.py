@@ -3,10 +3,13 @@ import os
 import re
 import logging
 import pytest
+import requests
 
 from consts import input_values
+from consts import endpoints
 from models.user import User
 from utils.testrail_client import TestRailClient
+from utils import utils
 
 logger = logging.getLogger(__name__)
 
@@ -64,6 +67,20 @@ def pytest_sessionstart(session):
 def pytest_sessionfinish(session):
     # TODO: Test run closing should ideally go here
     pass
+
+
+def get_output_profile_name(profile):
+    return profile['name']
+
+
+def pytest_generate_tests(metafunc):
+    if 'output_profile' in metafunc.fixturenames:
+        cluster = metafunc.config.option.cluster
+        base_url = utils.get_base_url(cluster)
+        all_profiles = requests.get(base_url + endpoints.PROFILE).json()['items']
+        metafunc.parametrize(
+            'output_profile', all_profiles, ids=get_output_profile_name
+        )
 
 
 def pytest_collection_finish(session):

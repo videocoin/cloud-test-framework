@@ -122,7 +122,7 @@ def test_creating_stream_and_send_data_to_rtmp_url_starts_output_stream(
 
         _wait_for_stream_status(new_stream, 'STREAM_STATUS_PREPARED')
         rtmp_runner.start(new_stream.rtmp_url)
-        _wait_for_stream_status(new_stream, 'STREAM_STATUS_READY', 120)
+        _wait_for_stream_status(new_stream, 'STREAM_STATUS_READY')
         assert _is_hls_playlist_healthy(new_stream.id, 120)
     finally:
         new_stream.stop()
@@ -376,7 +376,6 @@ def test_creating_stream_with_empty_profile_id_returns_error(user):
 
 
 @pytest.mark.functional
-@pytest.mark.skip(reason="What's the expected behavior of an invalid profile_id?")
 def test_creating_stream_with_invalid_profile_id(user):
     """
     Name:
@@ -395,10 +394,29 @@ def test_creating_stream_with_invalid_profile_id(user):
     """
     with pytest.raises(requests.HTTPError) as e:
         user.create_stream(profile_id='abcd-1234')
-    print(e)
+    assert e.value.response.status_code == 400
 
 
-def _wait_for_stream_status(stream, status, timeout=60):
+# Parametrized with all available profiles picked up at run time. See
+# pytest_generate_tests in conftest.py
+def test_all_available_output_profiles(user, rtmp_runner, output_profile):
+    logger.debug('running with profile name: {}'.format(output_profile['name']))
+    profile_id = output_profile['id']
+    new_stream = user.create_stream(profile_id=profile_id)
+    new_stream.start()
+    try:
+        _wait_for_stream_status(new_stream, 'STREAM_STATUS_PREPARED')
+        rtmp_runner.start(new_stream.rtmp_url)
+        _wait_for_stream_status(new_stream, 'STREAM_STATUS_READY')
+        assert _is_hls_playlist_healthy(new_stream.id, 120)
+    finally:
+        new_stream.stop()
+        _wait_for_stream_status(new_stream, 'STREAM_STATUS_COMPLETED')
+        rtmp_runner.stop()
+        new_stream.delete()
+
+
+def _wait_for_stream_status(stream, status, timeout=120):
     start = datetime.now()
     while stream.status != status and _time_from_start(start) <= timeout:
         logger.debug(
@@ -442,13 +460,12 @@ def _is_hls_playlist_healthy(stream_id, duration, expected_update_duration=10):
                     continue
                 logger.debug('took {} to update'.format(datetime.now() - last_time))
                 if _time_from_start(last_time) > expected_update_duration:
-                    logger.warning(
-                        'Next .ts chunk took too long to update playlist: '
+                    raise RuntimeError(
+                        'Transcoder took too long to create new chunk. '
                         'Expected duration: {} | Actual duration: {}'.format(
                             expected_update_duration, _time_from_start(last_time)
                         )
                     )
-                    return False
             last = res.text
             last_time = datetime.now()
         sleep(0.5)
