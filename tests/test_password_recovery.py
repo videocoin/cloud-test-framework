@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 @pytest.mark.smoke
 @pytest.mark.functional
+@pytest.mark.skip
 def test_password_recovery_with_registered_email(user):
     """
     Name:
@@ -43,12 +44,12 @@ def test_password_recovery_with_registered_email(user):
     old_password = user.password
     new_password = 'brand_n3w_test_p4ssword'
 
-    _start_password_recovery(email)
+    _start_password_recovery(user.base_url, email)
     sleep(5)
     token = _get_password_reset_token(email, email_password)
     _change_password_with_token(token, new_password)
     _auth(email, new_password)
-    _start_password_recovery(email)
+    _start_password_recovery(user.base_url, email)
     sleep(5)
     token = _get_password_reset_token(email, email_password)
     _change_password_with_token(token, old_password)
