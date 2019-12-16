@@ -77,10 +77,19 @@ def pytest_generate_tests(metafunc):
     if 'output_profile' in metafunc.fixturenames:
         cluster = metafunc.config.option.cluster
         base_url = utils.get_base_url(cluster)
-        all_profiles = requests.get(base_url + endpoints.PROFILE).json()['items']
-        metafunc.parametrize(
-            'output_profile', all_profiles, ids=get_output_profile_name
-        )
+        try:
+            res = requests.get(base_url + endpoints.PROFILE + '1')
+            all_profiles = res.json()['items']
+            metafunc.parametrize(
+                'output_profile', all_profiles, ids=get_output_profile_name
+            )
+        except KeyError:
+            logger.warning(
+                '\nGetting output profiles failed. Ignore results for {} | '
+                'Current response of /profiles: {}'.format(metafunc.function, res)
+            )
+            all_profiles = []
+            metafunc.parametrize('output_profile', all_profiles)
 
 
 def pytest_collection_finish(session):
