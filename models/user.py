@@ -76,8 +76,6 @@ class User:
         return Stream(self.cluster, self.token, response.json()['id'])
 
     def start_withdraw(self, address, amount):
-        logger.debug('amount in VID: {}'.format(amount))
-        amount = w3.toWei(amount, 'ether')
         body = {'address': address, 'amount': str(amount)}
         logger.debug('address: {}'.format(address))
         logger.debug('amount in wei: {}'.format(amount))

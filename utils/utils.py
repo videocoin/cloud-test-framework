@@ -4,6 +4,7 @@ import quopri
 import re
 import requests
 import logging
+import math
 
 from web3 import Web3, HTTPProvider
 from web3.middleware import geth_poa_middleware
@@ -103,8 +104,8 @@ def get_items_from_email(test_email, test_email_password, support_subject, *body
 
 def send_vid_to_account(address, amount):
     if type(amount) == float:
-        amount = int(amount)
-        logger.warning(
+        amount = int(math.ceil(amount))
+        logger.debug(
             'Cannot send float VID amount to address. '
             'Converting float value to integer'
         )

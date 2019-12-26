@@ -92,9 +92,9 @@ def test_password_recovery_with_invalid_email_returns_error(invalid_email):
     assert e.value.response.status_code == 400
 
 
-def _start_password_recovery(email):
+def _start_password_recovery(base_url, email):
     body = {'email': email}
-    response = requests.post(endpoints.BASE_URL + endpoints.RECOVERY_START, json=body)
+    response = requests.post(base_url + endpoints.RECOVERY_START, json=body)
     response.raise_for_status()
 
 
