@@ -67,7 +67,7 @@ def test_password_recovery_with_registered_email(user):
         'consecutive_symbol_in_domain@gmail..com',
     ],
 )
-def test_password_recovery_with_invalid_email_returns_error(invalid_email):
+def test_password_recovery_with_invalid_email_returns_error(user, invalid_email):
     """
     Name:
     Test password recovery with invalid email returns error
@@ -84,11 +84,21 @@ def test_password_recovery_with_invalid_email_returns_error(invalid_email):
     0. Server should return with correct error and error object
     """
     with pytest.raises(requests.HTTPError) as e:
-        _start_password_recovery(invalid_email)
-    assert e.value.response.json() == {
-        'message': 'invalid argument',
-        'fields': {'email': 'Enter a valid email address'},
-    }
+        _start_password_recovery(user.base_url, invalid_email)
+    # TODO: Split the test cases with different results into a different test completely
+    # Currently handling each case with a different result individually
+    if invalid_email == '':
+        assert e.value.response.json() == {
+            'message': 'invalid argument',
+            'fields': {'email': 'Email is a required field'},
+        }
+    elif invalid_email == 'not_a_registered_email@fake.ru':
+        assert e.value.response.json() == {'message': 'Bad request', 'fields': None}
+    else:
+        assert e.value.response.json() == {
+            'message': 'invalid argument',
+            'fields': {'email': 'Enter a valid email address'},
+        }
     assert e.value.response.status_code == 400
 
 
