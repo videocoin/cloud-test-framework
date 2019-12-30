@@ -374,4 +374,4 @@ def _create_random_confirmation_code(length=6):
 def _is_within_range(actual, expected, tolerance=13000):
     difference = abs(actual - expected)
     logger.debug('difference between actual and expected values: {}'.format(difference))
-    return abs(actual - expected) < tolerance
+    return abs(actual - expected) <= tolerance
