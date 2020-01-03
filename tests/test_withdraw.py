@@ -201,12 +201,12 @@ def test_correct_vid_amount_is_subtracted_from_user_balance(user):
     sleep(90)
     end_balance = user.wallet_balance
 
-    logger.debug('Start balance: {}'.format(start_balance))
-    logger.debug('End balance: {}'.format(end_balance))
-    logger.debug('Withdraw amount (in wei): {}'.format(withdraw_amt_wei))
+    logger.debug('Start balance: {:.16e}'.format(start_balance))
+    logger.debug('End balance: {:.16e}'.format(end_balance))
+    logger.debug('Withdraw amount (in wei): {:.16e}'.format(withdraw_amt_wei))
     actual_difference = start_balance - end_balance
     expected_difference = withdraw_amt_wei + input_values.NATIVE_GAS_AMOUNT
-    assert _is_within_range(actual_difference, expected_difference)
+    assert _is_within_range(actual_difference, expected_difference, 13000)
 
 
 @pytest.mark.smoke
@@ -371,7 +371,12 @@ def _create_random_confirmation_code(length=6):
 
 # Withdrawing from an account isn't 100% accurate. Add some tolerance for error
 # (measured in wei)
-def _is_within_range(actual, expected, tolerance=13000):
+def _is_within_range(actual, expected, tolerance):
     difference = abs(actual - expected)
-    logger.debug('difference between actual and expected values: {}'.format(difference))
+    logger.debug(
+        'Actual difference between actual and expected values: {}'.format(difference)
+    )
+    logger.debug(
+        'Expected difference between actual and expected values: {}'.format(tolerance)
+    )
     return abs(actual - expected) <= tolerance
