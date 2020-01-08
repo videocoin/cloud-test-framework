@@ -10,6 +10,7 @@ from consts import endpoints
 from models.user import User
 from utils.testrail_client import TestRailClient
 from utils import utils
+from utils.rtmp_runner import RTMPRunner
 
 logger = logging.getLogger(__name__)
 
@@ -59,6 +60,12 @@ def users(request):
     return list_of_users
 
 
+@pytest.fixture
+def rtmp_runner(request):
+    addr = request.config.getoption('--rtmp_runner')
+    return RTMPRunner(addr)
+
+
 def pytest_sessionstart(session):
     # TODO: Test run creation should ideally go here
     pass
@@ -78,7 +85,7 @@ def pytest_generate_tests(metafunc):
         cluster = metafunc.config.option.cluster
         base_url = utils.get_base_url(cluster)
         try:
-            res = requests.get(base_url + endpoints.PROFILE + '1')
+            res = requests.get(base_url + endpoints.PROFILE)
             all_profiles = res.json()['items']
             metafunc.parametrize(
                 'output_profile', all_profiles, ids=get_output_profile_name
