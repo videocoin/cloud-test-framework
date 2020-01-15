@@ -5,9 +5,8 @@ import re
 import requests
 import logging
 import math
-
-from web3 import Web3, HTTPProvider
-from web3.middleware import geth_poa_middleware
+from datetime import datetime
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -102,7 +101,7 @@ def get_items_from_email(test_email, test_email_password, support_subject, *body
         return result if len(regex_result) == 1 else regex_result
 
 
-def send_vid_to_account(address, amount):
+def faucet_vid_to_account(address, amount):
     if type(amount) == float:
         amount = int(math.ceil(amount))
         logger.debug(
@@ -122,60 +121,32 @@ def send_vid_to_account(address, amount):
     # return res.json()
 
 
-def get_vid_balance_of_erc20(addr, network='rinkeby'):
-    if network == 'rinkeby':
-        network_url = 'https://rinkeby.infura.io'
-        token_addr = '0x0A94F11D89e799A2a6b9EAdC784FfD3897592dD7'
-
-    w3 = Web3(HTTPProvider(network_url))
-    # Still don't really understand this...Read more here:
-    # https://web3py.readthedocs.io/en/latest/middleware.html#geth-style-proof-of-authority
-    w3.middleware_onion.inject(geth_poa_middleware, layer=0)
-    ABI = [
-        {
-            "constant": True,
-            "inputs": [],
-            "name": "name",
-            "outputs": [{"name": "", "type": "string"}],
-            "payable": False,
-            "type": "function",
-        },
-        {
-            "constant": True,
-            "inputs": [],
-            "name": "decimals",
-            "outputs": [{"name": "", "type": "uint8"}],
-            "payable": False,
-            "type": "function",
-        },
-        {
-            "constant": True,
-            "inputs": [{"name": "_owner", "type": "address"}],
-            "name": "balanceOf",
-            "outputs": [{"name": "balance", "type": "uint256"}],
-            "payable": False,
-            "type": "function",
-        },
-        {
-            "constant": True,
-            "inputs": [],
-            "name": "symbol",
-            "outputs": [{"name": "", "type": "string"}],
-            "payable": False,
-            "type": "function",
-        },
-    ]
-    vid_addr = w3.eth.contract(token_addr, abi=ABI)
+def get_vid_balance_of_erc20(w3, abi, addr, network='rinkeby'):
+    token_addr = '0x0A94F11D89e799A2a6b9EAdC784FfD3897592dD7'
+    vid_addr = w3.eth.contract(token_addr, abi=abi)
     amt = vid_addr.functions.balanceOf(addr).call()
 
     return amt
 
 
 def get_base_url(cluster):
-    env = ''
     if cluster == 'snb':
         env = '.snb'
+    elif cluster == 'prod':
+        env = ''
     return 'https://studio{}.videocoin.network'.format(env)
+
+
+def get_vid_erc20_abi(cluster):
+    if cluster == 'snb':
+        with open('consts/ERC20.abi.json') as file:
+            abi = json.load(file)
+            return abi
+
+
+def time_from_start(start):
+    now = datetime.now()
+    return (now - start).seconds
 
 
 if __name__ == '__main__':
@@ -183,4 +154,4 @@ if __name__ == '__main__':
 
     if len(sys.argv) > 0:
         addr = sys.argv[1]
-        send_vid_to_account(addr, 20)
+        faucet_vid_to_account(addr, 1000)

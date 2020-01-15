@@ -1,8 +1,8 @@
 from datetime import datetime
 import logging
 import requests
-from web3.auto import w3
 
+from models.miner import Miner
 from models.stream import Stream
 from consts import endpoints
 from utils import utils
@@ -35,7 +35,6 @@ class User:
     def get_streams(self):
         response = requests.get(self.base_url + endpoints.STREAM, headers=self.headers)
         response.raise_for_status()
-        # TODO: Make sure response is good
         items = response.json()['items']
         stream_objs = []
         for item in items:
@@ -45,13 +44,23 @@ class User:
         # TODO: This always returns the same ID for all stream objects created
         # return [Stream(self.token, stream['id']) for stream in items]
 
+    def get_miners(self):
+        response = requests.get(self.base_url + endpoints.MINER, headers=self.headers)
+        response.raise_for_status()
+        items = response.json()['items']
+        miner_objs = []
+        for item in items:
+            miner_obj = Miner(self.cluster, self.token, item['id'])
+            miner_objs.append(miner_obj)
+        return miner_objs
+
     def create_stream(self, name=None, profile_name=None, profile_id=None):
         """
         profile_name is only a convenience argument
         profile_id takes precedence over profile_name
         """
         if name is None:
-            name = datetime.now().strftime("%m-%d-%Y@%H:%M:%S %p")
+            name = datetime.now().strftime("%m-%d-%Y@%H:%M:%S")
 
         output_profiles = self._get_output_profiles()
         if profile_id is None:
@@ -67,6 +76,7 @@ class User:
                 raise ValueError('Profile name does not exist')
 
         body = {'name': name, 'profile_id': profile_id}
+        logger.debug('Creating stream "{}" with profile_id {}'.format(name, profile_id))
 
         response = requests.post(
             self.base_url + endpoints.STREAM, headers=self.headers, json=body

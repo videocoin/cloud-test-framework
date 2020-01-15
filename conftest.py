@@ -4,6 +4,8 @@ import re
 import logging
 import pytest
 import requests
+from web3 import Web3, HTTPProvider
+from web3.middleware import geth_poa_middleware
 
 from consts import input_values
 from consts import endpoints
@@ -35,6 +37,13 @@ def pytest_addoption(parser):
 @pytest.fixture
 def user(request):
     cluster = request.config.getoption('--cluster')
+    available_clusters = ['snb', 'prod']
+    if cluster not in available_clusters:
+        raise ValueError(
+            'Cluster not available. Currently available clusters are {}'.format(
+                available_clusters
+            )
+        )
     email = request.config.getoption('--email')
     password = request.config.getoption('--password')
     email_password = request.config.getoption('--email_password')
@@ -64,6 +73,40 @@ def users(request):
 def rtmp_runner(request):
     addr = request.config.getoption('--rtmp_runner')
     return RTMPRunner(addr)
+
+
+@pytest.fixture
+def w3(request):
+    cluster = request.config.getoption('--cluster')
+    available_clusters = ['snb']
+    if cluster not in available_clusters:
+        raise ValueError(
+            'Cluster not available. Currently available clusters are {}'.format(
+                available_clusters
+            )
+        )
+    if cluster == 'snb':
+        network_url = 'https://rinkeby.infura.io'
+
+    w3 = Web3(HTTPProvider(network_url))
+    # Still don't really understand this...Read more here:
+    # https://web3py.readthedocs.io/en/latest/middleware.html#geth-style-proof-of-authority
+    w3.middleware_onion.inject(geth_poa_middleware, layer=0)
+
+    return w3
+
+
+@pytest.fixture
+def abi(request):
+    cluster = request.config.getoption('--cluster')
+    available_clusters = ['snb']
+    if cluster not in available_clusters:
+        raise ValueError(
+            'Cluster not available. Currently available clusters are {}'.format(
+                available_clusters
+            )
+        )
+    return utils.get_vid_erc20_abi(cluster)
 
 
 def pytest_sessionstart(session):

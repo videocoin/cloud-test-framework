@@ -1,6 +1,12 @@
+from time import sleep
+from datetime import datetime
+import logging
+
 import requests
 from consts import endpoints
 from utils import utils
+
+logger = logging.getLogger(__name__)
 
 
 class Stream:
@@ -45,8 +51,96 @@ class Stream:
             self.base_url + endpoints.STREAM + '/' + self.id, headers=self.headers
         )
         response.raise_for_status()
-        # TODO: Make sure response was good here
+
         return response.json()
+
+    def wait_for_status(self, status, timeout=120):
+        start = datetime.now()
+        while self.status != status and utils.time_from_start(start) <= timeout:
+            logger.debug(
+                'Time: {} | Current status: {} | Waiting for status: {}'.format(
+                    utils.time_from_start(start), self.status, status
+                )
+            )
+            sleep(1)
+        if utils.time_from_start(start) > timeout:
+            raise RuntimeError(
+                'Stream {} took too long to transition to {}. '
+                'Time allowed: {}. Status during failure: {}'.format(
+                    self.id, status, timeout, self.status
+                )
+            )
+
+        return utils.time_from_start(start)
+
+    def is_hls_playlist_healthy(self, duration, expected_update_duration=10):
+        start = datetime.now()
+        base_playlist_url = 'https://streams-{}.videocoin.network/{}/index.m3u8'
+        durations = []
+
+        if self.cluster == 'snb':
+            playlist_url = base_playlist_url.format('snb', self.id)
+        elif self.cluster == 'prod':
+            playlist_url = base_playlist_url.format('kili', self.id)
+
+        last = ''
+        last_time = None
+
+        while utils.time_from_start(start) < duration:
+            res = requests.get(playlist_url)
+            if last != res.text:
+                if last_time is not None:
+                    try:
+                        last_chunk = res.text.split('\n')[-2]
+                        logger.debug('last chunk: {}'.format(last_chunk))
+                    except IndexError:
+                        continue
+                    logger.debug('took {} to update'.format(datetime.now() - last_time))
+                    durations.append((datetime.now() - last_time).seconds)
+                    if utils.time_from_start(last_time) > expected_update_duration:
+                        raise RuntimeError(
+                            'Transcoder took too long to create new chunk. '
+                            'Expected duration: {} | Actual duration: {}'.format(
+                                expected_update_duration,
+                                utils.time_from_start(last_time),
+                            )
+                        )
+                last = res.text
+                last_time = datetime.now()
+            sleep(0.5)
+
+        logger.debug(
+            'Average time to update {}'.format(sum(durations) / len(durations))
+        )
+        return True
+
+    def wait_for_playlist_size(self, expected_num_chunks):
+        start_time = datetime.now()
+        playlist_url = 'https://streams-snb.videocoin.network/{}/index.m3u8'.format(
+            self.id
+        )
+        current_num_chunks = 0
+
+        while current_num_chunks < expected_num_chunks:
+            res = requests.get(playlist_url)
+            lines = res.text.split('\n')
+            chunks = [lines[i + 1] for i in range(len(lines)) if '#EXTINF' in lines[i]]
+            current_num_chunks = len(chunks)
+            logger.debug(
+                'Current number of chunks in stream {}: {}'.format(
+                    self.id, current_num_chunks
+                )
+            )
+            sleep(1)
+
+        end_time = datetime.now()
+        logger.debug(
+            'Time it took to wait for {} chunks: {}'.format(
+                expected_num_chunks, end_time - start_time
+            )
+        )
+
+        return end_time - start_time
 
     @property
     def name(self):

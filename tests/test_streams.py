@@ -3,19 +3,11 @@ from datetime import datetime
 import requests
 import pytest
 import logging
-import m3u8
 
 from consts import expected_results
-from utils.rtmp_runner import RTMPRunner
-from utils.utils import send_vid_to_account
+from utils import utils
 
 logger = logging.getLogger(__name__)
-
-
-@pytest.fixture
-def rtmp_runner(request):
-    addr = request.config.getoption('--rtmp_runner')
-    return RTMPRunner(addr)
 
 
 @pytest.mark.smoke
@@ -116,17 +108,17 @@ def test_creating_stream_and_send_data_to_rtmp_url_starts_output_stream(
     """
     try:
         if user.token_type == 'sign_in':
-            send_vid_to_account(user.wallet_address, 11)
+            utils.faucet_vid_to_account(user.wallet_address, 11)
         new_stream = user.create_stream()
         new_stream.start()
 
-        _wait_for_stream_status(new_stream, 'STREAM_STATUS_PREPARED')
+        new_stream.wait_for_status('STREAM_STATUS_PREPARED')
         rtmp_runner.start(new_stream.rtmp_url)
-        _wait_for_stream_status(new_stream, 'STREAM_STATUS_READY')
-        assert _is_hls_playlist_healthy(new_stream.id, 120)
+        new_stream.wait_for_status('STREAM_STATUS_READY')
+        assert new_stream.is_hls_playlist_healthy(120)
     finally:
         new_stream.stop()
-        _wait_for_stream_status(new_stream, 'STREAM_STATUS_COMPLETED')
+        new_stream.wait_for_status('STREAM_STATUS_COMPLETED')
         rtmp_runner.stop()
         new_stream.delete()
 
@@ -134,15 +126,15 @@ def test_creating_stream_and_send_data_to_rtmp_url_starts_output_stream(
 @pytest.mark.functional
 def test_cancelling_stream_after_input_url_ready_cancels_stream(user):
     try:
-        send_vid_to_account(user.wallet_address, 11)
+        utils.faucet_vid_to_account(user.wallet_address, 11)
         new_stream = user.create_stream()
         new_stream.start()
 
-        _wait_for_stream_status(new_stream, 'STREAM_STATUS_PREPARED')
+        new_stream.wait_for_status('STREAM_STATUS_PREPARED')
         new_stream.stop()
         # Make sure it really stopped by waiting a little after invoking cancel
         sleep(5)
-        _wait_for_stream_status(new_stream, 'STREAM_STATUS_COMPLETED')
+        new_stream.wait_for_status('STREAM_STATUS_COMPLETED')
     finally:
         new_stream.delete()
         pass
@@ -151,17 +143,17 @@ def test_cancelling_stream_after_input_url_ready_cancels_stream(user):
 @pytest.mark.functional
 def test_cancelling_stream_during_input_processing_cancels_stream(user, rtmp_runner):
     try:
-        # send_vid_to_account(user.wallet_address, 11)
+        # utils.faucet_vid_to_account(user.wallet_address, 11)
         new_stream = user.create_stream()
         new_stream.start()
-        _wait_for_stream_status(new_stream, 'STREAM_STATUS_PREPARED')
+        new_stream.wait_for_status('STREAM_STATUS_PREPARED')
         rtmp_runner.start(new_stream.rtmp_url)
         # Let stream run before attemtping to stop
         sleep(10)
         new_stream.stop()
         # Make sure it really stopped by waiting a little after invoking cancel
         sleep(5)
-        _wait_for_stream_status(new_stream, 'STREAM_STATUS_COMPLETED')
+        new_stream.wait_for_status('STREAM_STATUS_COMPLETED')
     finally:
         new_stream.delete()
 
@@ -192,17 +184,17 @@ def test_time_it_takes_for_stream_prepared_state_is_less_than_expected_time(user
     results = []
     for i in range(NUM_OF_TESTS):
         try:
-            send_vid_to_account(user.wallet_address, 11)
+            utils.faucet_vid_to_account(user.wallet_address, 11)
             new_stream = user.create_stream()
             new_stream.start()
-            duration = _wait_for_stream_status(
-                new_stream, 'STREAM_STATUS_PREPARED', timeout=EXPECTED_TIME
+            duration = new_stream.wait_for_status(
+                'STREAM_STATUS_PREPARED', timeout=EXPECTED_TIME
             )
             results.append(duration)
         finally:
             new_stream.stop()
             # TODO: Should this be CANCELLED or COMPLETED?
-            _wait_for_stream_status(new_stream, 'STREAM_STATUS_COMPLETED')
+            new_stream.wait_for_status('STREAM_STATUS_COMPLETED')
             new_stream.delete()
 
     average = sum(results) / len(results)
@@ -244,18 +236,18 @@ def test_time_it_takes_for_stream_to_reach_output_ready_state_is_less_than_expec
     results = []
     for i in range(NUM_OF_TESTS):
         try:
-            send_vid_to_account(user.wallet_address, 11)
+            utils.faucet_vid_to_account(user.wallet_address, 11)
             new_stream = user.create_stream()
             new_stream.start()
-            _wait_for_stream_status(new_stream, 'STREAM_STATUS_PREPARED')
+            new_stream.wait_for_status('STREAM_STATUS_PREPARED')
             rtmp_runner.start(new_stream.rtmp_url)
-            duration = _wait_for_stream_status(
-                new_stream, 'STREAM_STATUS_READY', timeout=EXPECTED_TIME
+            duration = new_stream.wait_for_status(
+                'STREAM_STATUS_READY', timeout=EXPECTED_TIME
             )
             results.append(duration)
         finally:
             new_stream.stop()
-            _wait_for_stream_status(new_stream, 'STREAM_STATUS_COMPLETED')
+            new_stream.wait_for_status('STREAM_STATUS_COMPLETED')
             rtmp_runner.stop()
             new_stream.delete()
 
@@ -302,15 +294,15 @@ def test_time_it_takes_for_stream_to_reach_completed_state_is_less_than_expected
     results = []
     for i in range(NUM_OF_TESTS):
         try:
-            send_vid_to_account(user.wallet_address, 11)
+            utils.faucet_vid_to_account(user.wallet_address, 11)
             new_stream = user.create_stream()
             new_stream.start()
-            _wait_for_stream_status(new_stream, 'STREAM_STATUS_PREPARED')
+            new_stream.wait_for_status('STREAM_STATUS_PREPARED')
             rtmp_runner.start(new_stream.rtmp_url)
-            _wait_for_stream_status(new_stream, 'STREAM_STATUS_READY')
+            new_stream.wait_for_status('STREAM_STATUS_READY')
             new_stream.stop()
-            duration = _wait_for_stream_status(
-                new_stream, 'STREAM_STATUS_COMPLETED', timeout=EXPECTED_TIME
+            duration = new_stream.wait_for_status(
+                'STREAM_STATUS_COMPLETED', timeout=EXPECTED_TIME
             )
             results.append(duration)
         finally:
@@ -405,69 +397,29 @@ def test_all_available_output_profiles(user, rtmp_runner, output_profile):
     new_stream = user.create_stream(profile_id=profile_id)
     new_stream.start()
     try:
-        _wait_for_stream_status(new_stream, 'STREAM_STATUS_PREPARED')
+        new_stream.wait_for_status('STREAM_STATUS_PREPARED')
         rtmp_runner.start(new_stream.rtmp_url)
-        _wait_for_stream_status(new_stream, 'STREAM_STATUS_READY')
-        assert _is_hls_playlist_healthy(new_stream.id, 120)
+        new_stream.wait_for_status('STREAM_STATUS_READY')
+        assert new_stream.is_hls_playlist_healthy(120)
     finally:
         new_stream.stop()
-        _wait_for_stream_status(new_stream, 'STREAM_STATUS_COMPLETED')
+        new_stream.wait_for_status('STREAM_STATUS_COMPLETED')
         rtmp_runner.stop()
         new_stream.delete()
 
 
-def _wait_for_stream_status(stream, status, timeout=120):
-    start = datetime.now()
-    while stream.status != status and _time_from_start(start) <= timeout:
-        logger.debug(
-            'Time: {} | Current status: {} | Waiting for status: {}'.format(
-                _time_from_start(start), stream.status, status
-            )
-        )
-        sleep(1)
-    if _time_from_start(start) > timeout:
-        raise RuntimeError(
-            'Stream {} took too long to transition to {}. '
-            'Time allowed: {}. Status during failure: {}'.format(
-                stream.id, status, timeout, stream.status
-            )
-        )
+def test_playlist_size(user, rtmp_runner):
+    start_balance = user.wallet_balance
+    new_stream = user.create_stream()
+    new_stream.start()
+    new_stream.wait_for_status('STREAM_STATUS_PREPARED')
+    rtmp_runner.start(new_stream.rtmp_url)
+    new_stream.wait_for_status('STREAM_STATUS_READY')
+    new_stream.wait_for_playlist_size(10)
+    new_stream.stop()
+    sleep(120)
+    end_balance = user.wallet_balance
 
-    return _time_from_start(start)
-
-
-def _time_from_start(start):
-    now = datetime.now()
-    return (now - start).seconds
-
-
-def _is_hls_playlist_healthy(stream_id, duration, expected_update_duration=10):
-    start = datetime.now()
-    playlist_url = 'https://streams-snb.videocoin.network/{}/index.m3u8'.format(
-        stream_id
-    )
-    last = ''
-    last_time = None
-
-    while _time_from_start(start) < duration:
-        res = requests.get(playlist_url)
-        if last != res.text:
-            if last_time is not None:
-                try:
-                    last_chunk = res.text.split('\n')[-2]
-                    logger.debug('last chunk: {}'.format(last_chunk))
-                except IndexError:
-                    continue
-                logger.debug('took {} to update'.format(datetime.now() - last_time))
-                if _time_from_start(last_time) > expected_update_duration:
-                    raise RuntimeError(
-                        'Transcoder took too long to create new chunk. '
-                        'Expected duration: {} | Actual duration: {}'.format(
-                            expected_update_duration, _time_from_start(last_time)
-                        )
-                    )
-            last = res.text
-            last_time = datetime.now()
-        sleep(0.5)
-
-    return True
+    logger.debug('Start balance: {:.6e}'.format(start_balance))
+    logger.debug('End balance: {:.6e}'.format(end_balance))
+    logger.debug('Balance difference: {:.6e}'.format(start_balance - end_balance))

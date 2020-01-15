@@ -38,7 +38,7 @@ def test_starting_withdraw_with_valid_address_and_amount_has_correct_information
     email = user.email
     email_password = user.email_password
 
-    utils.send_vid_to_account(user.wallet_address, withdraw_amt)
+    utils.faucet_vid_to_account(user.wallet_address, withdraw_amt)
     user.start_withdraw(deposit_address, withdraw_amt_wei)
     # TODO: Replace with waiting until the newly sent (unread) email is found in inbox
     sleep(5)
@@ -100,7 +100,7 @@ def test_invalid_confirmation_code_returns_error(user, invalid_code, expected_er
     email = user.email
     email_password = user.email_password
 
-    utils.send_vid_to_account(user.wallet_address, withdraw_amt)
+    utils.faucet_vid_to_account(user.wallet_address, withdraw_amt)
     transfer_id = user.start_withdraw(deposit_address, withdraw_amt_wei)
     # Used to delete the sent emails, but no information is needed
     # TODO: Replace with waiting until the newly sent (unread) email is found in inbox
@@ -139,7 +139,7 @@ def test_correct_confirmation_code_sends_success_email(user):
     email = user.email
     email_password = user.email_password
 
-    utils.send_vid_to_account(user.wallet_address, withdraw_amt)
+    utils.faucet_vid_to_account(user.wallet_address, withdraw_amt)
     transfer_id = user.start_withdraw(deposit_address, withdraw_amt_wei)
     # TODO: Replace with waiting until the newly sent (unread) email is found in inbox
     sleep(5)
@@ -187,7 +187,7 @@ def test_correct_vid_amount_is_subtracted_from_user_balance(user):
     email_password = user.email_password
     withdraw_amt_wei = w3.toWei(withdraw_amt, 'ether')
 
-    utils.send_vid_to_account(user.wallet_address, withdraw_amt)
+    utils.faucet_vid_to_account(user.wallet_address, withdraw_amt)
     # Wait for faucet to send VID to account
     sleep(90)
     start_balance = user.wallet_balance
@@ -201,16 +201,16 @@ def test_correct_vid_amount_is_subtracted_from_user_balance(user):
     sleep(90)
     end_balance = user.wallet_balance
 
-    logger.debug('Start balance: {:.16e}'.format(start_balance))
-    logger.debug('End balance: {:.16e}'.format(end_balance))
-    logger.debug('Withdraw amount (in wei): {:.16e}'.format(withdraw_amt_wei))
+    logger.debug('Start balance: {:.6e}'.format(start_balance))
+    logger.debug('End balance: {:.6e}'.format(end_balance))
+    logger.debug('Withdraw amount (in wei): {:.6e}'.format(withdraw_amt_wei))
     actual_difference = start_balance - end_balance
     expected_difference = withdraw_amt_wei + input_values.NATIVE_GAS_AMOUNT
     assert _is_within_range(actual_difference, expected_difference, 13000)
 
 
 @pytest.mark.smoke
-def test_correct_vid_amount_is_added_to_erc20_addr(user):
+def test_correct_vid_amount_is_added_to_erc20_addr(user, w3, abi):
     deposit_address = input_values.DEPOSIT_ADDRESS_METAMASK
     withdraw_amt = 20
     email = user.email
@@ -219,8 +219,8 @@ def test_correct_vid_amount_is_added_to_erc20_addr(user):
 
     logger.debug('withdraw_amt_wei: {}'.format(withdraw_amt_wei))
 
-    start_balance = utils.get_vid_balance_of_erc20(deposit_address)
-    utils.send_vid_to_account(user.wallet_address, withdraw_amt)
+    start_balance = utils.get_vid_balance_of_erc20(w3, abi, deposit_address)
+    utils.faucet_vid_to_account(user.wallet_address, withdraw_amt)
     # Wait for faucet to send VID to account
     sleep(90)
     transfer_id = user.start_withdraw(deposit_address, withdraw_amt_wei)
@@ -231,7 +231,7 @@ def test_correct_vid_amount_is_added_to_erc20_addr(user):
     user.confirm_withdraw(transfer_id, confirmation_code)
     # Wait for transaction to finish and be reflected in user's balance
     sleep(90)
-    end_balance = utils.get_vid_balance_of_erc20(deposit_address)
+    end_balance = utils.get_vid_balance_of_erc20(w3, abi, deposit_address)
 
     logger.debug('Start balance: {}'.format(start_balance))
     logger.debug('End balance: {}'.format(end_balance))
@@ -247,7 +247,7 @@ def test_withdraw_less_than_mainnet_gas(user):
     withdraw_amt = 0.5
     withdraw_amt_wei = w3.toWei(withdraw_amt, 'ether')
 
-    utils.send_vid_to_account(user.wallet_address, withdraw_amt)
+    utils.faucet_vid_to_account(user.wallet_address, withdraw_amt)
     # Wait for faucet to send VID to account
     sleep(90)
     transfer_id = user.start_withdraw(deposit_address, withdraw_amt_wei)
@@ -278,7 +278,7 @@ def test_entering_incorrect_confirmation_code_returns_error(user):
     withdraw_amt = 20
     withdraw_amt_wei = w3.toWei(withdraw_amt, 'ether')
 
-    utils.send_vid_to_account(user.wallet_address, 20)
+    utils.faucet_vid_to_account(user.wallet_address, 20)
     transfer_id = user.start_withdraw(deposit_address, withdraw_amt_wei)
     # TODO: Replace with waiting until the newly sent (unread) email is found in inbox
     sleep(5)
@@ -313,7 +313,7 @@ def test_entering_incorrect_confirmation_code_returns_error(user):
 def test_starting_withdraw_with_invalid_address_format_returns_error(user):
     # try:
     #     DEPOSIT_ADDRESS_INVALID = 'aasdfff0x03948593jcns456fsc52j358dsjsf4499'
-    #     utils.send_vid_to_account(user.wallet_address, 20)
+    #     utils.faucet_vid_to_account(user.wallet_address, 20)
     #     # withdraw_id = user.start_withdraw(DEPOSIT_ADDRESS_INVALID, 20)
     # finally:
     #     # should be able to throw the rest of the VID away, to clean the account
