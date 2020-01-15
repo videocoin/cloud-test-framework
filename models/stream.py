@@ -96,7 +96,7 @@ class Stream:
                     except IndexError:
                         continue
                     logger.debug('took {} to update'.format(datetime.now() - last_time))
-                    durations.append((datetime.now() - last_time).seconds)
+                    durations.append((datetime.now() - last_time).total_seconds())
                     if utils.time_from_start(last_time) > expected_update_duration:
                         raise RuntimeError(
                             'Transcoder took too long to create new chunk. '
@@ -114,14 +114,19 @@ class Stream:
         )
         return True
 
-    def wait_for_playlist_size(self, expected_num_chunks):
+    def wait_for_playlist_size(self, expected_num_chunks, timeout_per_chunk=20):
         start_time = datetime.now()
         playlist_url = 'https://streams-snb.videocoin.network/{}/index.m3u8'.format(
             self.id
         )
         current_num_chunks = 0
+        last_chunk = 0
+        last_chunk_update = datetime.now()
 
-        while current_num_chunks < expected_num_chunks:
+        while (
+            current_num_chunks < expected_num_chunks
+            and (datetime.now() - last_chunk_update).total_seconds() < timeout_per_chunk
+        ):
             res = requests.get(playlist_url)
             lines = res.text.split('\n')
             chunks = [lines[i + 1] for i in range(len(lines)) if '#EXTINF' in lines[i]]
@@ -131,7 +136,16 @@ class Stream:
                     self.id, current_num_chunks
                 )
             )
+            if current_num_chunks > last_chunk:
+                last_chunk = current_num_chunks
+                last_chunk_update = datetime.now()
             sleep(1)
+
+        if (datetime.now() - last_chunk_update).total_seconds() > timeout_per_chunk:
+            raise RuntimeError(
+                'Transcoder took too long to create new chunk. '
+                'Expected duration: {}'.format(timeout_per_chunk)
+            )
 
         end_time = datetime.now()
         logger.debug(

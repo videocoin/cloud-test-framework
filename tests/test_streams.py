@@ -257,11 +257,17 @@ def test_playlist_size(user, rtmp_runner):
     start_balance = user.wallet_balance
     new_stream = user.create_stream()
     new_stream.start()
-    new_stream.wait_for_status('STREAM_STATUS_PREPARED')
-    rtmp_runner.start(new_stream.rtmp_url)
-    new_stream.wait_for_status('STREAM_STATUS_READY')
-    new_stream.wait_for_playlist_size(10)
-    new_stream.stop()
+    try:
+        new_stream.wait_for_status('STREAM_STATUS_PREPARED')
+        rtmp_runner.start(new_stream.rtmp_url)
+        new_stream.wait_for_status('STREAM_STATUS_READY')
+        new_stream.wait_for_playlist_size(10)
+    finally:
+        new_stream.stop()
+        new_stream.wait_for_status('STREAM_STATUS_COMPLETED')
+        rtmp_runner.stop()
+        new_stream.delete()
+
     sleep(120)
     end_balance = user.wallet_balance
 
