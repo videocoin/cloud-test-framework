@@ -15,30 +15,6 @@ logger = logging.getLogger(__name__)
 @pytest.mark.functional
 @pytest.mark.skip
 def test_password_recovery_with_registered_email(user):
-    """
-    Name:
-    Test password recovery with registered email
-
-    Description:
-    Initiating and completing the password recovery process of a registered email
-    should change the account's password and the user should be able to authenticate
-    with the new password.
-
-    Steps:
-    0. Initate password recovery process with a registered email address
-    0. Wait for user's email to receive password recovery email
-    0. Open the latest Password Recovery email and retrieve the password reset token
-    0. Use the password reset token with a new password to change the account password
-    0. Verify the new password works to log in
-    0. Repeat above steps with the old account password to restore account to correct state
-    0. Verify the old password works to log in
-
-    Expected results:
-    0. User receives Password Recovery email
-    0. User is able to use token to create new password
-    0. User is able to log in using new password
-    0. User's password is reset to old password before test
-    """
     email = user.email
     email_password = user.email_password
     old_password = user.password
@@ -68,21 +44,6 @@ def test_password_recovery_with_registered_email(user):
     ],
 )
 def test_password_recovery_with_invalid_email_returns_error(user, invalid_email):
-    """
-    Name:
-    Test password recovery with invalid email returns error
-
-    Description:
-    Starting password recovery process with email that has a variety of errors should
-    return an error and should not continue the process.
-
-    Steps:
-    0. Initiate process with a variety of invalid emails
-    0. Observe response from server
-
-    Expected results:
-    0. Server should return with correct error and error object
-    """
     with pytest.raises(requests.HTTPError) as e:
         _start_password_recovery(user.base_url, invalid_email)
     # TODO: Split the test cases with different results into a different test completely

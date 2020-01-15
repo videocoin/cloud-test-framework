@@ -13,24 +13,6 @@ logger = logging.getLogger(__name__)
 @pytest.mark.smoke
 @pytest.mark.functional
 def test_creating_valid_stream_appears_in_streams_list(user):
-    """
-    Name:
-    Creating valid stream appears in streams list
-
-    Description:
-    When the user creates a new stream, the new stream should appear when calling the list
-    streams API. This validates the list stream API is updated immediately after new stream
-    creation.
-
-    Steps:
-    0. Create new stream with valid name and profile
-    0. Verify the newly created stream is added and shown in the list of streams
-    0. Delete the newly created stream to return account back to state before test
-
-    Expected results:
-    0. New stream is created and can be found in list of streams
-    0. Removing the stream restores the list back to its original state
-    """
     try:
         new_stream = user.create_stream()
         logging.debug('New stream created: %s', new_stream.id)
@@ -54,22 +36,6 @@ def test_creating_valid_stream_appears_in_streams_list(user):
 # TODO: Need to change test to verify the format of these values, not just
 # check that they're not None
 def test_creating_valid_stream_has_correct_information(user):
-    """
-    Name:
-    Creating valid stream has correct information
-
-    Description:
-    When the user creates a new stream, the stream should have the correct fields and
-    correct values (if they're available).
-
-    Steps:
-    0. Create new stream with valid name and profile
-    0. Verify newly created stream's information
-
-    Expected results:
-    0. All expected fields appear in stream object
-    0. All fields that are expected to be filled have correct information
-    """
     try:
         new_stream = user.create_stream()
         tested_keys = expected_results.NEW_STREAM_INFORMATION.keys()
@@ -88,24 +54,6 @@ def test_creating_valid_stream_has_correct_information(user):
 def test_creating_stream_and_send_data_to_rtmp_url_starts_output_stream(
     user, rtmp_runner
 ):
-    """
-    Name:
-    Creating stream and sending data to RTMP URL starts output stream
-
-    Description:
-    When the user creates a stream and begins sending data to its RTMP URL, the stream
-    should begin transcoding the data and provide output to its output URL.
-
-    Steps:
-    0. Create new stream with valid name and profile and note its RTMP URL
-    0. Start preparing the stream and wait for it to be prepared
-    0. Begin streaming to the stream's RTMP URL and wait for output stream to be ready
-    0. Allow stream to run for 60 seconds
-
-    Expected results:
-    0. Streaming to stream's RTMP URL creates valid content in stream's output URL
-    0. Stream from output HLS stream can be viewed properly
-    """
     try:
         if user.token_type == 'sign_in':
             utils.faucet_vid_to_account(user.wallet_address, 11)
@@ -160,24 +108,6 @@ def test_cancelling_stream_during_input_processing_cancels_stream(user, rtmp_run
 
 @pytest.mark.performance
 def test_time_it_takes_for_stream_prepared_state_is_less_than_expected_time(user):
-    """
-    Name:
-    Time it takes for stream to reach prepared state is less than expected time
-
-    Description:
-    When the user starts preparing a stream (clicking "Start stream"), the time it takes
-    for the stream to prepare the input and RTMP URLs should be less than a benchmarked
-    amount of time. This is used to make sure time to prepare the streams have not regressed
-
-    Steps:
-    0. Create new stream with valid name and profile
-    0. Start preparing the stream and begin timing its duration
-    0. Once stream is prepared (input and RTMP URLs are preapred), stop timer
-    0. Average time across 5 tests
-
-    Expected results:
-    0. Time to successfully prepare stream is less than benchmarked time over average of 5 tests
-    """
     NUM_OF_TESTS = 5
     EXPECTED_TIME = 10
 
@@ -210,26 +140,6 @@ def test_time_it_takes_for_stream_prepared_state_is_less_than_expected_time(user
 def test_time_it_takes_for_stream_to_reach_output_ready_state_is_less_than_expected_time(
     user, rtmp_runner
 ):
-    """
-    Name:
-    Time it takes for stream to reach prepared state is less than expected time
-
-    Description:
-    After a stream has been prepared, (input and RTMP URLs are ready), the time it takes
-    for the stream to transcode and output the HLS stream from an endcoder should be less
-    than a benchmarked amount of time. This is used to make sure the time it takes for
-    output to be ready have not regressed
-
-    Steps:
-    0. Create new stream with valid name and profile
-    0. Start preparing the stream
-    0. Once stream is prepared, begin sending stream data from encoder and start timing
-    0. When output is ready, stop timer
-    0. Average time across 5 tests
-
-    Expected results:
-    0. Time to successfully prepare ouput is less than benchmarked time over average of 5 tests
-    """
     NUM_OF_TESTS = 5
     EXPECTED_TIME = 120
 
@@ -266,28 +176,6 @@ def test_time_it_takes_for_stream_to_reach_output_ready_state_is_less_than_expec
 def test_time_it_takes_for_stream_to_reach_completed_state_is_less_than_expected_time(
     user, rtmp_runner
 ):
-    """
-    Name:
-    Time it takes for stream to reach completed state is less than expected time
-
-    Description:
-    After a stream has successfully transcoded its input and is finished, the time it
-    takes for the stream to complete after user initiation should be less than a
-    benchmarked amount of time. This is used to make sure the time it takes for stream
-    to be completed have not regressed
-
-    Steps:
-    0. Create new stream with valid name and profile
-    0. Start preparing the stream
-    0. Once stream is prepared, begin sending stream data from encoder
-    0. Allow stream to transcode for a short while
-    0. Initiate stream completion and start timer
-    0. Wait for stream to successfully transition to completed state and stop timer
-    0. Average time across 5 tests
-
-    Expected results:
-    0. Time to successfully complete is less than benchmarked time over average of 5 tests
-    """
     NUM_OF_TESTS = 5
     EXPECTED_TIME = 5
 
@@ -320,20 +208,6 @@ def test_time_it_takes_for_stream_to_reach_completed_state_is_less_than_expected
 
 @pytest.mark.functional
 def test_creating_stream_with_empty_name_returns_error(user):
-    """
-    Name:
-    Creating stream with empty name returns error
-
-    Description:
-    Users who attempt to create a new stream with an empty name field should be given
-    an error. Name is a required field for stream creation.
-
-    Steps:
-    0. Create new stream with empty name field and valid profile
-
-    Expected results:
-    0. Server returns error with message name is a required field
-    """
     with pytest.raises(requests.HTTPError) as e:
         user.create_stream(name='')
     assert e.value.response.status_code == 400
@@ -344,20 +218,6 @@ def test_creating_stream_with_empty_name_returns_error(user):
 
 @pytest.mark.functional
 def test_creating_stream_with_empty_profile_id_returns_error(user):
-    """
-    Name:
-    Creating stream with empty profile ID returns error
-
-    Description:
-    Users who attempt to create a new stream with an empty profile ID field should be
-    given an error. Profile ID is a required field for stream creation.
-
-    Steps:
-    0. Create new stream with valid name and empty profile ID
-
-    Expected results:
-    0. Server returns error with message profile ID is a required field
-    """
     with pytest.raises(requests.HTTPError) as e:
         user.create_stream(profile_id='')
     assert e.value.response.status_code == 400
@@ -369,21 +229,6 @@ def test_creating_stream_with_empty_profile_id_returns_error(user):
 
 @pytest.mark.functional
 def test_creating_stream_with_invalid_profile_id(user):
-    """
-    Name:
-    Creating stream with invalid profile ID returns error
-
-    Description:
-    Users who attempt to create a new stream with an invalid profile ID (not listed under
-    the /profiles endpoint) should return an error. Users are forced to use the
-    predetrmined transcoding profiles
-
-    Steps:
-    0. Create new stream with valid name and invalid profile ID
-
-    Expected results:
-    0. Server returns error with message a valid profile ID is requried
-    """
     with pytest.raises(requests.HTTPError) as e:
         user.create_stream(profile_id='abcd-1234')
     assert e.value.response.status_code == 400

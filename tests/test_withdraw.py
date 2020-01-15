@@ -15,23 +15,6 @@ logger = logging.getLogger(__name__)
 @pytest.mark.smoke
 @pytest.mark.functional
 def test_starting_withdraw_with_valid_address_and_amount_has_correct_information(user):
-    """
-    Name:
-    Starting withdraw with valid address and amount has correct information
-
-    Description:
-    When the user begins a withdraw process to deposit to a valid address and has a
-    valid withdraw amount, the information in the withdraw confirmation email should
-    be correct and accurately reflect the information that initiated the withdraw.
-
-    Steps:
-    0. Initiate withdraw request from server, noting the address and amount submitted
-    0. Check email for withdraw confirmation email, note the information listed in email
-    0. Compare submitted information to information in confirmation email
-
-    Expected results:
-    0. Information listed in email is accurate compared to information submitted
-    """
     deposit_address = input_values.DEPOSIT_ADDRESS_METAMASK
     withdraw_amt = 20
     withdraw_amt_wei = w3.toWei(withdraw_amt, 'ether')
@@ -78,22 +61,6 @@ def test_starting_withdraw_with_valid_address_and_amount_has_correct_information
     ],
 )
 def test_invalid_confirmation_code_returns_error(user, invalid_code, expected_error):
-    """
-    Name:
-    Invalid confirmation code format returns error
-
-    Description:
-    When the user attempts to confirm their withdraw with a confirmation code, invalid
-    confirmation code formats should be rejected and provide user with appropriate
-    error message.
-
-    Steps:
-    0. Initiate withdraw request from server
-    0. Attempt to complete withdraw request by submitting invalid format confirmation codes
-
-    Expected results:
-    0. Server returns error describing problem with confirmation code format
-    """
     deposit_address = input_values.DEPOSIT_ADDRESS_METAMASK
     withdraw_amt = 20
     withdraw_amt_wei = w3.toWei(withdraw_amt, 'ether')
@@ -116,23 +83,6 @@ def test_invalid_confirmation_code_returns_error(user, invalid_code, expected_er
 @pytest.mark.smoke
 @pytest.mark.functional
 def test_correct_confirmation_code_sends_success_email(user):
-    """
-    Name:
-    Correct confirmation code sends success email
-
-    Description:
-    When the user initiates and correctly completes a withdraw request, the user should
-    be sent an email describing the transaction with accurate information.
-
-    Steps:
-    0. Initiate withdraw request from server
-    0. Complete withdraw request using correct confirmation code
-    0. Check email for withdraw success email, verifying all information in email is correct
-
-    Expected results:
-    0. User's email receives success email from server after completing withdraw
-    0. Information in withdraw success email is correct
-    """
     deposit_address = input_values.DEPOSIT_ADDRESS_METAMASK
     withdraw_amt = 20
     withdraw_amt_wei = w3.toWei(withdraw_amt, 'ether')
@@ -256,22 +206,6 @@ def test_withdraw_less_than_mainnet_gas(user):
 
 @pytest.mark.functional
 def test_entering_incorrect_confirmation_code_returns_error(user):
-    """
-    Name:
-    Entering incorrect confirmation code returns error
-
-    Description:
-    When the user initiates a withdraw process, but inputs an incorrect code for
-    confirmation, the user should be returned an error and the withdraw process
-    is not completed
-
-    Steps:
-    0. Initiate withdraw request from server
-    0. Complete withdraw process using a confirmation code different from what was sent
-
-    Expected results:
-    0. Server returns an error describing the problem. The withdraw process is not complete
-    """
     email = user.email
     email_password = user.email_password
     deposit_address = input_values.DEPOSIT_ADDRESS_METAMASK
