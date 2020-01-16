@@ -122,7 +122,7 @@ def faucet_vid_to_account(address, amount):
 
 
 def get_vid_balance_of_erc20(w3, abi, addr, network='rinkeby'):
-    token_addr = '0x0A94F11D89e799A2a6b9EAdC784FfD3897592dD7'
+    token_addr = '0x22f9830cfCa475143749f19Ca7d5547D4939Ff67'
     vid_addr = w3.eth.contract(token_addr, abi=abi)
     amt = vid_addr.functions.balanceOf(addr).call()
 
