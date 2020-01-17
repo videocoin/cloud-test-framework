@@ -146,7 +146,7 @@ def get_vid_erc20_abi(cluster):
 
 def time_from_start(start):
     now = datetime.now()
-    return (now - start).seconds
+    return (now - start).total_seconds()
 
 
 if __name__ == '__main__':
