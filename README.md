@@ -58,10 +58,3 @@ Run tests with an RTMP Runner fixture, allowing usage of the `RTMP Runner` proje
 
 Usage:
 `pytest --rtmp_runner=127.0.0.1:8000`
-
-### TestRail reporting (IN SUPER ALPHA [what's before Alpha?])
-Reporting to TestRail has a large number of advantages (stores test results, graphical representation, history of test failures, etc.). To perform this, all tests (notably newly created tests) need to be synced with TestRail. This is done automatically when running with the `--testrail_report=True` option. Can be run with `-k` to only run and report a subset of tests. When running with this option, *you must include the -s option* to not capture output. This is because an input() is used to wait for user confirmation to edit the TestRail repository (will probably be removed later). Other TestRail environments need to be properly defined, such as the TESTRAIL_KEY, to work properly (I'll write more about this as I clean it up more). Did I mention this option is in Alpha?
-
-Usage:
-
-`pytest --testrail_report=True`
