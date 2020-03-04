@@ -3,8 +3,8 @@ from time import sleep
 import pytest
 import logging
 
-from consts import input_values
-from utils import utils
+from src.consts import input_values
+from src.utils import utils
 
 logger = logging.getLogger(__name__)
 

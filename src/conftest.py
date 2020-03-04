@@ -4,11 +4,11 @@ import requests
 from web3 import Web3, HTTPProvider
 from web3.middleware import geth_poa_middleware
 
-from consts import input_values
-from consts import endpoints
-from models.user import User
-from utils import utils
-from utils.rtmp_runner import RTMPRunner
+from src.consts import input_values
+from src.consts import endpoints
+from src.models.user import User
+from src.utils import utils
+from src.utils.rtmp_runner import RTMPRunner
 
 logger = logging.getLogger(__name__)
 

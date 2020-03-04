@@ -1,7 +1,7 @@
 import requests
 
-from utils import utils
-from consts import endpoints
+from src.utils import utils
+from src.consts import endpoints
 
 
 class Miner:

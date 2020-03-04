@@ -3,8 +3,8 @@ from datetime import datetime
 import logging
 
 import requests
-from consts import endpoints
-from utils import utils
+from src.consts import endpoints
+from src.utils import utils
 
 logger = logging.getLogger(__name__)
 

@@ -1,0 +1,98 @@
+setup_remote_docker: &setup_remote_docker
+  version: 18.06.0-ce
+  reusable: true
+  exclusive: true
+  docker_layer_caching: true
+
+docker_login: &docker_login
+  name: docker login
+  command: |
+    docker login -u _json_key -p "$GCLOUD_SERVICE_KEY" https://gcr.io
+
+init_gcloud: &init_gcloud
+  name: Init gcloud
+  command: .circleci/init-gcloud.sh
+
+base_docker_image: &base_docker_image
+  - image: gcr.io/videocoin-network/cloud-base-ci:1.0
+    auth:
+      username: _json_key
+      password: $GCLOUD_SERVICE_KEY
+
+restore_repo: &restore_repo
+  restore_cache:
+    keys:
+      - v1-repo-{{ .Branch }}-{{ .Revision }}
+      - v1-repo-{{ .Branch }}
+      - v1-repo
+
+defaults: &defaults
+  working_directory: /srv/src
+  docker: *base_docker_image
+
+version: 2
+jobs:
+  build:
+    <<: *defaults
+    steps:
+      - *restore_repo
+      - checkout
+      - setup_remote_docker:
+          <<: *setup_remote_docker
+      - run:
+          <<: *docker_login
+      - run:
+          name: release
+          command: |
+            make release
+      - save_cache:
+          key: v1-repo-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - .
+  pull:
+    <<: *defaults
+    steps:
+      - *restore_repo
+      - checkout
+      - setup_remote_docker:
+          <<: *setup_remote_docker
+      - run:
+          <<: *docker_login
+      - run:
+          name: release
+          command: |
+            make docker-pull
+      - save_cache:
+          key: v1-repo-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - .
+  test:
+    <<: *defaults
+    steps:
+      - checkout
+      - setup_remote_docker:
+          <<: *setup_remote_docker
+      - run:
+          name: deploy tests
+          command: |
+            make docker-run-smoke
+workflows:
+  version: 2
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only: develop
+    jobs:
+      - pull
+      - test:
+          requires:
+            - pull
+  build-n-deploy:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build

@@ -18,7 +18,7 @@ The default email and VideoCoin account are associated with the email kgoautomat
 `virtualenv -p python3 venv`
 
 ### Install dependencies
-`pip install -r req.txt`
+`pip install -r requirements.txt`
 
 ### Install pre-commit tool for linting and formatting (optional)
 `pre-commit install`

@@ -1,8 +1,8 @@
 import pytest
 import requests
 
-from consts import endpoints
-from consts import expected_results
+from src.consts import endpoints
+from src.consts import expected_results
 
 
 @pytest.mark.functional

@@ -2,8 +2,8 @@ from datetime import datetime
 import logging
 from time import sleep
 
-from utils import utils
-from consts import input_values
+from src.utils import utils
+from src.consts import input_values
 
 logger = logging.getLogger(__name__)
 

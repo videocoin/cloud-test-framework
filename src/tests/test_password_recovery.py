@@ -4,9 +4,9 @@ import urllib.parse
 import pytest
 import logging
 
-from consts import endpoints
-from consts import email_body_regex
-from utils import utils
+from src.consts import endpoints
+from src.consts import email_body_regex
+from src.utils import utils
 
 logger = logging.getLogger(__name__)
 

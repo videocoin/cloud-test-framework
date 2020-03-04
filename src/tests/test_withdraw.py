@@ -5,9 +5,9 @@ import requests
 from time import sleep
 from web3.auto import w3
 
-from consts import input_values
-from consts import email_body_regex
-from utils import utils
+from src.consts import input_values
+from src.consts import email_body_regex
+from src.utils import utils
 
 logger = logging.getLogger(__name__)
 

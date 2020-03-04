@@ -4,8 +4,8 @@ import requests
 import pytest
 import logging
 
-from consts import expected_results
-from utils import utils
+from src.consts import expected_results
+from src.utils import utils
 
 logger = logging.getLogger(__name__)
 

@@ -2,10 +2,10 @@ from datetime import datetime
 import logging
 import requests
 
-from models.miner import Miner
-from models.stream import Stream
-from consts import endpoints
-from utils import utils
+from src.models.miner import Miner
+from src.models.stream import Stream
+from src.consts import endpoints
+from src.utils import utils
 
 # This kind of class is reoccurring. It has:
 # 1) A token
