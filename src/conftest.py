@@ -9,6 +9,7 @@ from src.consts import endpoints
 from src.models.user import User
 from src.utils import utils
 from src.utils.rtmp_runner import RTMPRunner
+from src.utils.email import get_report_html, send_report
 
 logger = logging.getLogger(__name__)
 
@@ -26,8 +27,27 @@ def pytest_addoption(parser):
     parser.addoption('--token', action='store', default=None)
     parser.addoption('--cluster', action='store', default='snb')
     parser.addoption('--num_of_test_users', action='store', default=3)
-    parser.addoption('--rtmp_runner', action='store', default='192.168.1.159:8000')
-    parser.addoption('--testrail_report', action='store', default=False)
+    parser.addoption('--rtmp_runner', action='store', default='127.0.0.1:8080')
+    parser.addoption('--report_emails', action='store', default=False)
+    parser.addoption('--sendgrid_key', action='store', default=False)
+
+
+def pytest_terminal_summary(terminalreporter, config):
+    sendgrid_key = config.getoption('--sendgrid_key')
+    report_emails = config.getoption('--report_emails')
+    cluster = config.getoption('--cluster')
+    if not sendgrid_key:
+        return
+    if not report_emails:
+        return
+    report_html = get_report_html(
+        passed=terminalreporter.stats.get('passed', []),
+        failed=terminalreporter.stats.get('failed', []),
+        skipped=terminalreporter.stats.get('skipped', []),
+        error=terminalreporter.stats.get('error', []),
+        cluster=cluster,
+    )
+    send_report(report_html, sendgrid_key, report_emails)
 
 
 @pytest.fixture
