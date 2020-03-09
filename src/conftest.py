@@ -25,7 +25,7 @@ def pytest_addoption(parser):
         '--password', action='store', default=input_values.ACCOUNT_PASSWORD_DEFAULT
     )
     parser.addoption('--token', action='store', default=None)
-    parser.addoption('--cluster', action='store', default='snb')
+    parser.addoption('--cluster', action='store', default='dev')
     parser.addoption('--num_of_test_users', action='store', default=3)
     parser.addoption('--rtmp_runner', action='store', default='127.0.0.1:8080')
     parser.addoption('--report_emails', action='store', default=False)
@@ -53,7 +53,7 @@ def pytest_terminal_summary(terminalreporter, config):
 @pytest.fixture
 def user(request):
     cluster = request.config.getoption('--cluster')
-    available_clusters = ['snb', 'prod']
+    available_clusters = ['snb', 'kili', 'dev']
     if cluster not in available_clusters:
         raise ValueError(
             'Cluster not available. Currently available clusters are {}'.format(
@@ -94,15 +94,15 @@ def rtmp_runner(request):
 @pytest.fixture
 def w3(request):
     cluster = request.config.getoption('--cluster')
-    available_clusters = ['snb']
+    available_clusters = ['snb', 'dev']
     if cluster not in available_clusters:
         raise ValueError(
             'Cluster not available. Currently available clusters are {}'.format(
                 available_clusters
             )
         )
-    if cluster == 'snb':
-        network_url = 'https://rinkeby.infura.io'
+    if cluster in ['snb', 'dev']:
+        network_url = 'https://rinkeby.infura.io/v3/2133def9c46e42269dc76cff5338643a'
 
     w3 = Web3(HTTPProvider(network_url))
     # Still don't really understand this...Read more here:
@@ -115,7 +115,7 @@ def w3(request):
 @pytest.fixture
 def abi(request):
     cluster = request.config.getoption('--cluster')
-    available_clusters = ['snb']
+    available_clusters = ['snb', 'dev']
     if cluster not in available_clusters:
         raise ValueError(
             'Cluster not available. Currently available clusters are {}'.format(

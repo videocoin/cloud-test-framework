@@ -22,7 +22,6 @@ def format_time(seconds):
 
 def get_report_html(passed, failed, skipped, error, cluster):
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    print(base_dir)
     tpl_path = os.path.join(base_dir, '../templates/report.html')
 
     path, filename = os.path.split(tpl_path)

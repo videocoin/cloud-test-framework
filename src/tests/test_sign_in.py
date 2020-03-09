@@ -3,6 +3,7 @@ import requests
 
 from src.consts import endpoints
 from src.consts import expected_results
+from src.utils import utils
 
 
 @pytest.mark.smoke
@@ -32,11 +33,11 @@ def test_sign_in_with_valid_credentials_have_correct_user_information(user):
 
 
 @pytest.mark.functional
-def test_sign_in_with_non_existant_email_returns_error():
+def test_sign_in_with_non_existant_email_returns_error(user):
     email = 'really_fake_email@fake.ru'
     password = 'not_a_valid_password'
     with pytest.raises(requests.HTTPError) as e:
-        _auth(email, password)
+        _auth(user.cluster, email, password)
 
     assert e.value.response.status_code == 401
     assert (
@@ -50,7 +51,7 @@ def test_sign_in_with_incorrect_password_returns_error(user):
     email = user.email
     password = 'not_a_valid_password'
     with pytest.raises(requests.HTTPError) as e:
-        _auth(email, password)
+        _auth(user.cluster, email, password)
 
     assert e.value.response.status_code == 401
     assert (
@@ -59,10 +60,10 @@ def test_sign_in_with_incorrect_password_returns_error(user):
     )
 
 
-def _auth(email, password):
+def _auth(cluster, email, password):
     body = {'email': email, 'password': password}
-
-    res = requests.post(endpoints.BASE_URL + endpoints.AUTH, json=body)
+    base_url = utils.get_base_url(cluster)
+    res = requests.post(base_url + endpoints.AUTH, json=body)
     res.raise_for_status()
 
     return res.json()['token']

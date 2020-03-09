@@ -132,13 +132,15 @@ def get_vid_balance_of_erc20(w3, abi, addr, network='rinkeby'):
 def get_base_url(cluster):
     if cluster == 'snb':
         env = '.snb'
-    elif cluster == 'prod':
+    if cluster == 'dev':
+        env = '.dev'
+    elif cluster == 'kili':
         env = ''
     return 'https://studio{}.videocoin.network'.format(env)
 
 
 def get_vid_erc20_abi(cluster):
-    if cluster == 'snb':
+    if cluster in ['dev', 'snb']:
         with open('consts/ERC20.abi.json') as file:
             abi = json.load(file)
             return abi

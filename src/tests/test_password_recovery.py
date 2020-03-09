@@ -23,13 +23,13 @@ def test_password_recovery_with_registered_email(user):
     _start_password_recovery(user.base_url, email)
     sleep(5)
     token = _get_password_reset_token(email, email_password)
-    _change_password_with_token(token, new_password)
-    _auth(email, new_password)
+    _change_password_with_token(user.cluster, token, new_password)
+    _auth(user.cluster, email, new_password)
     _start_password_recovery(user.base_url, email)
     sleep(5)
     token = _get_password_reset_token(email, email_password)
-    _change_password_with_token(token, old_password)
-    _auth(email, old_password)
+    _change_password_with_token(user.cluster, token, old_password)
+    _auth(user.cluster, email, old_password)
 
 
 @pytest.mark.functional
@@ -88,13 +88,15 @@ def _get_password_reset_token(email, email_password):
     return token
 
 
-def _change_password_with_token(token, new_password):
+def _change_password_with_token(cluster, token, new_password):
     body = {'token': token, 'password': new_password, 'confirm_password': new_password}
-    response = requests.post(endpoints.BASE_URL + endpoints.RECOVER, json=body)
+    base_url = utils.get_base_url(cluster)
+    response = requests.post(base_url + endpoints.RECOVER, json=body)
     response.raise_for_status()
 
 
-def _auth(email, password):
+def _auth(cluster, email, password):
     body = {'email': email, 'password': password}
-    response = requests.post(endpoints.BASE_URL + endpoints.AUTH, json=body)
+    base_url = utils.get_base_url(cluster)
+    response = requests.post(base_url + endpoints.AUTH, json=body)
     response.raise_for_status()
