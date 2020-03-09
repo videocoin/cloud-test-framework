@@ -8,6 +8,8 @@ from src.utils import utils
 
 logger = logging.getLogger(__name__)
 
+BAD_STATUSES = ['STREAM_STATUS_CANCELLED', 'STREAM_STATUS_FAILED']
+
 
 class Stream:
     def __init__(self, cluster, token, id):
@@ -57,6 +59,13 @@ class Stream:
     def wait_for_status(self, status, timeout=120):
         start = datetime.now()
         while self.status != status and utils.time_from_start(start) <= timeout:
+            if self.status in BAD_STATUSES:
+                logger.debug(
+                    'Time: {} | Bad stream status: {}'.format(
+                        utils.time_from_start(start), self.status
+                    )
+                )
+                break
             logger.debug(
                 'Time: {} | Current status: {} | Waiting for status: {}'.format(
                     utils.time_from_start(start), self.status, status
@@ -70,7 +79,6 @@ class Stream:
                     self.id, status, timeout, self.status
                 )
             )
-
         return utils.time_from_start(start)
 
     def is_hls_playlist_healthy(self, duration, expected_update_duration=10):
@@ -78,10 +86,7 @@ class Stream:
         base_playlist_url = 'https://streams-{}.videocoin.network/{}/index.m3u8'
         durations = []
 
-        if self.cluster == 'snb':
-            playlist_url = base_playlist_url.format('snb', self.id)
-        elif self.cluster == 'prod':
-            playlist_url = base_playlist_url.format('kili', self.id)
+        playlist_url = base_playlist_url.format(self.cluster, self.id)
 
         last = ''
         last_time = None
@@ -113,6 +118,15 @@ class Stream:
             'Average time to update {}'.format(sum(durations) / len(durations))
         )
         return True
+
+    def check_playlist(self):
+        base_playlist_url = 'https://streams-{}.videocoin.network/{}/index.m3u8'
+        playlist_url = base_playlist_url.format(self.cluster, self.id)
+
+        res = requests.get(playlist_url)
+        last_chunk = res.text.split('\n')[-2]
+        logger.debug('last chunk: {}'.format(last_chunk))
+        return last_chunk
 
     def wait_for_playlist_size(self, expected_num_chunks, timeout_per_chunk=20):
         start_time = datetime.now()
@@ -155,6 +169,23 @@ class Stream:
         )
 
         return end_time - start_time
+
+    def upload_file(self, path):
+        with open(path, 'rb') as f:
+            response = requests.post(
+                self.base_url + endpoints.FILE_UPLOAD + self.id, files={'file': f}, headers=self.headers
+            )
+        response.raise_for_status()
+
+        return True
+
+    def upload_url(self, file_url):
+        response = requests.post(
+            self.base_url + endpoints.URL_UPLOAD + self.id, json={'url': file_url}, headers=self.headers
+        )
+        response.raise_for_status()
+
+        return True
 
     @property
     def name(self):

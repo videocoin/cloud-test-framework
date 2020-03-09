@@ -3,7 +3,7 @@ import pytest
 
 @pytest.mark.skip('still working on this')
 def test_get_miners(user, rtmp_runner):
-    stream = user.create_stream(profile_name='copy')
+    stream = user.create_stream_live(profile_name='copy')
     for miner in user.get_miners():
         if miner.name == 'small-dew':
             miner.assign_stream(stream.id)

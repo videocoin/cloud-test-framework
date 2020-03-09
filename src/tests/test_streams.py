@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 @pytest.mark.functional
 def test_creating_valid_stream_appears_in_streams_list(user):
     try:
-        new_stream = user.create_stream()
+        new_stream = user.create_stream_live()
         logging.debug('New stream created: %s', new_stream.id)
         all_streams = user.get_streams()
         found_stream = [stream for stream in all_streams if stream.id == new_stream.id]
@@ -37,7 +37,7 @@ def test_creating_valid_stream_appears_in_streams_list(user):
 # check that they're not None
 def test_creating_valid_stream_has_correct_information(user):
     try:
-        new_stream = user.create_stream()
+        new_stream = user.create_stream_live()
         tested_keys = expected_results.NEW_STREAM_INFORMATION.keys()
         for key in tested_keys:
             # These keys are expected to be None (or null)
@@ -57,7 +57,7 @@ def test_creating_stream_and_send_data_to_rtmp_url_starts_output_stream(
     try:
         if user.token_type == 'sign_in':
             utils.faucet_vid_to_account(user.wallet_address, 11)
-        new_stream = user.create_stream()
+        new_stream = user.create_stream_live()
         new_stream.start()
 
         new_stream.wait_for_status('STREAM_STATUS_PREPARED')
@@ -75,7 +75,7 @@ def test_creating_stream_and_send_data_to_rtmp_url_starts_output_stream(
 def test_cancelling_stream_after_input_url_ready_cancels_stream(user):
     try:
         utils.faucet_vid_to_account(user.wallet_address, 11)
-        new_stream = user.create_stream()
+        new_stream = user.create_stream_live()
         new_stream.start()
 
         new_stream.wait_for_status('STREAM_STATUS_PREPARED')
@@ -92,7 +92,7 @@ def test_cancelling_stream_after_input_url_ready_cancels_stream(user):
 def test_cancelling_stream_during_input_processing_cancels_stream(user, rtmp_runner):
     try:
         # utils.faucet_vid_to_account(user.wallet_address, 11)
-        new_stream = user.create_stream()
+        new_stream = user.create_stream_live()
         new_stream.start()
         new_stream.wait_for_status('STREAM_STATUS_PREPARED')
         rtmp_runner.start(new_stream.rtmp_url)
@@ -115,7 +115,7 @@ def test_time_it_takes_for_stream_prepared_state_is_less_than_expected_time(user
     for i in range(NUM_OF_TESTS):
         try:
             utils.faucet_vid_to_account(user.wallet_address, 11)
-            new_stream = user.create_stream()
+            new_stream = user.create_stream_live()
             new_stream.start()
             duration = new_stream.wait_for_status(
                 'STREAM_STATUS_PREPARED', timeout=EXPECTED_TIME
@@ -147,7 +147,7 @@ def test_time_it_takes_for_stream_to_reach_output_ready_state_is_less_than_expec
     for i in range(NUM_OF_TESTS):
         try:
             utils.faucet_vid_to_account(user.wallet_address, 11)
-            new_stream = user.create_stream()
+            new_stream = user.create_stream_live()
             new_stream.start()
             new_stream.wait_for_status('STREAM_STATUS_PREPARED')
             rtmp_runner.start(new_stream.rtmp_url)
@@ -183,7 +183,7 @@ def test_time_it_takes_for_stream_to_reach_completed_state_is_less_than_expected
     for i in range(NUM_OF_TESTS):
         try:
             utils.faucet_vid_to_account(user.wallet_address, 11)
-            new_stream = user.create_stream()
+            new_stream = user.create_stream_live()
             new_stream.start()
             new_stream.wait_for_status('STREAM_STATUS_PREPARED')
             rtmp_runner.start(new_stream.rtmp_url)
@@ -209,7 +209,7 @@ def test_time_it_takes_for_stream_to_reach_completed_state_is_less_than_expected
 @pytest.mark.functional
 def test_creating_stream_with_empty_name_returns_error(user):
     with pytest.raises(requests.HTTPError) as e:
-        user.create_stream(name='')
+        user.create_stream_live(name='')
     assert e.value.response.status_code == 400
     assert (
         e.value.response.json() == expected_results.CREATE_STREAM_WITH_EMPTY_NAME_ERROR
@@ -219,7 +219,7 @@ def test_creating_stream_with_empty_name_returns_error(user):
 @pytest.mark.functional
 def test_creating_stream_with_empty_profile_id_returns_error(user):
     with pytest.raises(requests.HTTPError) as e:
-        user.create_stream(profile_id='')
+        user.create_stream_live(profile_id='')
     assert e.value.response.status_code == 400
     assert (
         e.value.response.json()
@@ -230,7 +230,7 @@ def test_creating_stream_with_empty_profile_id_returns_error(user):
 @pytest.mark.functional
 def test_creating_stream_with_invalid_profile_id(user):
     with pytest.raises(requests.HTTPError) as e:
-        user.create_stream(profile_id='abcd-1234')
+        user.create_stream_live(profile_id='abcd-1234')
     assert e.value.response.status_code == 400
 
 
@@ -239,7 +239,7 @@ def test_creating_stream_with_invalid_profile_id(user):
 def test_all_available_output_profiles(user, rtmp_runner, output_profile):
     logger.debug('running with profile name: {}'.format(output_profile['name']))
     profile_id = output_profile['id']
-    new_stream = user.create_stream(profile_id=profile_id)
+    new_stream = user.create_stream_live(profile_id=profile_id)
     new_stream.start()
     try:
         new_stream.wait_for_status('STREAM_STATUS_PREPARED')
@@ -255,7 +255,7 @@ def test_all_available_output_profiles(user, rtmp_runner, output_profile):
 
 def test_playlist_size(user, rtmp_runner):
     start_balance = user.wallet_balance
-    new_stream = user.create_stream()
+    new_stream = user.create_stream_live()
     new_stream.start()
     try:
         new_stream.wait_for_status('STREAM_STATUS_PREPARED')

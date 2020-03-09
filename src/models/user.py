@@ -54,26 +54,43 @@ class User:
             miner_objs.append(miner_obj)
         return miner_objs
 
-    def create_stream(self, name=None, profile_name=None, profile_id=None):
-        """
-        profile_name is only a convenience argument
-        profile_id takes precedence over profile_name
-        """
+    def get_profile(self, profile_name=None):
+        output_profiles = self._get_output_profiles()
+        if not profile_name:
+            # If profile_id nor profile_name is specified, assume
+            # user will take any profile (the first)
+            profile_id = output_profiles[0]['id']
+        else:
+            for profile in output_profiles:
+                if profile['name'] == profile_name:
+                    profile_id = profile['id']
+        if not profile_id:
+            raise ValueError('Profile does not exist')
+        return profile_id
+
+    def create_stream_vod(self, name=None, profile_name=None, profile_id=None):
+        if name is None:
+            name = 'File upload {}'.format(datetime.now().strftime("%m-%d-%Y@%H:%M:%S"))
+
+        if not profile_id:
+            profile_id = self.get_profile(profile_name)
+
+        body = {'name': name, 'profile_id': profile_id, 'input_type': 'INPUT_TYPE_FILE'}
+        logger.debug('Creating stream "{}" with profile_id {}'.format(name, profile_id))
+
+        response = requests.post(
+            self.base_url + endpoints.STREAM, headers=self.headers, json=body
+        )
+        response.raise_for_status()
+
+        return Stream(self.cluster, self.token, response.json()['id'])
+
+    def create_stream_live(self, name=None, profile_name=None, profile_id=None):
         if name is None:
             name = datetime.now().strftime("%m-%d-%Y@%H:%M:%S")
 
-        output_profiles = self._get_output_profiles()
-        if profile_id is None:
-            if profile_name is None:
-                # If profile_id nor profile_name is specified, assume
-                # user will take any profile (the first)
-                profile_id = output_profiles[0]['id']
-            else:
-                for profile in output_profiles:
-                    if profile['name'] == profile_name:
-                        profile_id = profile['id']
-            if not profile_id:
-                raise ValueError('Profile name does not exist')
+        if not profile_id:
+            profile_id = self.get_profile(profile_name)
 
         body = {'name': name, 'profile_id': profile_id}
         logger.debug('Creating stream "{}" with profile_id {}'.format(name, profile_id))
