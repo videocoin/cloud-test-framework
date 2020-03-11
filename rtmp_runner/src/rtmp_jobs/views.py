@@ -8,6 +8,7 @@ from rest_framework import status
 from datetime import datetime
 from rtmp_jobs.rtmp_process_manager import stop_rtmp_output, start_rtmp_output
 
+
 class RTMPJobList(APIView):
     def get(self, request, format=None):
         rtmp_jobs = RTMPJob.objects.all()
@@ -16,12 +17,13 @@ class RTMPJobList(APIView):
 
     def post(self, request, format=None):
         serializer = RTMPJobSerializer(data=request.data)
-        if serializer.is_valid():                        
+        if serializer.is_valid():
             destination = request.data['destination']
             new_pid = start_rtmp_output('video', destination)
             serializer.save(pid=new_pid)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class RTMPJobDetail(APIView):
     def get_object(self, pk):

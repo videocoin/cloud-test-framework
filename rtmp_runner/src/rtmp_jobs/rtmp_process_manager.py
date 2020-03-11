@@ -1,7 +1,7 @@
 import subprocess
 import os
 import signal
-from datetime import datetime
+
 
 def start_rtmp_output(source, destination):
     bbb_vid = './small.mp4'
@@ -40,15 +40,10 @@ def start_rtmp_output(source, destination):
             # Output format
             "-f", "flv", destination]
 
-    now = datetime.now()
-    str_formatted_now = now.strftime('%Y-%m-%d-%H:%M:%S.%f')
-    log_directory = './logs/{}'.format(str_formatted_now)
-    os.makedirs(log_directory)
-    with open(os.path.join(log_directory, 'ffmpeg_stdout.txt'), 'w+') as ffmpeg_stdout, \
-    open (os.path.join(log_directory, 'ffmpeg_stderr.txt'), 'w+') as ffmpeg_stderr:
-        proc = subprocess.Popen(UNCONFIGURED_FFMPEG_ARGS, stdout=ffmpeg_stdout, stderr=ffmpeg_stderr)
+    proc = subprocess.Popen(UNCONFIGURED_FFMPEG_ARGS)
 
     return proc.pid
+
 
 def stop_rtmp_output(pid, signal_to_send=signal.SIGTERM):
     return os.kill(pid, signal_to_send)
