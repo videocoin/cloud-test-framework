@@ -44,6 +44,9 @@ def test_password_recovery_with_registered_email(user):
     ],
 )
 def test_password_recovery_with_invalid_email_returns_error(user, invalid_email):
+    """
+    Check password recovery with invalid emails
+    """
     with pytest.raises(requests.HTTPError) as e:
         _start_password_recovery(user.base_url, invalid_email)
     # TODO: Split the test cases with different results into a different test completely

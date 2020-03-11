@@ -10,6 +10,9 @@ logger = logging.getLogger(__name__)
 
 
 def test_deposit_updates_eth_acct_balance_correctly(user, w3, abi):
+    """
+    Check correct erc20 token transfer between users
+    """
     deposit_amt = 10 * 10 ** 18
     eth_addr = input_values.DEPOSIT_ADDRESS_METAMASK
     eth_private_key = input_values.PRIVATE_KEY_METAMASK
@@ -53,6 +56,9 @@ def test_deposit_updates_eth_acct_balance_correctly(user, w3, abi):
 
 @pytest.mark.skip('in progress')
 def test_deposit_updates_vid_acct_balance_correctly(user, w3, abi):
+    """
+    Check correct erc20 token transfer
+    """
     start_amt = user.wallet_balance
     deposit_amt = 10 * 10 ** 18
 

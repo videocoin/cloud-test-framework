@@ -8,6 +8,9 @@ from src.utils import utils
 
 @pytest.mark.functional
 def test_signing_up_with_an_existing_email_returns_error(user):
+    """
+    Check sign up with for a existing user
+    """
     email = user.email
     password = user.password
     name = 'Automation Account'
@@ -21,6 +24,9 @@ def test_signing_up_with_an_existing_email_returns_error(user):
 
 @pytest.mark.functional
 def test_signing_up_with_short_name_returns_error(user):
+    """
+    Check sign up with wrong data
+    """
     email = user.email
     password = user.password
     name = 'K'
@@ -35,6 +41,9 @@ def test_signing_up_with_short_name_returns_error(user):
 @pytest.mark.functional
 @pytest.mark.parametrize('password', ['1234567890', 'no_number_password', '2short'])
 def test_signing_up_with_invalid_password_returns_error(user, password):
+    """
+    Check sign up with wrong data
+    """
     email = user.email
     password = password
     name = 'Automation Account'

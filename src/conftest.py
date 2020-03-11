@@ -32,6 +32,10 @@ def pytest_addoption(parser):
     parser.addoption('--sendgrid_key', action='store', default=False)
 
 
+def pytest_itemcollected(item):
+    item._nodeid = '' if item._obj.__doc__ is None else item._obj.__doc__.strip()
+
+
 def pytest_terminal_summary(terminalreporter, config):
     sendgrid_key = config.getoption('--sendgrid_key')
     report_emails = config.getoption('--report_emails')

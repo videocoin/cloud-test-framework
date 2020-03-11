@@ -15,6 +15,9 @@ logger = logging.getLogger(__name__)
 @pytest.mark.smoke
 @pytest.mark.functional
 def test_starting_withdraw_with_valid_address_and_amount_has_correct_information(user):
+    """
+    Check withdraw for a valid account
+    """
     deposit_address = input_values.DEPOSIT_ADDRESS_METAMASK
     withdraw_amt = 20
     withdraw_amt_wei = w3.toWei(withdraw_amt, 'ether')
@@ -61,6 +64,9 @@ def test_starting_withdraw_with_valid_address_and_amount_has_correct_information
     ],
 )
 def test_invalid_confirmation_code_returns_error(user, invalid_code, expected_error):
+    """
+    Check withdraw for a invalid account
+    """
     deposit_address = input_values.DEPOSIT_ADDRESS_METAMASK
     withdraw_amt = 20
     withdraw_amt_wei = w3.toWei(withdraw_amt, 'ether')
@@ -83,6 +89,9 @@ def test_invalid_confirmation_code_returns_error(user, invalid_code, expected_er
 @pytest.mark.smoke
 @pytest.mark.functional
 def test_correct_confirmation_code_sends_success_email(user):
+    """
+    Check withdraw email
+    """
     deposit_address = input_values.DEPOSIT_ADDRESS_METAMASK
     withdraw_amt = 20
     withdraw_amt_wei = w3.toWei(withdraw_amt, 'ether')
@@ -131,6 +140,9 @@ def test_correct_confirmation_code_sends_success_email(user):
 
 @pytest.mark.smoke
 def test_correct_vid_amount_is_subtracted_from_user_balance(user):
+    """
+    Check correct VID is subtracted from user balance
+    """
     deposit_address = input_values.DEPOSIT_ADDRESS_METAMASK
     withdraw_amt = 20
     email = user.email
@@ -161,6 +173,9 @@ def test_correct_vid_amount_is_subtracted_from_user_balance(user):
 
 @pytest.mark.smoke
 def test_correct_vid_amount_is_added_to_erc20_addr(user, w3, abi):
+    """
+    Check correct VID is added to erc20 addr
+    """
     deposit_address = input_values.DEPOSIT_ADDRESS_METAMASK
     withdraw_amt = 20
     email = user.email
@@ -193,6 +208,9 @@ def test_correct_vid_amount_is_added_to_erc20_addr(user, w3, abi):
 @pytest.mark.functional
 @pytest.mark.skip
 def test_withdraw_less_than_mainnet_gas(user):
+    """
+    Check transactions with main net gas
+    """
     deposit_address = input_values.DEPOSIT_ADDRESS_METAMASK
     withdraw_amt = 0.5
     withdraw_amt_wei = w3.toWei(withdraw_amt, 'ether')
@@ -206,6 +224,9 @@ def test_withdraw_less_than_mainnet_gas(user):
 
 @pytest.mark.functional
 def test_entering_incorrect_confirmation_code_returns_error(user):
+    """
+    Check incorrect transactions
+    """
     email = user.email
     email_password = user.email_password
     deposit_address = input_values.DEPOSIT_ADDRESS_METAMASK

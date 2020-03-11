@@ -25,9 +25,11 @@ def get_report_html(passed, failed, skipped, error, cluster):
     tpl_path = os.path.join(base_dir, '../templates/report.html')
 
     path, filename = os.path.split(tpl_path)
-    html = jinja2.Environment(
+    env = jinja2.Environment(
         loader=jinja2.FileSystemLoader(path or './')
-    ).get_template(filename).render({
+    )
+    env.filters['format_time'] = format_time
+    html = env.get_template(filename).render({
         'now': datetime.now().strftime("%Y-%m-%d %H:%M"),
         'execution_time': format_time(time.time() - time.time()),
         'domain': cluster,
@@ -39,7 +41,6 @@ def get_report_html(passed, failed, skipped, error, cluster):
         'has_errors': failed or error,
         'success_count': len(passed),
     })
-
     return html
 
 

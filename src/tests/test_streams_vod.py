@@ -9,6 +9,9 @@ logger = logging.getLogger(__name__)
 @pytest.mark.smoke
 @pytest.mark.functional
 def test_creating_valid_stream_appears_in_streams_list(user):
+    """
+    Create vod stream and check list response
+    """
     try:
         new_stream = user.create_stream_vod()
         logging.debug('New stream created: %s', new_stream.id)
@@ -27,6 +30,9 @@ def test_creating_valid_stream_appears_in_streams_list(user):
 @pytest.mark.smoke
 @pytest.mark.functional
 def test_creating_stream_and_upload_file(user):
+    """
+    Check file upload via local file
+    """
     try:
         if user.token_type == 'sign_in':
             utils.faucet_vid_to_account(user.wallet_address, 11)
@@ -44,6 +50,9 @@ def test_creating_stream_and_upload_file(user):
 @pytest.mark.smoke
 @pytest.mark.functional
 def test_creating_stream_and_upload_url(user):
+    """
+    Check file upload via url
+    """
     try:
         if user.token_type == 'sign_in':
             utils.faucet_vid_to_account(user.wallet_address, 11)
