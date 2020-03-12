@@ -9,12 +9,14 @@ logger = logging.getLogger(__name__)
 
 
 def test_bank_receives_correct_amount(w3, abi, user):
+    """
+    Check correct erc20 token transfer for bank account
+    """
     deposit_amt = 10 * 10 ** 18
-    vid_token_addr = '0x22f9830cfCa475143749f19Ca7d5547D4939Ff67'
+    vid_token_addr = input_values.VID_TOKEN_ADDR
     sender = input_values.DEPOSIT_ADDRESS_METAMASK
     sender_private_key = input_values.PRIVATE_KEY_METAMASK
-    timeout = 360
-
+    timeout = 60
     vid_contract = w3.eth.contract(vid_token_addr, abi=abi)
     start_amt = utils.get_vid_balance_of_erc20(w3, abi, input_values.RINKEBY_VID_BANK)
     vid_txn = vid_contract.functions.transfer(

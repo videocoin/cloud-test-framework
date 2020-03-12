@@ -18,8 +18,7 @@ def test_deposit_updates_eth_acct_balance_correctly(user, w3, abi):
     eth_private_key = input_values.PRIVATE_KEY_METAMASK
     timeout = 300
 
-    vid_token_addr = '0x22f9830cfCa475143749f19Ca7d5547D4939Ff67'
-    vid_contract = w3.eth.contract(vid_token_addr, abi=abi)
+    vid_contract = w3.eth.contract(input_values.VID_TOKEN_ADDR, abi=abi)
     start_amt = utils.get_vid_balance_of_erc20(w3, abi, eth_addr)
     vid_txn = vid_contract.functions.transfer(
         user.wallet_address, deposit_amt
@@ -62,8 +61,7 @@ def test_deposit_updates_vid_acct_balance_correctly(user, w3, abi):
     start_amt = user.wallet_balance
     deposit_amt = 10 * 10 ** 18
 
-    vid_token_addr = '0x22f9830cfCa475143749f19Ca7d5547D4939Ff67'
-    vid_contract = w3.eth.contract(vid_token_addr, abi=abi)
+    vid_contract = w3.eth.contract(input_values.VID_TOKEN_ADDR, abi=abi)
     vid_txn = vid_contract.functions.transfer(
         user.wallet_address, deposit_amt
     ).buildTransaction(
@@ -100,8 +98,7 @@ def test_time_before_deposit_funds_received(user, w3, abi):
         start_amt = user.wallet_balance
         deposit_amt = 10 * 10 ** 18
 
-        vid_token_addr = '0x22f9830cfCa475143749f19Ca7d5547D4939Ff67'
-        vid_contract = w3.eth.contract(vid_token_addr, abi=abi)
+        vid_contract = w3.eth.contract(input_values.VID_TOKEN_ADDR, abi=abi)
         vid_txn = vid_contract.functions.transfer(
             user.wallet_address, deposit_amt
         ).buildTransaction(

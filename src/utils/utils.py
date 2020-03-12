@@ -8,6 +8,8 @@ import math
 from datetime import datetime
 import json
 
+from src.consts import input_values
+
 logger = logging.getLogger(__name__)
 
 
@@ -42,7 +44,7 @@ def get_items_from_email(test_email, test_email_password, support_subject, *body
     """
     Remember to enable POP server stuff on the test email being used
     """
-    if test_email.split('@')[1] == 'gmail.com':
+    if test_email.split('@')[1] in ['gmail.com', 'liveplanet.net']:
         pop_server = 'pop.gmail.com'
     else:
         raise ValueError('Invalid email format or POP server not supported')
@@ -63,7 +65,11 @@ def get_items_from_email(test_email, test_email_password, support_subject, *body
         raw_email = b"\n".join(pop_conn.retr(email_count)[1])
         parsed_email = email.message_from_bytes(raw_email)
         email_from = parsed_email['From']
-        parsed_email_from = re.match(r'^.* <(.+)>$', email_from).group(1)
+        parsed_email_from = re.match(r'^.*<(.+)>$', email_from)
+        if parsed_email_from:
+            parsed_email_from = parsed_email_from.group(1)
+        else:
+            parsed_email_from = email_from
         logger.debug(
             'Parsed email "From" line on email #%d: %s', email_count, parsed_email_from
         )
@@ -110,21 +116,23 @@ def faucet_vid_to_account(address, amount):
         )
 
     body = {'account': address, 'amount': amount}
-
-    res = requests.post(
-        'http://faucet.dev.kili.videocoin.network',
-        json=body,
-        auth=('dev1', 'D6msEL93LJT5RaPk'),
-    )
+    for x in range(5):
+        res = requests.post(
+            'http://faucet.dev.kili.videocoin.network',
+            json=body,
+            auth=('dev1', 'D6msEL93LJT5RaPk'),
+        )
+        if res.status_code == 200:
+            break
     res.raise_for_status()
 
     # return res.json()
 
 
-def get_vid_balance_of_erc20(w3, abi, addr, network='rinkeby'):
-    token_addr = '0x22f9830cfCa475143749f19Ca7d5547D4939Ff67'
+def get_vid_balance_of_erc20(w3, abi, addr):
+    token_addr = input_values.VID_TOKEN_ADDR
     vid_addr = w3.eth.contract(token_addr, abi=abi)
-    amt = vid_addr.functions.balanceOf(addr).call()
+    amt = vid_addr.functions.balanceOf(w3.toChecksumAddress(addr)).call()
 
     return amt
 
