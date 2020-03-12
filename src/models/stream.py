@@ -114,9 +114,9 @@ class Stream:
                 last_time = datetime.now()
             sleep(0.5)
 
-        logger.debug(
-            'Average time to update {}'.format(sum(durations) / len(durations))
-        )
+        # logger.debug(
+        #     'Average time to update {}'.format(sum(durations) / len(durations))
+        # )
         return True
 
     def check_playlist(self):
