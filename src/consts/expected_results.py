@@ -32,16 +32,40 @@ INCORRECT_CONFIRMATION_CODE_ERROR = {'message': 'Bad request', 'fields': None}
 # TODO: Don't compare the commented out valeus for now, since they're constantly changing
 # Need to find a way to not compare these values, but make sure they're in the right format
 TEST_USER_INFORMATION = {
-    'id': 'd71b8961-8de3-4383-7ac0-46299d2186f5',
-    'email': 'kgoautomation@gmail.com',
-    'name': 'Kenneth Go',
-    'is_active': True,
-    'account': {
-        'id': '25237a3c-d0bc-45d2-75c8-3f835f0012e3',
-        'address': '0x003d07A64C2FeFc8C1654EF742F9AF4088354090',
-        # 'balance': 1308,
-        # 'updated_at': '2019-10-31T23:00:12.604164461Z'
+    'dev': {
+        'id': '3b6c89e3-098e-41e9-4d6b-71310ec247b0',
+        'email': 'kudorussiaru@gmail.com',
+        'name': 'test',
+        'is_active': True,
+        'account': {
+            'id': '25237a3c-d0bc-45d2-75c8-3f835f0012e3',
+            'address': '0x00125Ab819Af65163bBa61C1B14B23D662C246CA',
+        }
     },
+    'snb': {
+        'id': '',
+        'email': 'kgoautomation@gmail.com',
+        'name': 'Kenneth Go',
+        'is_active': True,
+        'account': {
+            'id': '25237a3c-d0bc-45d2-75c8-3f835f0012e3',
+            'address': '0x003d07A64C2FeFc8C1654EF742F9AF4088354090',
+            # 'balance': 1308,
+            # 'updated_at': '2019-10-31T23:00:12.604164461Z'
+        }},
+    'kili': {
+        'id': '',
+        'email': 'kgoautomation@gmail.com',
+        'name': 'Kenneth Go',
+        'is_active': True,
+        'account': {
+            'id': '25237a3c-d0bc-45d2-75c8-3f835f0012e3',
+            'address': '0x003d07A64C2FeFc8C1654EF742F9AF4088354090',
+            # 'balance': 1308,
+            # 'updated_at': '2019-10-31T23:00:12.604164461Z'
+        }
+    },
+
 }
 NEW_STREAM_INFORMATION = {
     'id': '93f9512c-e524-4027-45a3-7e96c62ac0ff',
