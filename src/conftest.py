@@ -1,5 +1,6 @@
 import logging
 import pytest
+import re
 import requests
 from web3 import Web3, HTTPProvider
 from web3.middleware import geth_poa_middleware
@@ -33,7 +34,15 @@ def pytest_addoption(parser):
 
 
 def pytest_itemcollected(item):
-    item._nodeid = '' if item._obj.__doc__ is None else item._obj.__doc__.strip()
+    if item._obj.__doc__:
+        parsed_params = re.match(r'^.*[(.+)].*$', item.name)
+        if parsed_params:
+            parsed_params = parsed_params.group(0)
+        else:
+            parsed_params = ''
+        item._nodeid = '{}[{}]'.format(item._obj.__doc__.strip(), parsed_params)
+    else:
+        item._nodeid = item.name
 
 
 def pytest_terminal_summary(terminalreporter, config):

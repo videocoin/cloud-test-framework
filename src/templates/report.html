@@ -146,7 +146,7 @@
                                             </tr>
                                             {% for item in results %}
                                                 <tr class="{{ item.status_class }}">
-                                                    <br width="200">{% if item.nodeid %} {{item.nodeid}} {% else %}{{ item.head_line }} {% endif %}</td>
+                                                    <br width="200">{{item.nodeid}} {% else %}{{ item.head_line }} {% endif %}</td>
                                                     <td width="100" {% if item.passed %}style="color: #4caf50"{% endif %}>{% if item.passed %} Yes {% else %} No {% endif %}</td>
                                                     <td width="130">{{ item.duration | format_time }}
                                                     </td>
