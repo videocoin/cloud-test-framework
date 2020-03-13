@@ -2,25 +2,26 @@ from datetime import datetime
 import logging
 from time import sleep
 
+from src.utils.mixins import VideocoinMixin
 from src.utils import utils
-from src.consts import input_values
+from src.consts.input_values import (VID_TOKEN_ADDR, DEPOSIT_ADDRESS_METAMASK, PRIVATE_KEY_METAMASK, RINKEBY_VID_BANK)
 
 logger = logging.getLogger(__name__)
 
 
-class TestBank:
+class TestBank(VideocoinMixin):
 
     def test_bank_receives_correct_amount(self, w3, abi, user):
         """
         Check correct erc20 token transfer for bank account
         """
         deposit_amt = 10 * 10 ** 18
-        vid_token_addr = input_values.VID_TOKEN_ADDR
-        sender = input_values.DEPOSIT_ADDRESS_METAMASK
-        sender_private_key = input_values.PRIVATE_KEY_METAMASK
+        vid_token_addr = self.get_initial_value(VID_TOKEN_ADDR)
+        sender = self.get_initial_value(DEPOSIT_ADDRESS_METAMASK)
+        sender_private_key = self.get_initial_value(PRIVATE_KEY_METAMASK)
         timeout = 60
         vid_contract = w3.eth.contract(vid_token_addr, abi=abi)
-        start_amt = utils.get_vid_balance_of_erc20(w3, abi, input_values.RINKEBY_VID_BANK)
+        start_amt = self.get_vid_balance_of_erc20(w3, abi, self.get_initial_value(RINKEBY_VID_BANK))
         vid_txn = vid_contract.functions.transfer(
             user.wallet_address, deposit_amt
         ).buildTransaction(
@@ -35,7 +36,9 @@ class TestBank:
         signed_txn = w3.eth.account.signTransaction(vid_txn, sender_private_key)
         w3.eth.sendRawTransaction(signed_txn.rawTransaction)
 
-        latest_amt = utils.get_vid_balance_of_erc20(w3, abi, input_values.RINKEBY_VID_BANK)
+        latest_amt = self.get_vid_balance_of_erc20(
+            w3, abi, self.get_initial_value(RINKEBY_VID_BANK)
+        )
         logger.debug('Latest VID balance: {}'.format(latest_amt))
         start_time = datetime.now()
         while start_amt == latest_amt:
@@ -45,8 +48,8 @@ class TestBank:
                         timeout
                     )
                 )
-            latest_amt = utils.get_vid_balance_of_erc20(
-                w3, abi, input_values.RINKEBY_VID_BANK
+            latest_amt = self.get_vid_balance_of_erc20(
+                w3, abi, self.get_initial_value(RINKEBY_VID_BANK)
             )
             logger.debug('Latest VID balance: {}'.format(latest_amt))
             sleep(1)

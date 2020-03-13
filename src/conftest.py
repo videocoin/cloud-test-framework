@@ -16,15 +16,9 @@ logger = logging.getLogger(__name__)
 
 
 def pytest_addoption(parser):
-    parser.addoption(
-        '--email', action='store', default=input_values.ACCOUNT_EMAIL_DEFAULT
-    )
-    parser.addoption(
-        '--email_password', action='store', default=input_values.EMAIL_PASSWORD
-    )
-    parser.addoption(
-        '--password', action='store', default=input_values.ACCOUNT_PASSWORD_DEFAULT
-    )
+    parser.addoption('--email', action='store')
+    parser.addoption('--email_password', action='store')
+    parser.addoption('--password', action='store')
     parser.addoption('--token', action='store', default=None)
     parser.addoption('--cluster', action='store', default='dev')
     parser.addoption('--num_of_test_users', action='store', default=3)
@@ -64,6 +58,12 @@ def pytest_terminal_summary(terminalreporter, config):
 
 
 @pytest.fixture
+def cluster(request):
+    cluster = request.config.getoption('--cluster')
+    return cluster
+
+
+@pytest.fixture
 def user(request):
     cluster = request.config.getoption('--cluster')
     available_clusters = ['snb', 'kili', 'dev']
@@ -73,9 +73,17 @@ def user(request):
                 available_clusters
             )
         )
+
     email = request.config.getoption('--email')
+    if not email:
+        email = input_values.get_initial_value(cluster, input_values.ACCOUNT_EMAIL_DEFAULT)
     password = request.config.getoption('--password')
+    if not password:
+        password = input_values.get_initial_value(cluster, input_values.ACCOUNT_PASSWORD_DEFAULT)
     email_password = request.config.getoption('--email_password')
+    if not email_password:
+        email_password = input_values.get_initial_value(cluster, input_values.EMAIL_PASSWORD)
+
     token = request.config.getoption('--token')
 
     return User(cluster, email, password, email_password, token)

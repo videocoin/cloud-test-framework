@@ -5,14 +5,17 @@ import requests
 from time import sleep
 from web3.auto import w3
 
-from src.consts import input_values
+from src.consts.input_values import (
+    VID_TOKEN_ADDR, DEPOSIT_ADDRESS_METAMASK, PRIVATE_KEY_METAMASK, RINKEBY_VID_BANK, NATIVE_GAS_AMOUNT
+)
 from src.consts import email_body_regex
 from src.utils import utils
+from src.utils.mixins import VideocoinMixin
 
 logger = logging.getLogger(__name__)
 
 
-class TestWithdraw:
+class TestWithdraw(VideocoinMixin):
 
     @pytest.mark.smoke
     @pytest.mark.functional
@@ -20,7 +23,7 @@ class TestWithdraw:
         """
         Check withdraw for a valid account
         """
-        deposit_address = input_values.DEPOSIT_ADDRESS_METAMASK
+        deposit_address = self.get_initial_value(DEPOSIT_ADDRESS_METAMASK)
         withdraw_amt = 20
         withdraw_amt_wei = w3.toWei(withdraw_amt, 'ether')
         email = user.email
@@ -68,7 +71,7 @@ class TestWithdraw:
         """
         Check withdraw for a invalid account
         """
-        deposit_address = input_values.DEPOSIT_ADDRESS_METAMASK
+        deposit_address = self.get_initial_value(DEPOSIT_ADDRESS_METAMASK)
         withdraw_amt = 20
         withdraw_amt_wei = w3.toWei(withdraw_amt, 'ether')
         email = user.email
@@ -92,7 +95,7 @@ class TestWithdraw:
         """
         Check withdraw email
         """
-        deposit_address = input_values.DEPOSIT_ADDRESS_METAMASK
+        deposit_address = self.get_initial_value(DEPOSIT_ADDRESS_METAMASK)
         withdraw_amt = 20
         withdraw_amt_wei = w3.toWei(withdraw_amt, 'ether')
         email = user.email
@@ -142,7 +145,7 @@ class TestWithdraw:
         """
         Check correct VID is subtracted from user balance
         """
-        deposit_address = input_values.DEPOSIT_ADDRESS_METAMASK
+        deposit_address = self.get_initial_value(DEPOSIT_ADDRESS_METAMASK)
         withdraw_amt = 20
         email = user.email
         email_password = user.email_password
@@ -166,7 +169,7 @@ class TestWithdraw:
         logger.debug('End balance: {:.6e}'.format(end_balance))
         logger.debug('Withdraw amount (in wei): {:.6e}'.format(withdraw_amt_wei))
         actual_difference = start_balance - end_balance
-        expected_difference = withdraw_amt_wei + input_values.NATIVE_GAS_AMOUNT
+        expected_difference = withdraw_amt_wei + self.get_initial_value(NATIVE_GAS_AMOUNT)
         assert self.is_within_range(actual_difference, expected_difference, 13000)
 
     @pytest.mark.smoke
@@ -174,7 +177,7 @@ class TestWithdraw:
         """
         Check correct VID is added to erc20 addr
         """
-        deposit_address = input_values.DEPOSIT_ADDRESS_METAMASK
+        deposit_address = self.get_initial_value(DEPOSIT_ADDRESS_METAMASK)
         withdraw_amt = 20
         email = user.email
         email_password = user.email_password
@@ -182,7 +185,7 @@ class TestWithdraw:
 
         logger.debug('withdraw_amt_wei: {}'.format(withdraw_amt_wei))
 
-        start_balance = utils.get_vid_balance_of_erc20(w3, abi, deposit_address)
+        start_balance = self.get_vid_balance_of_erc20(w3, abi, deposit_address)
         utils.faucet_vid_to_account(user.wallet_address, withdraw_amt)
         # Wait for faucet to send VID to account
         sleep(90)
@@ -194,7 +197,7 @@ class TestWithdraw:
         user.confirm_withdraw(transfer_id, confirmation_code)
         # Wait for transaction to finish and be reflected in user's balance
         sleep(90)
-        end_balance = utils.get_vid_balance_of_erc20(w3, abi, deposit_address)
+        end_balance = self.get_vid_balance_of_erc20(w3, abi, deposit_address)
 
         logger.debug('Start balance: {}'.format(start_balance))
         logger.debug('End balance: {}'.format(end_balance))
@@ -208,7 +211,7 @@ class TestWithdraw:
         """
         Check transactions with main net gas
         """
-        deposit_address = input_values.DEPOSIT_ADDRESS_METAMASK
+        deposit_address = self.get_initial_value(DEPOSIT_ADDRESS_METAMASK)
         withdraw_amt = 0.5
         withdraw_amt_wei = w3.toWei(withdraw_amt, 'ether')
 
@@ -225,7 +228,7 @@ class TestWithdraw:
         """
         email = user.email
         email_password = user.email_password
-        deposit_address = input_values.DEPOSIT_ADDRESS_METAMASK
+        deposit_address = self.get_initial_value(DEPOSIT_ADDRESS_METAMASK)
         withdraw_amt = 20
         withdraw_amt_wei = w3.toWei(withdraw_amt, 'ether')
 
@@ -272,7 +275,7 @@ class TestWithdraw:
         current_balance = user.wallet_balance
         over_balance = current_balance + w3.fromWei(1000000000000000000, 'ether')
         withdraw_id = user.start_withdraw(
-            input_values.DEPOSIT_ADDRESS_METAMASK, over_balance
+            self.get_initial_value(DEPOSIT_ADDRESS_METAMASK), over_balance
         )
         pass
 

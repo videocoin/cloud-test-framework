@@ -3,24 +3,26 @@ from time import sleep
 import pytest
 import logging
 
-from src.consts import input_values
+from src.utils.mixins import VideocoinMixin
+from src.consts.input_values import (VID_TOKEN_ADDR, DEPOSIT_ADDRESS_METAMASK, PRIVATE_KEY_METAMASK, RINKEBY_VID_BANK)
 from src.utils import utils
 
 logger = logging.getLogger(__name__)
 
 
-class TestBank:
+class TestDeposit(VideocoinMixin):
+
     def test_deposit_updates_eth_acct_balance_correctly(self, user, w3, abi):
         """
         Check correct erc20 token transfer between users
         """
         deposit_amt = 10 * 10 ** 18
-        eth_addr = input_values.DEPOSIT_ADDRESS_METAMASK
-        eth_private_key = input_values.PRIVATE_KEY_METAMASK
+        eth_addr = self.get_initial_value(DEPOSIT_ADDRESS_METAMASK)
+        eth_private_key = self.get_initial_value(PRIVATE_KEY_METAMASK)
         timeout = 300
 
-        vid_contract = w3.eth.contract(input_values.VID_TOKEN_ADDR, abi=abi)
-        start_amt = utils.get_vid_balance_of_erc20(w3, abi, eth_addr)
+        vid_contract = w3.eth.contract(self.get_initial_value(VID_TOKEN_ADDR), abi=abi)
+        start_amt = self.get_vid_balance_of_erc20(w3, abi, eth_addr)
         vid_txn = vid_contract.functions.transfer(
             user.wallet_address, deposit_amt
         ).buildTransaction(
@@ -36,13 +38,13 @@ class TestBank:
         w3.eth.sendRawTransaction(signed_txn.rawTransaction)
 
         start_time = datetime.now()
-        latest_amt = utils.get_vid_balance_of_erc20(w3, abi, eth_addr)
+        latest_amt = self.get_vid_balance_of_erc20(w3, abi, eth_addr)
         while start_amt == latest_amt:
             if utils.time_from_start(start_time) > timeout:
                 raise RuntimeError(
                     'Took too long to subtract funds. Timeout allowed: {}'.format(timeout)
                 )
-            latest_amt = utils.get_vid_balance_of_erc20(w3, abi, eth_addr)
+            latest_amt = self.get_vid_balance_of_erc20(w3, abi, eth_addr)
             sleep(1)
 
         end_amt = latest_amt
@@ -61,7 +63,7 @@ class TestBank:
         start_amt = user.wallet_balance
         deposit_amt = 10 * 10 ** 18
 
-        vid_contract = w3.eth.contract(input_values.VID_TOKEN_ADDR, abi=abi)
+        vid_contract = w3.eth.contract(self.get_initial_value(VID_TOKEN_ADDR), abi=abi)
         vid_txn = vid_contract.functions.transfer(
             user.wallet_address, deposit_amt
         ).buildTransaction(
@@ -70,7 +72,7 @@ class TestBank:
                 'gas': 200000,
                 'value': 0,
                 'gasPrice': 1000000000,
-                'nonce': w3.eth.getTransactionCount(input_values.DEPOSIT_ADDRESS_METAMASK),
+                'nonce': w3.eth.getTransactionCount(self.get_initial_value(DEPOSIT_ADDRESS_METAMASK)),
             }
         )
         private_key = '523FC9D14D9610691BE281348968976FD397788EED49B1DB8949005ECA85B2E0'
@@ -97,7 +99,7 @@ class TestBank:
             start_amt = user.wallet_balance
             deposit_amt = 10 * 10 ** 18
 
-            vid_contract = w3.eth.contract(input_values.VID_TOKEN_ADDR, abi=abi)
+            vid_contract = w3.eth.contract(self.get_initial_value(VID_TOKEN_ADDR), abi=abi)
             vid_txn = vid_contract.functions.transfer(
                 user.wallet_address, deposit_amt
             ).buildTransaction(
@@ -107,7 +109,7 @@ class TestBank:
                     'value': 0,
                     'gasPrice': 1000000000,
                     'nonce': w3.eth.getTransactionCount(
-                        input_values.DEPOSIT_ADDRESS_METAMASK
+                        self.get_initial_value(DEPOSIT_ADDRESS_METAMASK)
                     ),
                 }
             )

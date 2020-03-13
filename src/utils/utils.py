@@ -129,14 +129,6 @@ def faucet_vid_to_account(address, amount):
     # return res.json()
 
 
-def get_vid_balance_of_erc20(w3, abi, addr):
-    token_addr = input_values.VID_TOKEN_ADDR
-    vid_addr = w3.eth.contract(token_addr, abi=abi)
-    amt = vid_addr.functions.balanceOf(w3.toChecksumAddress(addr)).call()
-
-    return amt
-
-
 def get_base_url(cluster):
     if cluster == 'snb':
         env = '.snb'
