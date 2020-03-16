@@ -13,6 +13,13 @@ init_gcloud: &init_gcloud
   name: Init gcloud
   command: .circleci/init-gcloud.sh
 
+run_consul: &run_rtmp_runner
+  name: run rtmp runner
+  command: |
+    make docker-run
+  background: true
+  working_directory: /srv/src/rtmp_runner
+
 base_docker_image: &base_docker_image
   - image: gcr.io/videocoin-network/cloud-base-ci:1.0
     auth:
@@ -32,50 +39,34 @@ defaults: &defaults
 
 version: 2
 jobs:
-  build:
-    <<: *defaults
-    steps:
-      - *restore_repo
-      - checkout
-      - setup_remote_docker:
-          <<: *setup_remote_docker
-      - run:
-          <<: *docker_login
-      - run:
-          name: release
-          command: |
-            make release
-      - save_cache:
-          key: v1-repo-{{ .Branch }}-{{ .Revision }}
-          paths:
-            - .
-  pull:
-    <<: *defaults
-    steps:
-      - *restore_repo
-      - checkout
-      - setup_remote_docker:
-          <<: *setup_remote_docker
-      - run:
-          <<: *docker_login
-      - run:
-          name: release
-          command: |
-            make docker-pull
-      - save_cache:
-          key: v1-repo-{{ .Branch }}-{{ .Revision }}
-          paths:
-            - .
   test:
     <<: *defaults
     steps:
+      - *restore_repo
       - checkout
       - setup_remote_docker:
           <<: *setup_remote_docker
       - run:
-          name: deploy tests
+          <<: *docker_login
+      - run:
+          name: build rtmp runner
           command: |
-            make docker-run-smoke
+            make docker-build
+          working_directory: /srv/src/rtmp_runner
+      - run:
+          <<: *run_rtmp_runner
+      - run:
+          name:  build test image
+          command: |
+            make docker-build
+      - run:
+          name: test
+          command: |
+            make docker-run
+      - save_cache:
+          key: v1-repo-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - .
 workflows:
   version: 2
   nightly:
@@ -86,13 +77,7 @@ workflows:
             branches:
               only: develop
     jobs:
-      - pull
-      - test:
-          requires:
-            - pull
+      - test
   build-n-deploy:
     jobs:
-      - build
-      - test:
-          requires:
-            - build
+      - test

@@ -28,7 +28,10 @@ docker-pull:
 	@echo "==> Pulling ${NAME} docker image..."
 	docker pull ${IMAGE_TAG}
 
-docker-run-smoke:
-	docker run ${IMAGE_TAG} pytest -m smoke
+docker-run:
+	docker run --network="host" ${IMAGE_TAG} pytest tests --report_emails=${REPORT_EMAILS} --sendgrid_key=${SENDGRID_KEY}
+
+run:
+	cd src && pytest tests --report_emails=${REPORT_EMAILS} --sendgrid_key=${SENDGRID_KEY}
 
 release: docker-build docker-push
