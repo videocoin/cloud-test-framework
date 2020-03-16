@@ -122,7 +122,7 @@
                                         style='margin:0;font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;box-sizing:border-box;font-size:14px;vertical-align:top;padding:0 0 20px;'>
                                         <h2 style='margin:0;font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;box-sizing:border-box;font-size:14px;font-family:"Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;color:#3b4153;margin:40px 0 0;line-height:1.2em;font-weight:400;font-size:24px;'>
                                             Cloud tests for <a
-                                                href="{{ domain }}">{{ domain }}</a>
+                                                href="{{ domain }}">{{ cluster }}</a>
                                         </h2>
                                     </td>
                                 </tr>
@@ -146,7 +146,7 @@
                                             </tr>
                                             {% for item in results %}
                                                 <tr class="{{ item.status_class }}">
-                                                    <br width="200">{{item.nodeid}} {% else %}{{ item.head_line }} {% endif %}</td>
+                                                    <br width="200">{{ item.nodeid }} {% else %}{{ item.head_line }} {% endif %}</td>
                                                     <td width="100" {% if item.passed %}style="color: #4caf50"{% endif %}>{% if item.passed %} Yes {% else %} No {% endif %}</td>
                                                     <td width="130">{{ item.duration | format_time }}
                                                     </td>

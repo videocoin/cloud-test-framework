@@ -63,3 +63,7 @@ VALUES = {
         'NATIVE_GAS_AMOUNT': 1000000000000000000,
     },
 }
+
+
+def get_initial_value(cluster, variable):
+    return VALUES[cluster][variable]

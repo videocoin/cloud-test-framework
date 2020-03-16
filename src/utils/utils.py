@@ -8,7 +8,7 @@ import math
 from datetime import datetime
 import json
 
-from src.consts import input_values
+from src.consts.clusters import CLUSTERS
 
 logger = logging.getLogger(__name__)
 
@@ -130,13 +130,11 @@ def faucet_vid_to_account(address, amount):
 
 
 def get_base_url(cluster):
-    if cluster == 'snb':
-        env = '.snb'
-    if cluster == 'dev':
-        env = '.dev'
-    elif cluster == 'kili':
-        env = ''
-    return 'https://studio{}.videocoin.network'.format(env)
+    return CLUSTERS[cluster]['base_url']
+
+
+def get_domain_link(cluster):
+    return CLUSTERS[cluster]['link']
 
 
 def get_vid_erc20_abi(cluster):
