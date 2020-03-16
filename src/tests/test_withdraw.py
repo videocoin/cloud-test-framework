@@ -29,7 +29,7 @@ class TestWithdraw(VideocoinMixin):
         email = user.email
         email_password = user.email_password
 
-        utils.faucet_vid_to_account(user.wallet_address, withdraw_amt)
+        self.faucet_vid_to_account(user.wallet_address, withdraw_amt)
         user.start_withdraw(deposit_address, withdraw_amt_wei)
         # TODO: Replace with waiting until the newly sent (unread) email is found in inbox
         sleep(5)
@@ -77,7 +77,7 @@ class TestWithdraw(VideocoinMixin):
         email = user.email
         email_password = user.email_password
 
-        utils.faucet_vid_to_account(user.wallet_address, withdraw_amt)
+        self.faucet_vid_to_account(user.wallet_address, withdraw_amt)
         transfer_id = user.start_withdraw(deposit_address, withdraw_amt_wei)
         # Used to delete the sent emails, but no information is needed
         # TODO: Replace with waiting until the newly sent (unread) email is found in inbox
@@ -101,7 +101,7 @@ class TestWithdraw(VideocoinMixin):
         email = user.email
         email_password = user.email_password
 
-        utils.faucet_vid_to_account(user.wallet_address, withdraw_amt)
+        self.faucet_vid_to_account(user.wallet_address, withdraw_amt)
         transfer_id = user.start_withdraw(deposit_address, withdraw_amt_wei)
         # TODO: Replace with waiting until the newly sent (unread) email is found in inbox
         sleep(5)
@@ -151,7 +151,7 @@ class TestWithdraw(VideocoinMixin):
         email_password = user.email_password
         withdraw_amt_wei = w3.toWei(withdraw_amt, 'ether')
 
-        utils.faucet_vid_to_account(user.wallet_address, withdraw_amt)
+        self.faucet_vid_to_account(user.wallet_address, withdraw_amt)
         # Wait for faucet to send VID to account
         sleep(90)
         start_balance = user.wallet_balance
@@ -186,7 +186,7 @@ class TestWithdraw(VideocoinMixin):
         logger.debug('withdraw_amt_wei: {}'.format(withdraw_amt_wei))
 
         start_balance = self.get_vid_balance_of_erc20(w3, abi, deposit_address)
-        utils.faucet_vid_to_account(user.wallet_address, withdraw_amt)
+        self.faucet_vid_to_account(user.wallet_address, withdraw_amt)
         # Wait for faucet to send VID to account
         sleep(90)
         transfer_id = user.start_withdraw(deposit_address, withdraw_amt_wei)
@@ -215,7 +215,7 @@ class TestWithdraw(VideocoinMixin):
         withdraw_amt = 0.5
         withdraw_amt_wei = w3.toWei(withdraw_amt, 'ether')
 
-        utils.faucet_vid_to_account(user.wallet_address, withdraw_amt)
+        self.faucet_vid_to_account(user.wallet_address, withdraw_amt)
         # Wait for faucet to send VID to account
         sleep(90)
         transfer_id = user.start_withdraw(deposit_address, withdraw_amt_wei)
@@ -232,7 +232,7 @@ class TestWithdraw(VideocoinMixin):
         withdraw_amt = 20
         withdraw_amt_wei = w3.toWei(withdraw_amt, 'ether')
 
-        utils.faucet_vid_to_account(user.wallet_address, 20)
+        self.faucet_vid_to_account(user.wallet_address, 20)
         transfer_id = user.start_withdraw(deposit_address, withdraw_amt_wei)
         # TODO: Replace with waiting until the newly sent (unread) email is found in inbox
         sleep(5)
@@ -261,7 +261,7 @@ class TestWithdraw(VideocoinMixin):
     def test_starting_withdraw_with_invalid_address_format_returns_error(self, user):
         # try:
         #     DEPOSIT_ADDRESS_INVALID = 'aasdfff0x03948593jcns456fsc52j358dsjsf4499'
-        #     utils.faucet_vid_to_account(user.wallet_address, 20)
+        #     self.faucet_vid_to_account(user.wallet_address, 20)
         #     # withdraw_id = user.start_withdraw(DEPOSIT_ADDRESS_INVALID, 20)
         # finally:
         #     # should be able to throw the rest of the VID away, to clean the account

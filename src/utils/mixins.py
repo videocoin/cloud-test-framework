@@ -1,6 +1,13 @@
 import pytest
+import math
+import logging
+import requests
 
-from src.consts.input_values import VALUES, VID_TOKEN_ADDR
+
+from src.consts.input_values import VALUES, VID_TOKEN_ADDR, FAUCET_URL
+
+
+logger = logging.getLogger(__name__)
 
 
 class VideocoinMixin:
@@ -18,3 +25,22 @@ class VideocoinMixin:
         amt = vid_addr.functions.balanceOf(w3.toChecksumAddress(addr)).call()
 
         return amt
+
+    def faucet_vid_to_account(self, address, amount):
+        if type(amount) == float:
+            amount = int(math.ceil(amount))
+            logger.debug(
+                'Cannot send float VID amount to address. '
+                'Converting float value to integer'
+            )
+
+        body = {'account': address, 'amount': amount}
+        for x in range(5):
+            res = requests.post(
+                self.get_initial_value(FAUCET_URL),
+                json=body,
+            )
+            if res.status_code == 200:
+                break
+        else:
+            res.raise_for_status()

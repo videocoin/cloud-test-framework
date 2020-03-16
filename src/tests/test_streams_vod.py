@@ -1,12 +1,12 @@
 import pytest
 import logging
 
-from src.utils import utils
+from src.utils.mixins import VideocoinMixin
 
 logger = logging.getLogger(__name__)
 
 
-class TestVodStreams:
+class TestVodStreams(VideocoinMixin):
 
     @pytest.mark.smoke
     @pytest.mark.functional
@@ -36,7 +36,7 @@ class TestVodStreams:
         """
         try:
             if user.token_type == 'sign_in':
-                utils.faucet_vid_to_account(user.wallet_address, 11)
+                self.faucet_vid_to_account(user.wallet_address, 11)
             new_stream = user.create_stream_vod()
             new_stream.start()
 
@@ -55,7 +55,7 @@ class TestVodStreams:
         """
         try:
             if user.token_type == 'sign_in':
-                utils.faucet_vid_to_account(user.wallet_address, 11)
+                self.faucet_vid_to_account(user.wallet_address, 11)
             new_stream = user.create_stream_vod()
             new_stream.start()
 

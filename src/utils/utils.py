@@ -4,7 +4,6 @@ import quopri
 import re
 import requests
 import logging
-import math
 from datetime import datetime
 import json
 
@@ -107,28 +106,6 @@ def get_items_from_email(test_email, test_email_password, support_subject, *body
         return result if len(regex_result) == 1 else regex_result
 
 
-def faucet_vid_to_account(address, amount):
-    if type(amount) == float:
-        amount = int(math.ceil(amount))
-        logger.debug(
-            'Cannot send float VID amount to address. '
-            'Converting float value to integer'
-        )
-
-    body = {'account': address, 'amount': amount}
-    for x in range(5):
-        res = requests.post(
-            'http://faucet.dev.kili.videocoin.network',
-            json=body,
-            auth=('dev1', 'D6msEL93LJT5RaPk'),
-        )
-        if res.status_code == 200:
-            break
-    res.raise_for_status()
-
-    # return res.json()
-
-
 def get_base_url(cluster):
     return CLUSTERS[cluster]['base_url']
 
@@ -147,11 +124,3 @@ def get_vid_erc20_abi(cluster):
 def time_from_start(start):
     now = datetime.now()
     return (now - start).total_seconds()
-
-
-if __name__ == '__main__':
-    import sys
-
-    if len(sys.argv) > 0:
-        addr = sys.argv[1]
-        faucet_vid_to_account(addr, 1000)

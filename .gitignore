@@ -4,3 +4,4 @@ __pycache__
 sandbox.py
 env/
 .sqlite3
+.env
