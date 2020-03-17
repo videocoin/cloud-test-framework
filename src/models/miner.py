@@ -1,28 +1,29 @@
 import requests
 
-from src.utils import utils
 from src.consts import endpoints
+from src.models.base import BaseModel
 
 
-class Miner:
-    def __init__(self, cluster, token, id):
-        self.cluster = cluster
-        self.base_url = utils.get_base_url(self.cluster)
-        self.token = token
-        self.headers = self._get_headers()
-        self.id = id
+class MinerList(BaseModel):
+    def all(self):
+        response = requests.get(self.base_url + endpoints.MINER + '/all')
+        response.raise_for_status()
+        return response.json()
 
-    def assign_stream(self, stream_id):
-        tag = {"tags": [{'key': 'force_task_id', 'value': stream_id}]}
-        request = requests.put(
-            self.base_url + endpoints.MINER + '/{}'.format(self.id) + '/tags',
-            json=tag,
-            headers=self.headers,
+    def my(self):
+        response = requests.get(
+            self.base_url + endpoints.MINER, headers=self.headers
         )
-        request.raise_for_status()
+        response.raise_for_status()
 
-    def _get_headers(self):
-        return {'Authorization': 'Bearer ' + self.token}
+        return response.json()
+
+
+class Miner(BaseModel):
+
+    def __init__(self, cluster, token, id):
+        self.id = id
+        super().__init__(cluster, token)
 
     def json(self):
         response = requests.get(

@@ -1,7 +1,23 @@
 import pytest
+import logging
+
+from src.utils.mixins import VideocoinMixin
+from src.models.miner import MinerList
+
+logger = logging.getLogger(__name__)
 
 
-class TestMiner:
+class TestMiner(VideocoinMixin):
+
+    @pytest.mark.smoke
+    def test_get_all_miners(self):
+        miners = MinerList(self.cluster)
+        assert miners.all() is not None
+
+    @pytest.mark.smoke
+    def test_get_my_miners(self, user):
+        miners = MinerList(self.cluster, user.token)
+        assert miners.my() is not None
 
     @pytest.mark.skip('still working on this')
     def test_get_miners(self, user, rtmp_runner):
