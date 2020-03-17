@@ -4,7 +4,6 @@ Kenneth's TODOs
     Do before Taiwan (before 11/15/19):
         TODO: Document framework and tests with docstrings
         TODO: Support concurrency tests with multiple users
-        -TOOD: Mark tests properly (smoke, functional, performance, etc.)-
         TODO: m3u8 parser and other HLS verification stuff
         -TODO: Do conversion from wei to VID for tests using web3-
         -TODO: Use web3 to connect to rinkeby network-

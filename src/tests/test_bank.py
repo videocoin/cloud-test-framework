@@ -1,6 +1,7 @@
 from datetime import datetime
 import logging
 from time import sleep
+import pytest
 
 from src.utils.mixins import VideocoinMixin
 from src.utils import utils
@@ -11,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 class TestBank(VideocoinMixin):
 
+    @pytest.mark.smoke
     def test_bank_receives_correct_amount(self, w3, abi, user):
         """
         Check correct erc20 token transfer for bank account

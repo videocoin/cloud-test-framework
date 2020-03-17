@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 class TestDeposit(VideocoinMixin):
 
+    @pytest.mark.smoke
     def test_deposit_updates_eth_acct_balance_correctly(self, user, w3, abi):
         """
         Check correct erc20 token transfer between users

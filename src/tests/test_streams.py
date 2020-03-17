@@ -223,6 +223,7 @@ class TestLiveStreams(VideocoinMixin):
 
     # Parametrized with all available profiles picked up at run time. See
     # pytest_generate_tests in conftest.py
+    @pytest.mark.functional
     def test_all_available_output_profiles(self, user, rtmp_runner, output_profile):
         logger.debug('running with profile name: {}'.format(output_profile['name']))
         profile_id = output_profile['id']
@@ -239,6 +240,7 @@ class TestLiveStreams(VideocoinMixin):
             rtmp_runner.stop()
             new_stream.delete()
 
+    @pytest.mark.functional
     def test_playlist_size(self, user, rtmp_runner):
         start_balance = user.wallet_balance
         new_stream = user.create_stream_live()
