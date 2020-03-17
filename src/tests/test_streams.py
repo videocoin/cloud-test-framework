@@ -52,8 +52,7 @@ class TestLiveStreams(VideocoinMixin):
     @pytest.mark.functional
     def test_creating_stream_and_send_data_to_rtmp_url_starts_output_stream(self, user, rtmp_runner):
         try:
-            if user.token_type == 'sign_in':
-                self.faucet_vid_to_account(user.wallet_address, 11)
+            self.faucet_vid_to_account(user.wallet_address, 11)
             new_stream = user.create_stream_live()
             new_stream.start()
 

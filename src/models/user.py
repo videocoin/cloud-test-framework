@@ -17,20 +17,14 @@ logger = logging.getLogger(__name__)
 
 
 class User:
-    def __init__(
-        self, cluster, email, password, email_password, token, name="Automation Account"
-    ):
-        # Set token and headers first because all get methods for properties
-        # of this class rely getting information from server
+    def __init__(self, cluster, email, password, email_password):
         self.cluster = cluster
         self.base_url = utils.get_base_url(self.cluster)
-        self.token_type = 'api_token' if token else 'sign_in'
-        self.token = token if token else self._get_token(email, password)
+        self.token = self._get_token(email, password)
         self.headers = self._get_headers()
 
         self.password = password
         self.email_password = email_password
-        # self.id = self.json()['id']
 
     def get_streams(self):
         response = requests.get(self.base_url + endpoints.STREAM, headers=self.headers)

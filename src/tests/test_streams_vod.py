@@ -35,8 +35,7 @@ class TestVodStreams(VideocoinMixin):
         Check file upload via local file
         """
         try:
-            if user.token_type == 'sign_in':
-                self.faucet_vid_to_account(user.wallet_address, 11)
+            self.faucet_vid_to_account(user.wallet_address, 11)
             new_stream = user.create_stream_vod()
             new_stream.start()
 
@@ -54,8 +53,7 @@ class TestVodStreams(VideocoinMixin):
         Check file upload via url
         """
         try:
-            if user.token_type == 'sign_in':
-                self.faucet_vid_to_account(user.wallet_address, 11)
+            self.faucet_vid_to_account(user.wallet_address, 11)
             new_stream = user.create_stream_vod()
             new_stream.start()
 
