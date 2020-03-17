@@ -13,6 +13,9 @@ VID_TOKEN_ADDR = 'VID_TOKEN_ADDR'
 NATIVE_GAS_AMOUNT = 'NATIVE_GAS_AMOUNT'
 FAUCET_URL = 'FAUCET_URL'
 
+# common vars
+SENDGRID_KEY = 'SENDGRID_KEY'
+REPORT_EMAILS = 'REPORT_EMAILS'
 
 VALUES = {
     'dev': {
@@ -32,6 +35,8 @@ VALUES = {
 
         'NATIVE_GAS_AMOUNT': 1000000000000000000,
         'FAUCET_URL': os.environ.get('FAUCET_URL_DEV'),
+        'SENDGRID_KEY': os.environ.get('SENDGRID_KEY'),
+        'REPORT_EMAILS': os.environ.get('REPORT_EMAILS'),
     },
     'snb': {
         'ACCOUNT_EMAIL_DEFAULT': 'kudorussiaru@gmail.com',
@@ -50,6 +55,8 @@ VALUES = {
 
         'NATIVE_GAS_AMOUNT': 1000000000000000000,
         'FAUCET_URL': os.environ.get('FAUCET_URL_SNB'),
+        'SENDGRID_KEY': os.environ.get('SENDGRID_KEY'),
+        'REPORT_EMAILS': os.environ.get('REPORT_EMAILS'),
     },
     'kili': {
         'ACCOUNT_EMAIL_DEFAULT': 'kudorussiaru@gmail.com',
@@ -68,6 +75,8 @@ VALUES = {
 
         'NATIVE_GAS_AMOUNT': 1000000000000000000,
         'FAUCET_URL': os.environ.get('FAUCET_URL_KILI'),
+        'SENDGRID_KEY': os.environ.get('SENDGRID_KEY'),
+        'REPORT_EMAILS': os.environ.get('REPORT_EMAILS'),
     },
 }
 

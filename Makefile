@@ -29,9 +29,9 @@ docker-pull:
 	docker pull ${IMAGE_TAG}
 
 docker-run:
-	docker run --network="host" ${IMAGE_TAG} pytest tests --report_emails=${REPORT_EMAILS} --sendgrid_key=${SENDGRID_KEY}
+	docker run --network="host" ${IMAGE_TAG} pytest tests
 
 run:
-	cd src && pytest tests --report_emails=${REPORT_EMAILS} --sendgrid_key=${SENDGRID_KEY}
+	cd src && pytest tests
 
 release: docker-build docker-push

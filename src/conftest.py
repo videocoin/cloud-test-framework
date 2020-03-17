@@ -5,7 +5,9 @@ import requests
 from web3 import Web3, HTTPProvider
 from web3.middleware import geth_poa_middleware
 
-from src.consts import input_values
+from src.consts.input_values import (
+    get_initial_value, ACCOUNT_EMAIL_DEFAULT, ACCOUNT_PASSWORD_DEFAULT, EMAIL_PASSWORD, SENDGRID_KEY, REPORT_EMAILS
+)
 from src.consts import endpoints
 from src.models.user import User
 from src.utils import utils
@@ -36,9 +38,9 @@ def pytest_itemcollected(item):
 
 
 def pytest_terminal_summary(terminalreporter, config):
-    sendgrid_key = config.getoption('--sendgrid_key')
-    report_emails = config.getoption('--report_emails')
     cluster = config.getoption('--cluster')
+    sendgrid_key = get_initial_value(cluster, SENDGRID_KEY)
+    report_emails = get_initial_value(cluster, REPORT_EMAILS)
     if not sendgrid_key:
         return
     if not report_emails:
@@ -70,9 +72,9 @@ def user(request):
             )
         )
 
-    email = input_values.get_initial_value(cluster, input_values.ACCOUNT_EMAIL_DEFAULT)
-    password = input_values.get_initial_value(cluster, input_values.ACCOUNT_PASSWORD_DEFAULT)
-    email_password = input_values.get_initial_value(cluster, input_values.EMAIL_PASSWORD)
+    email = get_initial_value(cluster, ACCOUNT_EMAIL_DEFAULT)
+    password = get_initial_value(cluster, ACCOUNT_PASSWORD_DEFAULT)
+    email_password = get_initial_value(cluster, EMAIL_PASSWORD)
 
     return User(cluster, email, password, email_password)
 
