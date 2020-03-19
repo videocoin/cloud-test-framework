@@ -1,15 +1,14 @@
 import logging
 import pytest
 import re
-import requests
 from web3 import Web3, HTTPProvider
 from web3.middleware import geth_poa_middleware
 
 from src.consts.input_values import (
     get_initial_value, ACCOUNT_EMAIL_DEFAULT, ACCOUNT_PASSWORD_DEFAULT, EMAIL_PASSWORD, SENDGRID_KEY, REPORT_EMAILS
 )
-from src.consts import endpoints
 from src.models.user import User
+from src.models.profiles import ProfilesList
 from src.utils import utils
 from src.utils.rtmp_runner import RTMPRunner
 from src.utils.email import get_report_html, send_report
@@ -45,6 +44,7 @@ def pytest_terminal_summary(terminalreporter, config):
         return
     if not report_emails:
         return
+    return
     report_html = get_report_html(
         passed=terminalreporter.stats.get('passed', []),
         failed=terminalreporter.stats.get('failed', []),
@@ -145,17 +145,8 @@ def pytest_generate_tests(metafunc):
     # profiles for tests
     if 'output_profile' in metafunc.fixturenames:
         cluster = metafunc.config.option.cluster
-        base_url = utils.get_base_url(cluster)
-        try:
-            res = requests.get(base_url + endpoints.PROFILE)
-            all_profiles = res.json()['items']
-            metafunc.parametrize(
-                'output_profile', all_profiles, ids=get_output_profile_name
-            )
-        except KeyError:
-            logger.warning(
-                '\nGetting output profiles failed. Ignore results for {} | '
-                'Current response of /profiles: {}'.format(metafunc.function, res)
-            )
-            all_profiles = []
-            metafunc.parametrize('output_profile', all_profiles)
+        all_profiles = ProfilesList(cluster).all()
+        logger.debug('all_profiles {}'.format(all_profiles))
+        metafunc.parametrize(
+            'output_profile', all_profiles, ids=get_output_profile_name
+        )
