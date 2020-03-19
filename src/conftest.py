@@ -44,7 +44,7 @@ def pytest_terminal_summary(terminalreporter, config):
         return
     if not report_emails:
         return
-    return
+
     report_html = get_report_html(
         passed=terminalreporter.stats.get('passed', []),
         failed=terminalreporter.stats.get('failed', []),

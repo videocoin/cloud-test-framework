@@ -4,7 +4,7 @@ import jinja2
 import time
 from datetime import datetime
 
-from src.utils.utils import get_domain_link
+from src.consts.input_values import get_initial_value, LINK
 
 
 def format_time(seconds):
@@ -35,7 +35,7 @@ def get_report_html(passed, failed, skipped, error, cluster):
         'now': datetime.now().strftime("%Y-%m-%d %H:%M"),
         'execution_time': format_time(time.time() - time.time()),
         'cluster': cluster,
-        'domain': get_domain_link(cluster),
+        'domain': get_initial_value(cluster, LINK),
 
         'passed': passed,
         'results': passed + failed + error,

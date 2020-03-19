@@ -7,7 +7,7 @@ import logging
 from datetime import datetime
 import json
 
-from src.consts.clusters import CLUSTERS
+from src.consts.input_values import get_initial_value, BASE_URL
 
 logger = logging.getLogger(__name__)
 
@@ -107,11 +107,7 @@ def get_items_from_email(test_email, test_email_password, support_subject, *body
 
 
 def get_base_url(cluster):
-    return CLUSTERS[cluster]['base_url']
-
-
-def get_domain_link(cluster):
-    return CLUSTERS[cluster]['link']
+    return get_initial_value(cluster, BASE_URL)
 
 
 def get_vid_erc20_abi(cluster):

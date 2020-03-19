@@ -1,5 +1,7 @@
 import os
 
+LINK = 'LINK'
+BASE_URL = 'BASE_URL'
 
 ACCOUNT_EMAIL_DEFAULT = 'ACCOUNT_EMAIL_DEFAULT'
 EMAIL_PASSWORD = 'EMAIL_PASSWORD'
@@ -19,6 +21,8 @@ REPORT_EMAILS = 'REPORT_EMAILS'
 
 VALUES = {
     'dev': {
+        'LINK': 'https://studio.dev.videocoin.network/',
+        'BASE_URL': 'https://studio.dev.videocoin.network',
         'ACCOUNT_EMAIL_DEFAULT': 'kudorussiaru@gmail.com',
         'EMAIL_PASSWORD': 'P@$$w0rd',
         'ACCOUNT_PASSWORD_DEFAULT': 'tester123',
@@ -39,6 +43,8 @@ VALUES = {
         'REPORT_EMAILS': os.environ.get('REPORT_EMAILS'),
     },
     'snb': {
+        'LINK': 'https://studio.snb.videocoin.network/',
+        'BASE_URL': 'https://studio.snb.videocoin.network',
         'ACCOUNT_EMAIL_DEFAULT': 'kudorussiaru@gmail.com',
         'EMAIL_PASSWORD': 'P@$$w0rd',
         'ACCOUNT_PASSWORD_DEFAULT': 'tester123',
@@ -59,6 +65,8 @@ VALUES = {
         'REPORT_EMAILS': os.environ.get('REPORT_EMAILS'),
     },
     'kili': {
+        'LINK': 'https://studio.videocoin.network',
+        'BASE_URL': 'https://studio.videocoin.network',
         'ACCOUNT_EMAIL_DEFAULT': 'kudorussiaru@gmail.com',
         'EMAIL_PASSWORD': 'P@$$w0rd',
         'ACCOUNT_PASSWORD_DEFAULT': 'tester123',
