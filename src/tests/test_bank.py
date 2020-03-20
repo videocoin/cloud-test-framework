@@ -5,7 +5,7 @@ import pytest
 
 from src.utils.mixins import VideocoinMixin
 from src.utils import utils
-from src.consts.input_values import (VID_TOKEN_ADDR, DEPOSIT_ADDRESS_METAMASK, PRIVATE_KEY_METAMASK, RINKEBY_VID_BANK)
+from src.consts.input_values import VID_TOKEN_ADDR, DEPOSIT_ADDRESS_METAMASK, PRIVATE_KEY_METAMASK, RINKEBY_VID_BANK
 
 logger = logging.getLogger(__name__)
 

@@ -5,19 +5,24 @@ import logging
 
 from src.consts import expected_results
 from src.utils.mixins import VideocoinMixin
+from src.models.stream import StreamFactory
 
 logger = logging.getLogger(__name__)
 
 
 class TestLiveStreams(VideocoinMixin):
 
+    @pytest.fixture(autouse=True)
+    def create_stream_factory(self, cluster, user):
+        self.stream_factory = StreamFactory(cluster, user.token)
+
     @pytest.mark.smoke
     @pytest.mark.functional
-    def test_creating_valid_stream_appears_in_streams_list(self, user):
+    def test_creating_valid_stream_appears_in_streams_list(self):
         try:
-            new_stream = user.create_stream_live()
+            new_stream = self.stream_factory.create_live()
             logging.debug('New stream created: %s', new_stream.id)
-            all_streams = user.get_streams()
+            all_streams = self.stream_factory.my()
             found_stream = [stream for stream in all_streams if stream.id == new_stream.id]
             assert len(found_stream) == 1
         # TODO: What if I created a "stream" fixture that would delete itself in fin()
@@ -25,7 +30,7 @@ class TestLiveStreams(VideocoinMixin):
         # to delete the stream at the end of the test? Will I ever want that?
         finally:
             new_stream.delete()
-            all_streams = user.get_streams()
+            all_streams = self.stream_factory.my()
             other_found_stream = [
                 stream for stream in all_streams if stream.id == new_stream.id
             ]
@@ -35,9 +40,9 @@ class TestLiveStreams(VideocoinMixin):
     @pytest.mark.functional
     # TODO: Need to change test to verify the format of these values, not just
     # check that they're not None
-    def test_creating_valid_stream_has_correct_information(self, user):
+    def test_creating_valid_stream_has_correct_information(self):
         try:
-            new_stream = user.create_stream_live()
+            new_stream = self.stream_factory.create_live()
             tested_keys = expected_results.NEW_STREAM_INFORMATION.keys()
             for key in tested_keys:
                 # These keys are expected to be None (or null)
@@ -53,7 +58,7 @@ class TestLiveStreams(VideocoinMixin):
     def test_creating_stream_and_send_data_to_rtmp_url_starts_output_stream(self, user, rtmp_runner):
         try:
             self.faucet_vid_to_account(user.wallet_address, 11)
-            new_stream = user.create_stream_live()
+            new_stream = self.stream_factory.create_live()
             new_stream.start()
 
             new_stream.wait_for_status('STREAM_STATUS_PREPARED')
@@ -70,7 +75,7 @@ class TestLiveStreams(VideocoinMixin):
     def test_cancelling_stream_after_input_url_ready_cancels_stream(self, user):
         try:
             self.faucet_vid_to_account(user.wallet_address, 11)
-            new_stream = user.create_stream_live()
+            new_stream = self.stream_factory.create_live()
             new_stream.start()
 
             new_stream.wait_for_status('STREAM_STATUS_PREPARED')
@@ -86,7 +91,7 @@ class TestLiveStreams(VideocoinMixin):
     def test_cancelling_stream_during_input_processing_cancels_stream(self, user, rtmp_runner):
         try:
             # utils.faucet_vid_to_account(user.wallet_address, 11)
-            new_stream = user.create_stream_live()
+            new_stream = self.stream_factory.create_live()
             new_stream.start()
             new_stream.wait_for_status('STREAM_STATUS_PREPARED')
             rtmp_runner.start(new_stream.rtmp_url)
@@ -108,7 +113,7 @@ class TestLiveStreams(VideocoinMixin):
         for i in range(NUM_OF_TESTS):
             try:
                 self.faucet_vid_to_account(user.wallet_address, 11)
-                new_stream = user.create_stream_live()
+                new_stream = self.stream_factory.create_live()
                 new_stream.start()
                 duration = new_stream.wait_for_status(
                     'STREAM_STATUS_PREPARED', timeout=EXPECTED_TIME
@@ -139,7 +144,7 @@ class TestLiveStreams(VideocoinMixin):
         for i in range(NUM_OF_TESTS):
             try:
                 self.faucet_vid_to_account(user.wallet_address, 11)
-                new_stream = user.create_stream_live()
+                new_stream = self.stream_factory.create_live()
                 new_stream.start()
                 new_stream.wait_for_status('STREAM_STATUS_PREPARED')
                 rtmp_runner.start(new_stream.rtmp_url)
@@ -174,7 +179,7 @@ class TestLiveStreams(VideocoinMixin):
         for i in range(NUM_OF_TESTS):
             try:
                 self.faucet_vid_to_account(user.wallet_address, 11)
-                new_stream = user.create_stream_live()
+                new_stream = self.stream_factory.create_live()
                 new_stream.start()
                 new_stream.wait_for_status('STREAM_STATUS_PREPARED')
                 rtmp_runner.start(new_stream.rtmp_url)
@@ -199,7 +204,7 @@ class TestLiveStreams(VideocoinMixin):
     @pytest.mark.functional
     def test_creating_stream_with_empty_name_returns_error(self, user):
         with pytest.raises(requests.HTTPError) as e:
-            user.create_stream_live(name='')
+            self.stream_factory.create_live(name='')
         assert e.value.response.status_code == 400
         assert (
             e.value.response.json() == expected_results.CREATE_STREAM_WITH_EMPTY_NAME_ERROR
@@ -208,7 +213,7 @@ class TestLiveStreams(VideocoinMixin):
     @pytest.mark.functional
     def test_creating_stream_with_empty_profile_id_returns_error(self, user):
         with pytest.raises(requests.HTTPError) as e:
-            user.create_stream_live(profile_id='')
+            self.stream_factory.create_live(profile_id='')
         assert e.value.response.status_code == 400
         assert (
             e.value.response.json()
@@ -218,7 +223,7 @@ class TestLiveStreams(VideocoinMixin):
     @pytest.mark.functional
     def test_creating_stream_with_invalid_profile_id(self, user):
         with pytest.raises(requests.HTTPError) as e:
-            user.create_stream_live(profile_id='abcd-1234')
+            self.stream_factory.create_live(profile_id='abcd-1234')
         assert e.value.response.status_code == 400
 
     # Parametrized with all available profiles picked up at run time. See
@@ -227,7 +232,7 @@ class TestLiveStreams(VideocoinMixin):
     def test_all_available_output_profiles(self, user, rtmp_runner, output_profile):
         logger.debug('running with profile name: {}'.format(output_profile['name']))
         profile_id = output_profile['id']
-        new_stream = user.create_stream_live(profile_id=profile_id)
+        new_stream = self.stream_factory.create_live(profile_id=profile_id)
         new_stream.start()
         try:
             new_stream.wait_for_status('STREAM_STATUS_PREPARED')
@@ -243,7 +248,7 @@ class TestLiveStreams(VideocoinMixin):
     @pytest.mark.functional
     def test_playlist_size(self, user, rtmp_runner):
         start_balance = user.wallet_balance
-        new_stream = user.create_stream_live()
+        new_stream = self.stream_factory.create_live()
         new_stream.start()
         try:
             new_stream.wait_for_status('STREAM_STATUS_PREPARED')

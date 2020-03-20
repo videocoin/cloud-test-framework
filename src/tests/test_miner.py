@@ -2,7 +2,7 @@ import pytest
 import logging
 
 from src.utils.mixins import VideocoinMixin
-from src.models.miner import MinerList
+from src.models.miner import MinerFactory
 
 logger = logging.getLogger(__name__)
 
@@ -11,18 +11,19 @@ class TestMiner(VideocoinMixin):
 
     @pytest.mark.smoke
     def test_get_all_miners(self):
-        miners = MinerList(self.cluster)
+        miners = MinerFactory(self.cluster)
         assert miners.all() is not None
 
     @pytest.mark.smoke
     def test_get_my_miners(self, user):
-        miners = MinerList(self.cluster, user.token)
+        miners = MinerFactory(self.cluster, user.token)
         assert miners.my() is not None
 
     @pytest.mark.skip('still working on this')
     def test_get_miners(self, user, rtmp_runner):
+        miners = MinerFactory(self.cluster, user.token)
         stream = user.create_stream_live(profile_name='copy')
-        for miner in user.get_miners():
+        for miner in miners.my():
             if miner.name == 'small-dew':
                 miner.assign_stream(stream.id)
 

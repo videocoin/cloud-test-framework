@@ -4,7 +4,7 @@ from src.consts import endpoints
 from src.models.base import BaseModel
 
 
-class MinerList(BaseModel):
+class MinerFactory(BaseModel):
     def all(self):
         response = requests.get(self.base_url + endpoints.MINER + '/all')
         response.raise_for_status()

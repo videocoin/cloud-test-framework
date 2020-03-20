@@ -1,9 +1,6 @@
-from datetime import datetime
 import logging
 import requests
 
-from src.models.miner import Miner
-from src.models.stream import Stream
 from src.consts import endpoints
 from src.utils import utils
 
@@ -25,76 +22,6 @@ class User:
 
         self.password = password
         self.email_password = email_password
-
-    def get_streams(self):
-        response = requests.get(self.base_url + endpoints.STREAM, headers=self.headers)
-        response.raise_for_status()
-        items = response.json()['items']
-        stream_objs = []
-        for item in items:
-            stream_obj = Stream(self.cluster, self.token, item['id'])
-            stream_objs.append(stream_obj)
-        return stream_objs
-        # TODO: This always returns the same ID for all stream objects created
-        # return [Stream(self.token, stream['id']) for stream in items]
-
-    def get_miners(self):
-        response = requests.get(self.base_url + endpoints.MINER, headers=self.headers)
-        response.raise_for_status()
-        items = response.json()['items']
-        miner_objs = []
-        for item in items:
-            miner_obj = Miner(self.cluster, self.token, item['id'])
-            miner_objs.append(miner_obj)
-        return miner_objs
-
-    def get_profile(self, profile_name=None):
-        output_profiles = self._get_output_profiles()
-        if not profile_name:
-            # If profile_id nor profile_name is specified, assume
-            # user will take any profile (the first)
-            profile_id = output_profiles[0]['id']
-        else:
-            for profile in output_profiles:
-                if profile['name'] == profile_name:
-                    profile_id = profile['id']
-        if not profile_id:
-            raise ValueError('Profile does not exist')
-        return profile_id
-
-    def create_stream_vod(self, name=None, profile_name=None, profile_id=None):
-        if name is None:
-            name = 'File upload {}'.format(datetime.now().strftime("%m-%d-%Y@%H:%M:%S"))
-
-        if not profile_id:
-            profile_id = self.get_profile(profile_name)
-
-        body = {'name': name, 'profile_id': profile_id, 'input_type': 'INPUT_TYPE_FILE'}
-        logger.debug('Creating stream "{}" with profile_id {}'.format(name, profile_id))
-
-        response = requests.post(
-            self.base_url + endpoints.STREAM, headers=self.headers, json=body
-        )
-        response.raise_for_status()
-
-        return Stream(self.cluster, self.token, response.json()['id'])
-
-    def create_stream_live(self, name=None, profile_name=None, profile_id=None):
-        if name is None:
-            name = datetime.now().strftime("%m-%d-%Y@%H:%M:%S")
-
-        if not profile_id:
-            profile_id = self.get_profile(profile_name)
-
-        body = {'name': name, 'profile_id': profile_id}
-        logger.debug('Creating stream "{}" with profile_id {}'.format(name, profile_id))
-
-        response = requests.post(
-            self.base_url + endpoints.STREAM, headers=self.headers, json=body
-        )
-        response.raise_for_status()
-
-        return Stream(self.cluster, self.token, response.json()['id'])
 
     def start_withdraw(self, address, amount):
         body = {'address': address, 'amount': str(amount)}
@@ -161,12 +88,6 @@ class User:
 
     def _get_headers(self):
         return {'Authorization': 'Bearer ' + self.token}
-
-    def _get_output_profiles(self):
-        response = requests.get(self.base_url + endpoints.PROFILE)
-        response.raise_for_status()
-
-        return response.json()['items']
 
     def _get_token(self, email, password):
         body = {'email': email, 'password': password}

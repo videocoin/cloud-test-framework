@@ -2,11 +2,16 @@ import pytest
 import logging
 
 from src.utils.mixins import VideocoinMixin
+from src.models.stream import StreamFactory
 
 logger = logging.getLogger(__name__)
 
 
 class TestVodStreams(VideocoinMixin):
+
+    @pytest.fixture(autouse=True)
+    def create_stream_factory(self, cluster, user):
+        self.stream_factory = StreamFactory(cluster, user.token)
 
     @pytest.mark.smoke
     @pytest.mark.functional
@@ -15,14 +20,14 @@ class TestVodStreams(VideocoinMixin):
         Create vod stream and check list response
         """
         try:
-            new_stream = user.create_stream_vod()
+            new_stream = self.stream_factory.create_vod()
             logging.debug('New stream created: %s', new_stream.id)
-            all_streams = user.get_streams()
+            all_streams = self.stream_factory.my()
             found_stream = [stream for stream in all_streams if stream.id == new_stream.id]
             assert len(found_stream) == 1
         finally:
             new_stream.delete()
-            all_streams = user.get_streams()
+            all_streams = self.stream_factory.my()
             other_found_stream = [
                 stream for stream in all_streams if stream.id == new_stream.id
             ]
@@ -36,7 +41,7 @@ class TestVodStreams(VideocoinMixin):
         """
         try:
             self.faucet_vid_to_account(user.wallet_address, 11)
-            new_stream = user.create_stream_vod()
+            new_stream = self.stream_factory.create_vod()
             new_stream.start()
 
             new_stream.wait_for_status('STREAM_STATUS_PREPARED')
@@ -54,7 +59,7 @@ class TestVodStreams(VideocoinMixin):
         """
         try:
             self.faucet_vid_to_account(user.wallet_address, 11)
-            new_stream = user.create_stream_vod()
+            new_stream = self.stream_factory.create_vod()
             new_stream.start()
 
             new_stream.wait_for_status('STREAM_STATUS_PREPARED')

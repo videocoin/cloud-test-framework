@@ -8,7 +8,7 @@ from src.consts.input_values import (
     get_initial_value, ACCOUNT_EMAIL_DEFAULT, ACCOUNT_PASSWORD_DEFAULT, EMAIL_PASSWORD, SENDGRID_KEY, REPORT_EMAILS
 )
 from src.models.user import User
-from src.models.profiles import ProfilesList
+from src.models.profile import ProfileFactory
 from src.utils import utils
 from src.utils.rtmp_runner import RTMPRunner
 from src.utils.email import get_report_html, send_report
@@ -145,7 +145,7 @@ def pytest_generate_tests(metafunc):
     # profiles for tests
     if 'output_profile' in metafunc.fixturenames:
         cluster = metafunc.config.option.cluster
-        all_profiles = ProfilesList(cluster).all()
+        all_profiles = ProfileFactory(cluster).all()
         logger.debug('all_profiles {}'.format(all_profiles))
         metafunc.parametrize(
             'output_profile', all_profiles, ids=get_output_profile_name

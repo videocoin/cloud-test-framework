@@ -1,14 +1,62 @@
 from time import sleep
 from datetime import datetime
 import logging
-
 import requests
+
 from src.consts import endpoints
+from src.models.base import BaseModel
+from src.models.profile import ProfileFactory
 from src.utils import utils
 
 logger = logging.getLogger(__name__)
 
 BAD_STATUSES = ['STREAM_STATUS_CANCELLED', 'STREAM_STATUS_FAILED']
+
+
+class StreamFactory(BaseModel):
+
+    def my(self):
+        response = requests.get(self.base_url + endpoints.STREAM, headers=self.headers)
+        response.raise_for_status()
+        items = response.json()['items']
+        stream_objs = []
+        for item in items:
+            stream_obj = Stream(self.cluster, self.token, item['id'])
+            stream_objs.append(stream_obj)
+        return stream_objs
+
+    def create_vod(self, name=None, profile_id=None):
+        if name is None:
+            name = 'File upload {}'.format(datetime.now().strftime("%m-%d-%Y@%H:%M:%S"))
+
+        if not profile_id:
+            profile_id = ProfileFactory(self.cluster).get()
+
+        body = {'name': name, 'profile_id': profile_id, 'input_type': 'INPUT_TYPE_FILE'}
+        logger.debug('Creating stream "{}" with profile_id {}'.format(name, profile_id))
+
+        response = requests.post(
+            self.base_url + endpoints.STREAM, headers=self.headers, json=body
+        )
+        response.raise_for_status()
+
+        return Stream(self.cluster, self.token, response.json()['id'])
+
+    def create_live(self, name=None, profile_id=None):
+        if name is None:
+            name = datetime.now().strftime("%m-%d-%Y@%H:%M:%S")
+
+        if not profile_id:
+            profile_id = self.get_profile()
+
+        body = {'name': name, 'profile_id': profile_id}
+        logger.debug('Creating stream "{}" with profile_id {}'.format(name, profile_id))
+
+        response = requests.post(
+            self.base_url + endpoints.STREAM, headers=self.headers, json=body
+        )
+        response.raise_for_status()
+        return Stream(self.cluster, self.token, response.json()['id'])
 
 
 class Stream:

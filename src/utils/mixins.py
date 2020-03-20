@@ -3,7 +3,6 @@ import math
 import logging
 import requests
 
-
 from src.consts.input_values import VALUES, VID_TOKEN_ADDR, FAUCET_URL
 
 
