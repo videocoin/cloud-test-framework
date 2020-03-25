@@ -26,9 +26,9 @@ def pytest_itemcollected(item):
         parsed_params = re.match(r'^.*[(.+)].*$', item.name)
         if parsed_params:
             parsed_params = parsed_params.group(0)
+            item._nodeid = '{}[{}]'.format(item._obj.__doc__.strip(), parsed_params)
         else:
-            parsed_params = ''
-        item._nodeid = '{}[{}]'.format(item._obj.__doc__.strip(), parsed_params)
+            item._nodeid = '{}'.format(item._obj.__doc__.strip())
     else:
         item._nodeid = item.name
 
