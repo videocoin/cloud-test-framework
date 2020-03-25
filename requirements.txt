@@ -15,14 +15,6 @@ contextlib2==0.6.0.post1
 cytoolz==0.10.0
 docopt==0.6.2
 entrypoints==0.3
-eth-abi==2.0.0
-eth-account==0.4.0
-eth-hash==0.2.0
-eth-keyfile==0.5.1
-eth-keys==0.2.4
-eth-rlp==0.1.2
-eth-typing==2.1.0
-eth-utils==1.7.0
 flake8==3.7.9
 future==0.18.0
 hexbytes==0.2.0
@@ -76,6 +68,5 @@ urllib3==1.25.6
 varint==1.0.2
 virtualenv==16.7.7
 wcwidth==0.1.7
-web3==5.2.2
 websockets==7.0
 zipp==0.6.0

@@ -5,7 +5,6 @@ import re
 import requests
 import logging
 from datetime import datetime
-import json
 
 from src.consts.input_values import get_initial_value, BASE_URL
 
@@ -108,13 +107,6 @@ def get_items_from_email(test_email, test_email_password, support_subject, *body
 
 def get_base_url(cluster):
     return get_initial_value(cluster, BASE_URL)
-
-
-def get_vid_erc20_abi(cluster):
-    if cluster in ['dev', 'snb']:
-        with open('consts/ERC20.abi.json') as file:
-            abi = json.load(file)
-            return abi
 
 
 def time_from_start(start):

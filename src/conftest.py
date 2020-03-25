@@ -1,15 +1,12 @@
 import logging
 import pytest
 import re
-from web3 import Web3, HTTPProvider
-from web3.middleware import geth_poa_middleware
 
 from src.consts.input_values import (
     get_initial_value, ACCOUNT_EMAIL_DEFAULT, ACCOUNT_PASSWORD_DEFAULT, EMAIL_PASSWORD, SENDGRID_KEY, REPORT_EMAILS
 )
 from src.models.user import User
 from src.models.profile import ProfileFactory
-from src.utils import utils
 from src.utils.rtmp_runner import RTMPRunner
 from src.utils.email import get_report_html, send_report
 
@@ -100,40 +97,6 @@ def users(request):
 def rtmp_runner(request):
     addr = request.config.getoption('--rtmp_runner')
     return RTMPRunner(addr)
-
-
-@pytest.fixture
-def w3(request):
-    cluster = request.config.getoption('--cluster')
-    available_clusters = ['snb', 'dev']
-    if cluster not in available_clusters:
-        raise ValueError(
-            'Cluster not available. Currently available clusters are {}'.format(
-                available_clusters
-            )
-        )
-    if cluster in ['snb', 'dev']:
-        network_url = 'https://rinkeby.infura.io/v3/2133def9c46e42269dc76cff5338643a'
-
-    w3 = Web3(HTTPProvider(network_url))
-    # Still don't really understand this...Read more here:
-    # https://web3py.readthedocs.io/en/latest/middleware.html#geth-style-proof-of-authority
-    w3.middleware_onion.inject(geth_poa_middleware, layer=0)
-
-    return w3
-
-
-@pytest.fixture
-def abi(request):
-    cluster = request.config.getoption('--cluster')
-    available_clusters = ['snb', 'dev']
-    if cluster not in available_clusters:
-        raise ValueError(
-            'Cluster not available. Currently available clusters are {}'.format(
-                available_clusters
-            )
-        )
-    return utils.get_vid_erc20_abi(cluster)
 
 
 def get_output_profile_name(profile):
