@@ -1,6 +1,9 @@
 from django.urls import path
-from rtmp_jobs import views
+
 from rest_framework.urlpatterns import format_suffix_patterns
+
+from rtmp_jobs import views
+
 
 urlpatterns = [
     path(r'rtmpjobs', views.RTMPJobList.as_view()),

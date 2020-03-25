@@ -1,11 +1,13 @@
-from rtmp_jobs.models import RTMPJob
-from rtmp_jobs.serializers import RTMPJobSerializer
+from datetime import datetime
+
 from django.http import Http404
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from datetime import datetime
+from rtmp_jobs.models import RTMPJob
+from rtmp_jobs.serializers import RTMPJobSerializer
 from rtmp_jobs.rtmp_process_manager import stop_rtmp_output, start_rtmp_output
 
 

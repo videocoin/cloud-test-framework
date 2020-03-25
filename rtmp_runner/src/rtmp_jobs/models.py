@@ -1,11 +1,17 @@
 from django.db import models
-# from datetime import datetime
+
+
 SOURCE_CHOICES = [
-	('FILE', 'File'), ('SCREEN', 'Screen')]
+    ('FILE', 'File'),
+    ('SCREEN', 'Screen')
+]
 
 STATUS_CHOICES = [
-	('RUNNING', 'Running'), ('PAUSED', 'paused'), 
-	('COMPLETED', 'Completed'), ('ERROR', 'Error')]
+    ('RUNNING', 'Running'),
+    ('PAUSED', 'paused'),
+    ('COMPLETED', 'Completed'),
+    ('ERROR', 'Error')
+]
 
 
 class RTMPJob(models.Model):	
