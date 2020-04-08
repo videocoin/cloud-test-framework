@@ -2,7 +2,7 @@ import pytest
 import logging
 
 from src.utils.mixins import VideocoinMixin
-from src.models.miner import MinerFactory
+from src.models.miners import MinerFactory
 
 logger = logging.getLogger(__name__)
 
