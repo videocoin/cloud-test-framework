@@ -2,11 +2,13 @@ import pytest
 import requests
 
 from src.consts import endpoints
+from src.consts.input_values import TEST_USER_INFORMATION
 from src.consts import expected_results
 from src.utils import utils
+from src.utils.mixins import VideocoinMixin
 
 
-class TestSignIn:
+class TestSignIn(VideocoinMixin):
 
     @pytest.mark.smoke
     @pytest.mark.functional
@@ -22,18 +24,19 @@ class TestSignIn:
         #     expected_value = expected_results.TEST_USER_INFORMATION[key]
         #     assert actual_value == expected_value
         actual_user_values = user.json()
-        assert actual_user_values['id'] == expected_results.TEST_USER_INFORMATION[user.cluster]['id']
+        expected_results = self.get_initial_value(TEST_USER_INFORMATION)
+        assert actual_user_values['id'] == expected_results['id']
         assert (
-            actual_user_values['email'] == expected_results.TEST_USER_INFORMATION[user.cluster]['email']
+            actual_user_values['email'] == expected_results['email']
         )
-        assert actual_user_values['name'] == expected_results.TEST_USER_INFORMATION[user.cluster]['name']
+        assert actual_user_values['name'] == expected_results['name']
         assert (
             actual_user_values['is_active']
-            == expected_results.TEST_USER_INFORMATION[user.cluster]['is_active']
+            == expected_results['is_active']
         )
         assert (
             actual_user_values['account']['address']
-            == expected_results.TEST_USER_INFORMATION[user.cluster]['account']['address']
+            == expected_results['account']['address']
         )
     
     @pytest.mark.functional

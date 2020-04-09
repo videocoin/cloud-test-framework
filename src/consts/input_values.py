@@ -14,6 +14,7 @@ RINKEBY_VID_BANK = 'RINKEBY_VID_BANK'
 VID_TOKEN_ADDR = 'VID_TOKEN_ADDR'
 NATIVE_GAS_AMOUNT = 'NATIVE_GAS_AMOUNT'
 FAUCET_URL = 'FAUCET_URL'
+TEST_USER_INFORMATION = 'TEST_USER_INFORMATION'
 
 # common vars
 SENDGRID_KEY = 'SENDGRID_KEY'
@@ -41,6 +42,16 @@ VALUES = {
         'FAUCET_URL': os.environ.get('FAUCET_URL_DEV'),
         'SENDGRID_KEY': os.environ.get('SENDGRID_KEY'),
         'REPORT_EMAILS': os.environ.get('REPORT_EMAILS'),
+        'TEST_USER_INFORMATION':  {
+            'id': '3b6c89e3-098e-41e9-4d6b-71310ec247b0',
+            'email': 'kudorussiaru@gmail.com',
+            'name': 'test',
+            'is_active': True,
+            'account': {
+                'id': '25237a3c-d0bc-45d2-75c8-3f835f0012e3',
+                'address': '0x00125Ab819Af65163bBa61C1B14B23D662C246CA',
+            }
+        },
     },
     'snb': {
         'LINK': 'https://studio.snb.videocoin.network/',
@@ -63,6 +74,15 @@ VALUES = {
         'FAUCET_URL': os.environ.get('FAUCET_URL_SNB'),
         'SENDGRID_KEY': os.environ.get('SENDGRID_KEY'),
         'REPORT_EMAILS': os.environ.get('REPORT_EMAILS'),
+        'TEST_USER_INFORMATION':  {
+            'id': 'b2c96236-0f97-4f59-702d-c07277a2b200',
+            'email': 'kudorussiaru@gmail.com',
+            'name': 'Auto Tests',
+            'is_active': True,
+            'account': {
+                'id': '25237a3c-d0bc-45d2-75c8-3f835f0012e3',
+                'address': '0x00Eb351e3fA562DEeAeAE844d5D0A736da6e0578',
+            }},
     },
     'kili': {
         'LINK': 'https://studio.videocoin.network',
@@ -85,6 +105,18 @@ VALUES = {
         'FAUCET_URL': os.environ.get('FAUCET_URL_KILI'),
         'SENDGRID_KEY': os.environ.get('SENDGRID_KEY'),
         'REPORT_EMAILS': os.environ.get('REPORT_EMAILS'),
+        'TEST_USER_INFORMATION':  {
+            'id': '',
+            'email': 'kgoautomation@gmail.com',
+            'name': 'Kenneth Go',
+            'is_active': True,
+            'account': {
+                'id': '25237a3c-d0bc-45d2-75c8-3f835f0012e3',
+                'address': '0x003d07A64C2FeFc8C1654EF742F9AF4088354090',
+                # 'balance': 1308,
+                # 'updated_at': '2019-10-31T23:00:12.604164461Z'
+            }
+        },
     },
 }
 

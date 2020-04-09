@@ -29,7 +29,7 @@ docker-pull:
 	docker pull ${IMAGE_TAG}
 
 docker-run:
-	docker run --network="host" ${IMAGE_TAG} pytest tests
+	docker run --network="host" ${IMAGE_TAG} pytest --cluster=snb tests
 
 run:
 	cd src && pytest tests

@@ -47,7 +47,7 @@ class StreamFactory(BaseModel):
             name = datetime.now().strftime("%m-%d-%Y@%H:%M:%S")
 
         if not profile_id:
-            profile_id = self.get_profile()
+            profile_id = ProfileFactory(self.cluster).get()
 
         body = {'name': name, 'profile_id': profile_id}
         logger.debug('Creating stream "{}" with profile_id {}'.format(name, profile_id))
@@ -104,7 +104,7 @@ class Stream:
 
         return response.json()
 
-    def wait_for_status(self, status, timeout=120):
+    def wait_for_status(self, status, timeout=180):
         start = datetime.now()
         while self.status != status and utils.time_from_start(start) <= timeout:
             if self.status in BAD_STATUSES:
@@ -129,7 +129,7 @@ class Stream:
             )
         return utils.time_from_start(start)
 
-    def is_hls_playlist_healthy(self, duration, expected_update_duration=10):
+    def is_hls_playlist_healthy(self, duration, expected_update_duration=30):
         start = datetime.now()
         base_playlist_url = 'https://streams-{}.videocoin.network/{}/index.m3u8'
         durations = []

@@ -1,5 +1,6 @@
 import pytest
 import logging
+import time
 
 from src.utils.mixins import VideocoinMixin
 from src.models.stream import StreamFactory
@@ -15,7 +16,7 @@ class TestVodStreams(VideocoinMixin):
 
     @pytest.mark.smoke
     @pytest.mark.functional
-    def test_creating_valid_stream_appears_in_streams_list(self, user):
+    def test_creating_valid_stream_appears_in_streams_list(self):
         """
         Create vod stream and check list response
         """
@@ -42,6 +43,7 @@ class TestVodStreams(VideocoinMixin):
         try:
             self.faucet_vid_to_account(user.wallet_address, 11)
             new_stream = self.stream_factory.create_vod()
+            time.sleep(5)
             new_stream.start()
 
             new_stream.wait_for_status('STREAM_STATUS_PREPARED')
@@ -60,6 +62,7 @@ class TestVodStreams(VideocoinMixin):
         try:
             self.faucet_vid_to_account(user.wallet_address, 11)
             new_stream = self.stream_factory.create_vod()
+            time.sleep(5)
             new_stream.start()
 
             new_stream.wait_for_status('STREAM_STATUS_PREPARED')
