@@ -70,3 +70,4 @@ virtualenv==16.7.7
 wcwidth==0.1.7
 websockets==7.0
 zipp==0.6.0
+web3==4.8.1

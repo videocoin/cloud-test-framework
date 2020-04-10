@@ -1,11 +1,14 @@
 from time import sleep
 import requests
 import pytest
+import time
 import logging
 
 from src.consts import expected_results
 from src.utils.mixins import VideocoinMixin
 from src.models.stream import StreamFactory
+from src.consts.input_values import RPC_NODE_URL, STREAM_MANAGER_CONTRACT_ADDR
+from src.blockchain import Blockchain, ValidatorCollection
 
 logger = logging.getLogger(__name__)
 
@@ -267,3 +270,35 @@ class TestLiveStreams(VideocoinMixin):
         logger.debug('Start balance: {:.6e}'.format(start_balance))
         logger.debug('End balance: {:.6e}'.format(end_balance))
         logger.debug('Balance difference: {:.6e}'.format(start_balance - end_balance))
+
+    @pytest.mark.functional
+    def test_live_stream_blockchain_events(self, user, rtmp_runner):
+        """
+        Validate blockchain events for live stream
+        """
+        new_stream = self.stream_factory.create_live()
+        new_stream.start()
+        try:
+            new_stream.wait_for_status('STREAM_STATUS_PREPARED')
+            rtmp_runner.start(new_stream.rtmp_url)
+            new_stream.wait_for_status('STREAM_STATUS_READY')
+            new_stream.wait_for_playlist_size(10, 30)
+            new_stream.stop()
+            time.sleep(10)
+            blockchain = Blockchain(
+                self.get_initial_value(RPC_NODE_URL),
+                stream_id=new_stream.stream_contract_id,
+                stream_address=new_stream.stream_contract_address,
+                stream_manager_address=self.get_initial_value(STREAM_MANAGER_CONTRACT_ADDR),
+            )
+
+            events = blockchain.get_all_events()
+            validator = ValidatorCollection(
+                events=events,
+                input_url=new_stream.input_url,
+                output_url=new_stream.output_url
+            )
+            for k, v in validator.validate().items():
+                assert v.get('is_valid'), '{}: {}'.format(k, ', '.join(v.get('errors')))
+        finally:
+            new_stream.delete()
