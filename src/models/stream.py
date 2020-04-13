@@ -47,7 +47,8 @@ class StreamFactory(BaseModel):
             name = datetime.now().strftime("%m-%d-%Y@%H:%M:%S")
 
         if not profile_id:
-            profile_id = ProfileFactory(self.cluster).get()
+            if not profile_id == '':
+                profile_id = ProfileFactory(self.cluster).get()
 
         body = {'name': name, 'profile_id': profile_id}
         logger.debug('Creating stream "{}" with profile_id {}'.format(name, profile_id))

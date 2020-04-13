@@ -41,23 +41,6 @@ class TestLiveStreams(VideocoinMixin):
 
     @pytest.mark.smoke
     @pytest.mark.functional
-    # TODO: Need to change test to verify the format of these values, not just
-    # check that they're not None
-    def test_creating_valid_stream_has_correct_information(self):
-        try:
-            new_stream = self.stream_factory.create_live()
-            tested_keys = expected_results.NEW_STREAM_INFORMATION.keys()
-            for key in tested_keys:
-                # These keys are expected to be None (or null)
-                if key in ['ready_at', 'completed_at']:
-                    assert new_stream.json()[key] is None
-                else:
-                    assert new_stream.json()[key] is not None
-        finally:
-            new_stream.delete()
-
-    @pytest.mark.smoke
-    @pytest.mark.functional
     def test_creating_stream_and_send_data_to_rtmp_url_starts_output_stream(self, user, rtmp_runner):
         try:
             self.faucet_vid_to_account(user.wallet_address, 11)
