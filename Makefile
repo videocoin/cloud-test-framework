@@ -29,7 +29,7 @@ docker-pull:
 	docker pull ${IMAGE_TAG}
 
 docker-run:
-	docker run --network="host" ${IMAGE_TAG} pytest --cluster=snb tests
+	env > env_file && docker run --network="host" --env-file env_file ${IMAGE_TAG} pytest --cluster=snb tests
 
 run:
 	cd src && pytest tests
