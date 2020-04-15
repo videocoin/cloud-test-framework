@@ -6,7 +6,7 @@ import requests
 import logging
 from datetime import datetime
 
-from src.consts.input_values import get_initial_value, BASE_URL
+from src.consts.input_values import get_initial_value, BASE_URL, API_URL
 
 logger = logging.getLogger(__name__)
 
@@ -44,6 +44,8 @@ def get_items_from_email(test_email, test_email_password, support_subject, *body
     """
     if test_email.split('@')[1] in ['gmail.com', 'liveplanet.net']:
         pop_server = 'pop.gmail.com'
+    elif test_email.split('@')[1] in ['yandex.ru']:
+        pop_server = 'pop.yandex.ru'
     else:
         raise ValueError('Invalid email format or POP server not supported')
 
@@ -107,6 +109,10 @@ def get_items_from_email(test_email, test_email_password, support_subject, *body
 
 def get_base_url(cluster):
     return get_initial_value(cluster, BASE_URL)
+
+
+def get_api_url(cluster):
+    return get_initial_value(cluster, API_URL)
 
 
 def time_from_start(start):

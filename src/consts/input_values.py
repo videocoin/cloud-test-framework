@@ -2,10 +2,13 @@ import os
 
 LINK = 'LINK'
 BASE_URL = 'BASE_URL'
+API_URL = 'API_URL'
 
 ACCOUNT_EMAIL_DEFAULT = 'ACCOUNT_EMAIL_DEFAULT'
 EMAIL_PASSWORD = 'EMAIL_PASSWORD'
 ACCOUNT_PASSWORD_DEFAULT = 'ACCOUNT_PASSWORD_DEFAULT'
+NEW_ACCOUNT_EMAIL = 'NEW_ACCOUNT_EMAIL'
+NEW_ACCOUNT_PASSWORD = 'NEW_ACCOUNT_PASSWORD'
 DEPOSIT_ADDRESS_METAMASK = 'DEPOSIT_ADDRESS_METAMASK'
 PRIVATE_KEY_METAMASK = 'PRIVATE_KEY_METAMASK'
 DEPOSIT_ADDRESS_DUMPSTER = 'DEPOSIT_ADDRESS_DUMPSTER'
@@ -27,9 +30,13 @@ VALUES = {
     'dev': {
         'LINK': 'https://studio.dev.videocoin.network/',
         'BASE_URL': 'https://studio.dev.videocoin.network',
+        'API_URL': 'https://dev.videocoin.network',
         'ACCOUNT_EMAIL_DEFAULT': 'kudorussiaru@gmail.com',
         'EMAIL_PASSWORD': 'P@$$w0rd',
         'ACCOUNT_PASSWORD_DEFAULT': 'tester123',
+
+        'NEW_ACCOUNT_EMAIL': 'videocointtest@yandex.ru',
+        'NEW_ACCOUNT_PASSWORD': 'r5ooFn9Jinwg1Mb2',
 
         'DEPOSIT_ADDRESS_METAMASK': '0x1C4215Fcf5599173BBbc8cDb9119aE42b44ce2D4',
         'PRIVATE_KEY_METAMASK': (
@@ -64,9 +71,13 @@ VALUES = {
     'snb': {
         'LINK': 'https://studio.snb.videocoin.network/',
         'BASE_URL': 'https://studio.snb.videocoin.network',
+        'API_URL': 'https://snb.videocoin.network',
         'ACCOUNT_EMAIL_DEFAULT': 'kudorussiaru@gmail.com',
         'EMAIL_PASSWORD': 'P@$$w0rd',
         'ACCOUNT_PASSWORD_DEFAULT': 'tester123',
+
+        'NEW_ACCOUNT_EMAIL': 'videocointtest@yandex.ru',
+        'NEW_ACCOUNT_PASSWORD': 'r5ooFn9Jinwg1Mb2',
 
         'DEPOSIT_ADDRESS_METAMASK': '0x1C4215Fcf5599173BBbc8cDb9119aE42b44ce2D4',
         'PRIVATE_KEY_METAMASK': (
@@ -100,9 +111,14 @@ VALUES = {
     'kili': {
         'LINK': 'https://studio.videocoin.network',
         'BASE_URL': 'https://studio.videocoin.network',
+        'API_URL': 'https://videocoin.network',
+
         'ACCOUNT_EMAIL_DEFAULT': 'kudorussiaru@gmail.com',
         'EMAIL_PASSWORD': 'P@$$w0rd',
         'ACCOUNT_PASSWORD_DEFAULT': 'tester123',
+
+        'NEW_ACCOUNT_EMAIL': 'videocointtest@yandex.ru',
+        'NEW_ACCOUNT_PASSWORD': 'r5ooFn9Jinwg1Mb2',
 
         'DEPOSIT_ADDRESS_METAMASK': '0x1C4215Fcf5599173BBbc8cDb9119aE42b44ce2D4',
         'PRIVATE_KEY_METAMASK': (

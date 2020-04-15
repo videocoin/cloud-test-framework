@@ -11,6 +11,7 @@ VID_TRANSFER_AMOUNT_REGEX = EmailBodyRegex(
     'vid_transfer_amount_regex', r'(\d+\.?\d*).*VID'
 )
 DEPOSIT_ADDRESS_REGEX = EmailBodyRegex('deposit_address_regex', r'(0x[A-Za-z0-9]{40})')
-CONFIRMATION_CODE_REGEX = EmailBodyRegex(
-    'six_digit_code_regex', r'Copy the 6 digit code below [\S\s]* ([0-9]{6})'
+
+CONFIRMATION_URL_REGEX = EmailBodyRegex(
+    'confirmation_url_regex', r'<a href="(.*?)".*?>Confirm'
 )

@@ -17,6 +17,7 @@ class User:
     def __init__(self, cluster, email, password, email_password):
         self.cluster = cluster
         self.base_url = utils.get_base_url(self.cluster)
+        self.api_url = utils.get_api_url(self.cluster)
         self.token = self._get_token(email, password)
         self.headers = self._get_headers()
 
@@ -47,6 +48,11 @@ class User:
 
         return res.json()
 
+    def delete(self):
+        url = self.api_url + endpoints.TEST_USER + self.id + '/'
+        res = requests.delete(url)
+        res.raise_for_status()
+
     # This kind of method is reoccuring. It does:
     # 1) An authenticated request
     # 2) Needs its response verified (make sure it doesn't have 404, 500, etc.)
@@ -57,6 +63,10 @@ class User:
         response.raise_for_status()
 
         return response.json()
+
+    @property
+    def id(self):
+        return self.json()['id']
 
     @property
     def email(self):
@@ -85,6 +95,16 @@ class User:
     @property
     def wallet_update_at(self):
         return self.json()['account']['update_at']
+
+    @property
+    def balance(self):
+        url = self.base_url + endpoints.BILLING
+
+        res = requests.get(url, headers=self.headers)
+        logger.debug('response from {}: {}'.format(url, res.json()))
+        res.raise_for_status()
+
+        return res.json()['balance']
 
     def _get_headers(self):
         return {'Authorization': 'Bearer ' + self.token}

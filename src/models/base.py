@@ -7,6 +7,7 @@ class BaseModel:
     def __init__(self, cluster, token=None):
         self.cluster = cluster
         self.base_url = utils.get_base_url(self.cluster)
+        self.api_url = utils.get_api_url(self.cluster)
 
         self.token = token
         if self.token:
