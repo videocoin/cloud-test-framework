@@ -67,8 +67,3 @@ jobs:
           key: v1-repo-{{ .Branch }}-{{ .Revision }}
           paths:
             - .
-workflows:
-  version: 2
-  build-n-deploy:
-    jobs:
-      - test
