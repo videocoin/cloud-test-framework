@@ -15,6 +15,7 @@ from aiortc import (
     RTCSessionDescription,
     VideoStreamTrack,
 )
+from aiortc.contrib.media import MediaPlayer
 
 
 def startWebRTC(stream_id, sdp, cluster):
@@ -23,7 +24,7 @@ def startWebRTC(stream_id, sdp, cluster):
     return r.json().get('sdp')
 
 
-async def publish(pc, track, stream_id, cluster):
+async def publish(pc, player, stream_id, cluster):
 
     @pc.on("track")
     def on_track(track):
@@ -45,8 +46,8 @@ async def publish(pc, track, stream_id, cluster):
     def on_open():
         logger.warning("open")
 
-    pc.addTrack(track)
-    # pc.addTransceiver(track, 'sendonly')
+    pc.addTrack(player.audio)
+    pc.addTrack(player.video)
 
     await pc.setLocalDescription(await pc.createOffer())
     sdp = startWebRTC(stream_id, pc.localDescription.sdp, cluster)
@@ -57,11 +58,10 @@ async def publish(pc, track, stream_id, cluster):
     )
 
 
-async def run(stream_id, cluster):
+async def run(player, stream_id, cluster):
 
     pc = RTCPeerConnection()
-    track = VideoStreamTrack()
-    await publish(pc, track, stream_id, cluster)
+    await publish(pc, player, stream_id, cluster)
     logger.warning("Exchanging media")
     await asyncio.sleep(600)
 
@@ -73,6 +73,10 @@ def start_rtc_output():
     args = parser.parse_args()
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-    loop.run_until_complete(run(args.stream_id, args.cluster))
+
+    vid_file = './small.mp4'
+    player = MediaPlayer(vid_file)
+
+    loop.run_until_complete(run(player, args.stream_id, args.cluster))
 
 start_rtc_output()
