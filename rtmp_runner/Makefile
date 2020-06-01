@@ -20,6 +20,12 @@ version:
 docker-build:
 	docker build -t ${IMAGE_TAG} -f Dockerfile .
 
+build:
+	docker build -t test -f Dockerfile .
+
+run:
+	docker run -p 8080:8080 test
+
 docker-push:
 	@echo "==> Pushing ${NAME} docker image..."
 	docker push ${IMAGE_TAG}
