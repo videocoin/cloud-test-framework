@@ -14,11 +14,9 @@ PRIVATE_KEY_METAMASK = 'PRIVATE_KEY_METAMASK'
 DEPOSIT_ADDRESS_DUMPSTER = 'DEPOSIT_ADDRESS_DUMPSTER'
 DEPOSIT_ADDRESS_TOO_SHORT = 'DEPOSIT_ADDRESS_TOO_SHORT'
 RINKEBY_VID_BANK = 'RINKEBY_VID_BANK'
-VID_TOKEN_ADDR = 'VID_TOKEN_ADDR'
 STREAM_MANAGER_CONTRACT_ADDR = 'STREAM_MANAGER_CONTRACT_ADDR'
 TXLOG_API_URL = 'TXLOG_API_URL'
 NATIVE_GAS_AMOUNT = 'NATIVE_GAS_AMOUNT'
-FAUCET_URL = 'FAUCET_URL'
 RPC_NODE_URL = 'RPC_NODE_URL'
 TEST_USER_INFORMATION = 'TEST_USER_INFORMATION'
 
@@ -28,8 +26,8 @@ REPORT_EMAILS = 'REPORT_EMAILS'
 
 VALUES = {
     'dev': {
-        'LINK': 'https://studio.dev.videocoin.network/',
-        'BASE_URL': 'https://studio.dev.videocoin.network',
+        'LINK': 'https://console.dev.videocoin.network/',
+        'BASE_URL': 'https://console.dev.videocoin.network',
         'API_URL': 'https://dev.videocoin.network',
         'ACCOUNT_EMAIL_DEFAULT': 'kudorussiaru@gmail.com',
         'EMAIL_PASSWORD': 'P@$$w0rd',
@@ -46,21 +44,20 @@ VALUES = {
         'DEPOSIT_ADDRESS_TOO_SHORT': '0x1C4215Fcf5599173BBbc8cDb9119aE42b44ce',
 
         'RINKEBY_VID_BANK': '0x00125ab819af65163bba61c1b14b23d662c246ca',
-        'VID_TOKEN_ADDR': '0x22f9830cfCa475143749f19Ca7d5547D4939Ff67',
 
         'STREAM_MANAGER_CONTRACT_ADDR': '0x000000000000000000000000000000000000101',
 
-        'TXLOG_API_URL': 'https://txlog.dev.kili.videocoin.network',
+        'TXLOG_API_URL': 'https://symphony.dev.videocoin.net',
 
         'NATIVE_GAS_AMOUNT': 1000000000000000000,
-        'FAUCET_URL': os.environ.get('FAUCET_URL_DEV'),
         'RPC_NODE_URL': os.environ.get('RPC_NODE_URL_DEV'),
         'SENDGRID_KEY': os.environ.get('SENDGRID_KEY'),
         'REPORT_EMAILS': os.environ.get('REPORT_EMAILS'),
         'TEST_USER_INFORMATION':  {
             'id': '3b6c89e3-098e-41e9-4d6b-71310ec247b0',
             'email': 'kudorussiaru@gmail.com',
-            'name': 'test',
+            'first_name': 'test',
+            'last_name': 'user',
             'is_active': True,
             'account': {
                 'id': '25237a3c-d0bc-45d2-75c8-3f835f0012e3',
@@ -69,8 +66,8 @@ VALUES = {
         },
     },
     'snb': {
-        'LINK': 'https://studio.snb.videocoin.network/',
-        'BASE_URL': 'https://studio.snb.videocoin.network',
+        'LINK': 'https://console.snb.videocoin.network/',
+        'BASE_URL': 'https://console.snb.videocoin.network',
         'API_URL': 'https://snb.videocoin.network',
         'ACCOUNT_EMAIL_DEFAULT': 'kudorussiaru@gmail.com',
         'EMAIL_PASSWORD': 'P@$$w0rd',
@@ -87,21 +84,20 @@ VALUES = {
         'DEPOSIT_ADDRESS_TOO_SHORT': '0x1C4215Fcf5599173BBbc8cDb9119aE42b44ce',
 
         'RINKEBY_VID_BANK': '0x00125ab819af65163bba61c1b14b23d662c246ca',
-        'VID_TOKEN_ADDR': '0x22f9830cfCa475143749f19Ca7d5547D4939Ff67',
 
         'STREAM_MANAGER_CONTRACT_ADDR': '0x000000000000000000000000000000000000101',
 
         'TXLOG_API_URL': 'https://txlog.dev.kili.videocoin.network',
 
         'NATIVE_GAS_AMOUNT': 1000000000000000000,
-        'FAUCET_URL': os.environ.get('FAUCET_URL_SNB'),
         'RPC_NODE_URL': os.environ.get('RPC_NODE_URL_SNB'),
         'SENDGRID_KEY': os.environ.get('SENDGRID_KEY'),
         'REPORT_EMAILS': os.environ.get('REPORT_EMAILS'),
         'TEST_USER_INFORMATION':  {
             'id': 'b2c96236-0f97-4f59-702d-c07277a2b200',
             'email': 'kudorussiaru@gmail.com',
-            'name': 'Auto Tests',
+            'first_name': 'test',
+            'last_name': 'user',
             'is_active': True,
             'account': {
                 'id': '25237a3c-d0bc-45d2-75c8-3f835f0012e3',
@@ -109,8 +105,8 @@ VALUES = {
             }},
     },
     'kili': {
-        'LINK': 'https://studio.videocoin.network',
-        'BASE_URL': 'https://studio.videocoin.network',
+        'LINK': 'https://console.videocoin.network',
+        'BASE_URL': 'https://console.videocoin.network',
         'API_URL': 'https://videocoin.network',
 
         'ACCOUNT_EMAIL_DEFAULT': 'kudorussiaru@gmail.com',
@@ -128,21 +124,20 @@ VALUES = {
         'DEPOSIT_ADDRESS_TOO_SHORT': '0x1C4215Fcf5599173BBbc8cDb9119aE42b44ce',
 
         'RINKEBY_VID_BANK': '0x00125ab819af65163bba61c1b14b23d662c246ca',
-        'VID_TOKEN_ADDR': '0x22f9830cfCa475143749f19Ca7d5547D4939Ff67',
 
         'STREAM_MANAGER_CONTRACT_ADDR': '0x000000000000000000000000000000000000101',
 
         'TXLOG_API_URL': 'https://txlog.dev.kili.videocoin.network',
 
         'NATIVE_GAS_AMOUNT': 1000000000000000000,
-        'FAUCET_URL': os.environ.get('FAUCET_URL_KILI'),
         'RPC_NODE_URL': os.environ.get('RPC_NODE_URL_KILI'),
         'SENDGRID_KEY': os.environ.get('SENDGRID_KEY'),
         'REPORT_EMAILS': os.environ.get('REPORT_EMAILS'),
         'TEST_USER_INFORMATION':  {
             'id': '',
             'email': 'kgoautomation@gmail.com',
-            'name': 'Kenneth Go',
+            'first_name': 'test',
+            'last_name': 'user',
             'is_active': True,
             'account': {
                 'id': '25237a3c-d0bc-45d2-75c8-3f835f0012e3',

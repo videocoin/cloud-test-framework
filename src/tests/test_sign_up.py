@@ -52,10 +52,10 @@ class TestSignUp(VideocoinMixin):
         """
         email = user.email
         password = user.password
-        name = 'K'
+        first_name = 'K'
 
         with pytest.raises(requests.HTTPError) as e:
-            self.sign_up(user.cluster, email, password, name)
+            self.sign_up(user.cluster, email, password, first_name)
 
         assert e.value.response.status_code == 400
         assert e.value.response.json() == expected_results.SIGN_UP_WITH_SHORT_NAME_ERROR
@@ -83,12 +83,18 @@ class TestSignUp(VideocoinMixin):
         r = requests.get(confirm_url)
         assert r.status_code == 200
 
-    def sign_up(self, cluster, email, password, name):
+    def sign_up(self, cluster, email, password, first_name='test', last_name='user'):
         body = {
             'email': email,
+            'first_name': first_name,
+            'last_name': last_name,
             'password': password,
             'confirm_password': password,
-            'name': name,
+            'address_1': 'test user address #1',
+            'address_2': 'test user address #1',
+            'zip': '888888',
+            'city': 'Testcity',
+            'country': 'EU',
         }
         base_url = utils.get_base_url(cluster)
         res = requests.post(base_url + endpoints.SIGN_UP, json=body)

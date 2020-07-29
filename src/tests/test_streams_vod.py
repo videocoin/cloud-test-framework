@@ -38,12 +38,12 @@ class TestVodStreams(VideocoinMixin):
 
     @pytest.mark.smoke
     @pytest.mark.functional
+    @pytest.mark.dependency(name='test_creating_stream_and_upload_file', depends=["user_balance"], scope='session')
     def test_creating_stream_and_upload_file(self, user):
         """
         Check file upload via local file
         """
         try:
-            self.faucet_vid_to_account(user.wallet_address, 11)
             new_stream = self.stream_factory.create_vod()
             time.sleep(5)
             new_stream.start()
@@ -57,12 +57,12 @@ class TestVodStreams(VideocoinMixin):
 
     @pytest.mark.smoke
     @pytest.mark.functional
+    @pytest.mark.dependency(name='test_creating_stream_and_upload_url', depends=["user_balance"], scope='session')
     def test_creating_stream_and_upload_url(self, user):
         """
         Check file upload via url
         """
         try:
-            self.faucet_vid_to_account(user.wallet_address, 11)
             new_stream = self.stream_factory.create_vod()
             time.sleep(5)
             new_stream.start()
@@ -80,7 +80,6 @@ class TestVodStreams(VideocoinMixin):
         Validate blockchain events for vod stream
         """
         try:
-            self.faucet_vid_to_account(user.wallet_address, 11)
             new_stream = self.stream_factory.create_vod()
             time.sleep(5)
             new_stream.start()

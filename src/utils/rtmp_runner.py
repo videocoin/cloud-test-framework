@@ -9,9 +9,9 @@ class RTMPRunner:
         self.url = 'http://' + url
         self.state = 'NEW'
 
-    def start(self, destination):
+    def start_rtmp(self, destination):
         body = {'destination': destination}
-        res = requests.post(self.url + '/rtmpjobs', json=body)
+        res = requests.post(self.url + '/rtmp', json=body)
         try:
             res.raise_for_status()
         except requests.HTTPError as e:
@@ -26,7 +26,7 @@ class RTMPRunner:
         return self.id
 
     def stop(self):
-        res = requests.delete(self.url + '/rtmpjobs/' + str(self.id))
+        res = requests.delete(self.url + '/jobs/' + str(self.id) + '/')
         try:
             res.raise_for_status()
         except requests.HTTPError as e:
@@ -34,5 +34,5 @@ class RTMPRunner:
                 'Cannot send request to RTMP Runner server. Are you sure '
                 'you have the right address / that the server is running?'
             )
-            raise e
+            # raise e
         self.state = 'COMPLETE'

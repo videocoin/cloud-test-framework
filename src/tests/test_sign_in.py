@@ -24,21 +24,19 @@ class TestSignIn(VideocoinMixin):
         #     expected_value = expected_results.TEST_USER_INFORMATION[key]
         #     assert actual_value == expected_value
         actual_user_values = user.json()
+        print(actual_user_values)
         expected_results = self.get_initial_value(TEST_USER_INFORMATION)
         assert actual_user_values['id'] == expected_results['id']
         assert (
             actual_user_values['email'] == expected_results['email']
         )
-        assert actual_user_values['name'] == expected_results['name']
+        assert actual_user_values['first_name'] == expected_results['first_name']
+        assert actual_user_values['last_name'] == expected_results['last_name']
         assert (
             actual_user_values['is_active']
             == expected_results['is_active']
         )
-        assert (
-            actual_user_values['account']['address']
-            == expected_results['account']['address']
-        )
-    
+
     @pytest.mark.functional
     def test_sign_in_with_non_existant_email_returns_error(self, user):
         """

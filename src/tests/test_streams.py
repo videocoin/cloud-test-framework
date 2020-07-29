@@ -41,14 +41,14 @@ class TestLiveStreams(VideocoinMixin):
 
     @pytest.mark.smoke
     @pytest.mark.functional
+    @pytest.mark.dependency(name='test_creating_stream_and_send_data_to_rtmp_url_starts_output_stream', depends=["user_balance"], scope='session')
     def test_creating_stream_and_send_data_to_rtmp_url_starts_output_stream(self, user, rtmp_runner):
         try:
-            self.faucet_vid_to_account(user.wallet_address, 11)
             new_stream = self.stream_factory.create_live()
             new_stream.start()
 
             new_stream.wait_for_status('STREAM_STATUS_PREPARED')
-            rtmp_runner.start(new_stream.rtmp_url)
+            rtmp_runner.start_rtmp(new_stream.rtmp_url)
             new_stream.wait_for_status('STREAM_STATUS_READY')
             assert new_stream.is_hls_playlist_healthy(120)
         finally:
@@ -58,9 +58,9 @@ class TestLiveStreams(VideocoinMixin):
             new_stream.delete()
 
     @pytest.mark.functional
+    @pytest.mark.dependency(name='test_cancelling_stream_after_input_url_ready_cancels_stream', depends=["user_balance"], scope='session')
     def test_cancelling_stream_after_input_url_ready_cancels_stream(self, user):
         try:
-            self.faucet_vid_to_account(user.wallet_address, 11)
             new_stream = self.stream_factory.create_live()
             new_stream.start()
 
@@ -74,13 +74,14 @@ class TestLiveStreams(VideocoinMixin):
             pass
 
     @pytest.mark.functional
+    @pytest.mark.dependency(name='test_cancelling_stream_during_input_processing_cancels_stream', depends=["user_balance"], scope='session')
     def test_cancelling_stream_during_input_processing_cancels_stream(self, user, rtmp_runner):
         try:
             # utils.faucet_vid_to_account(user.wallet_address, 11)
             new_stream = self.stream_factory.create_live()
             new_stream.start()
             new_stream.wait_for_status('STREAM_STATUS_PREPARED')
-            rtmp_runner.start(new_stream.rtmp_url)
+            rtmp_runner.start_rtmp(new_stream.rtmp_url)
             # Let stream run before attemtping to stop
             sleep(10)
             new_stream.stop()
@@ -91,6 +92,7 @@ class TestLiveStreams(VideocoinMixin):
             new_stream.delete()
 
     @pytest.mark.performance
+    @pytest.mark.dependency(name='test_time_it_takes_for_stream_prepared_state_is_less_than_expected_time', depends=["user_balance"], scope='session')
     def test_time_it_takes_for_stream_prepared_state_is_less_than_expected_time(self, user):
         NUM_OF_TESTS = 5
         EXPECTED_TIME = 10
@@ -98,7 +100,6 @@ class TestLiveStreams(VideocoinMixin):
         results = []
         for i in range(NUM_OF_TESTS):
             try:
-                self.faucet_vid_to_account(user.wallet_address, 11)
                 new_stream = self.stream_factory.create_live()
                 new_stream.start()
                 duration = new_stream.wait_for_status(
@@ -120,6 +121,7 @@ class TestLiveStreams(VideocoinMixin):
         assert average <= EXPECTED_TIME
 
     @pytest.mark.performance
+    @pytest.mark.dependency(name='test_time_it_takes_for_stream_to_reach_output_ready_state_is_less_than_expected_time', depends=["user_balance"], scope='session')
     def test_time_it_takes_for_stream_to_reach_output_ready_state_is_less_than_expected_time(
         self, user, rtmp_runner
     ):
@@ -129,11 +131,10 @@ class TestLiveStreams(VideocoinMixin):
         results = []
         for i in range(NUM_OF_TESTS):
             try:
-                self.faucet_vid_to_account(user.wallet_address, 11)
                 new_stream = self.stream_factory.create_live()
                 new_stream.start()
                 new_stream.wait_for_status('STREAM_STATUS_PREPARED')
-                rtmp_runner.start(new_stream.rtmp_url)
+                rtmp_runner.start_rtmp(new_stream.rtmp_url)
                 duration = new_stream.wait_for_status(
                     'STREAM_STATUS_READY', timeout=EXPECTED_TIME
                 )
@@ -155,6 +156,7 @@ class TestLiveStreams(VideocoinMixin):
     # TODO: Something's not right about this test...
     # Is the transition to STREAM_STATUS_COMPLETED really instant?
     @pytest.mark.performance
+    @pytest.mark.dependency(name='test_time_it_takes_for_stream_to_reach_completed_state_is_less_than_expected_time', depends=["user_balance"], scope='session')
     def test_time_it_takes_for_stream_to_reach_completed_state_is_less_than_expected_time(
         self, user, rtmp_runner
     ):
@@ -164,11 +166,10 @@ class TestLiveStreams(VideocoinMixin):
         results = []
         for i in range(NUM_OF_TESTS):
             try:
-                self.faucet_vid_to_account(user.wallet_address, 11)
                 new_stream = self.stream_factory.create_live()
                 new_stream.start()
                 new_stream.wait_for_status('STREAM_STATUS_PREPARED')
-                rtmp_runner.start(new_stream.rtmp_url)
+                rtmp_runner.start_rtmp(new_stream.rtmp_url)
                 new_stream.wait_for_status('STREAM_STATUS_READY')
                 new_stream.stop()
                 duration = new_stream.wait_for_status(
@@ -215,6 +216,7 @@ class TestLiveStreams(VideocoinMixin):
     # Parametrized with all available profiles picked up at run time. See
     # pytest_generate_tests in conftest.py
     @pytest.mark.functional
+    @pytest.mark.dependency(name='test_all_available_output_profiles', depends=["user_balance"], scope='session')
     def test_all_available_output_profiles(self, user, rtmp_runner, output_profile):
         logger.debug('running with profile name: {}'.format(output_profile['name']))
         profile_id = output_profile['id']
@@ -222,7 +224,7 @@ class TestLiveStreams(VideocoinMixin):
         new_stream.start()
         try:
             new_stream.wait_for_status('STREAM_STATUS_PREPARED')
-            rtmp_runner.start(new_stream.rtmp_url)
+            rtmp_runner.start_rtmp(new_stream.rtmp_url)
             new_stream.wait_for_status('STREAM_STATUS_READY')
             assert new_stream.is_hls_playlist_healthy(120)
         finally:
@@ -232,13 +234,14 @@ class TestLiveStreams(VideocoinMixin):
             new_stream.delete()
 
     @pytest.mark.functional
+    @pytest.mark.dependency(name='test_playlist_size', depends=["user_balance"], scope='session')
     def test_playlist_size(self, user, rtmp_runner):
         start_balance = user.wallet_balance
         new_stream = self.stream_factory.create_live()
         new_stream.start()
         try:
             new_stream.wait_for_status('STREAM_STATUS_PREPARED')
-            rtmp_runner.start(new_stream.rtmp_url)
+            rtmp_runner.start_rtmp(new_stream.rtmp_url)
             new_stream.wait_for_status('STREAM_STATUS_READY')
             new_stream.wait_for_playlist_size(10)
         finally:
@@ -255,6 +258,7 @@ class TestLiveStreams(VideocoinMixin):
         logger.debug('Balance difference: {:.6e}'.format(start_balance - end_balance))
 
     @pytest.mark.functional
+    @pytest.mark.dependency(name='test_live_stream_blockchain_events', depends=["user_balance"], scope='session')
     def test_live_stream_blockchain_events(self, user, rtmp_runner):
         """
         Validate blockchain events for live stream
@@ -263,7 +267,7 @@ class TestLiveStreams(VideocoinMixin):
         new_stream.start()
         try:
             new_stream.wait_for_status('STREAM_STATUS_PREPARED')
-            rtmp_runner.start(new_stream.rtmp_url)
+            rtmp_runner.start_rtmp(new_stream.rtmp_url)
             new_stream.wait_for_status('STREAM_STATUS_READY')
             new_stream.wait_for_playlist_size(10, 30)
             new_stream.stop()

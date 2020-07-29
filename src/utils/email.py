@@ -8,6 +8,8 @@ from src.consts.input_values import get_initial_value, LINK
 
 
 def format_time(seconds):
+    if seconds < 1:
+        seconds = 1
     m, s = divmod(seconds, 60)
     h, m = divmod(m, 60)
     result = ''
@@ -38,7 +40,8 @@ def get_report_html(passed, failed, skipped, error, cluster):
         'domain': get_initial_value(cluster, LINK),
 
         'passed': passed,
-        'results': passed + failed + error,
+        'skipped': passed,
+        'results': passed + failed + error + skipped,
 
         'total_count': len(passed) + len(failed) + len(error),
         'has_errors': failed or error,
