@@ -25,7 +25,7 @@ SECRET_KEY = '&qhqdmb#h1%yxqe69(ha#%6i%rb$&gi6b-si3+^&6f-w_1+d*b'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'rest_framework',
-    'rtmp_jobs.apps.RtmpJobsConfig'
+    'jobs'
 ]
 
 MIDDLEWARE = [
