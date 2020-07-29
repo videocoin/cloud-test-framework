@@ -28,14 +28,18 @@ Run tests based on custom pytest markers that categorize the tests by type. Avai
 
 - `smoke`: Runs minimal smoke tests to check health of cloud. Runs should be kept under 30 minutes
 - `functional`: More thorough test of all features in cloud. Include positive and negative tests
-- `performance`: Longer, metric based tests that take more time because of test repetition. Tests create metrics to compare to KPI baseline
 
 Usage:
 
 `pytest -m smoke`
 
-### Run tests with an RTMP Runner fixture
-Run tests with an RTMP Runner fixture, allowing usage of the `RTMP Runner` project (more here: <<<Kenneth needs to put this repo on the organization after some clean up>>>) to perform outsourced RTMP streaming into ingest. The default value is `192.168.1.158:8000` (which is just a non-static IP from a computer in the SJ office).
+### Run tests with an RTMP Runner
+Run tests with an RTMP Runner fixture
+```
+cd rtmp_runner
+make docker-build && make docker-run
+```
+## Docker run
 
 Usage:
-`pytest --rtmp_runner=127.0.0.1:8000`
+`make docker-build && make docker-run`
